@@ -1,0 +1,10 @@
+The toolbox. Will contain single-purose useful libraries.
+
+TBD:
+    string class
+    collections - list, dictionary, hashset, etc
+    testing
+    keyboard input
+    mouse input
+    file IO
+    
