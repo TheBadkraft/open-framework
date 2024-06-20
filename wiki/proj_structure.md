@@ -25,5 +25,5 @@ When VS Code opens, you will see this directory structure:
 ![VS Code Project](images/project_vscode.png)
 
 
-| :-------------- | :--------------: | --------------: |
+| :-------------- | :--------------: | --------------: |  
 | [Intro](intro.md)       |   [Table of Contents](../README.md)   | [Languages](languages.md) |
