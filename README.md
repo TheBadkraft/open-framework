@@ -3,7 +3,7 @@
 
  **OpenPlatform** is about a return to grassroots software engineering. The mission is to return to basics: take what we've learned and re=invent our tools, our methods, and our protocols - rethink, re-engineer, and re-envision.
 
- C and Assembly (ASM) are extremely powerful. We should be looking to those powerhouse languages to re-imagine software engineering. OpenFramework will do just that.
+ C and Assembly (ASM) are extremely powerful. We should be looking to those powerhouse languages to re-imagine software engineering. **OpenFramework** will do just that.
 
  # Procedures
  I've been all over the internet looking for a few things.
