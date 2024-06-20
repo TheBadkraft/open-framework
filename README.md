@@ -31,7 +31,7 @@
 
  All development is taken from VS Code and using the built-in terminal
 
- ## **Table of Contents**
+ ### Table of Contents
  - Project structure
  - Shared Objects (libraries)
  - Linking to Shared Objects (.so files)
