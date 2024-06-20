@@ -51,6 +51,23 @@ All of these specifications are intended to create a standard between all develo
 
 At some point, it is likely that there will be a `build_dll ` executable to perform all the steps above. Likely, also a `link_dll`. These will use JSON configurations to assist in switches and options. To add value to the idea of custom *build* tooling, the specification may require documentation via `#pragma` directives. These would build documentation at compile time, ensuring a high level of quality be standardized.
 
+The real usefulness in a custom build tool is with the following project, `motor`. Remember that `statum` references `fballoc`. The project `motor` references both of those. So, `motor` must be linked to both shared libraries. We will compile and link `motor` and then verify that it is properly linked to both `statum` and `fballoc`.
+
+First, enter the following:
+> `gcc -o bin/motor src/*.c -lstatum -lfballoc`
+
+Assuming no errors, we just want to make sure we link to the right `.so` files at the correct locations, etc, etc.
+> `ldd ./bin/motor`
+
+Output:
+>         `linux-vdso.so.1 (0x00007ffecadeb000)
+        libstatum.so => /usr/local/lib/libstatum.so (0x00007f062528e000)
+        libfballoc.so => /usr/local/lib/libfballoc.so (0x00007f0625289000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0625000000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f062529a000)`
+
+Here you can see all the dependencies for your source executable. Lines 2 & 3 list our linked libraries.
+
 
 | Previous | | Next |  
 | :-------------- | :--------------: | --------------: |  
