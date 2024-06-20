@@ -11,7 +11,7 @@ On Linux, the specification expects the developer to be familiar and comfortable
 
 The *`usr/local/include`* directory, should resemble the logical structure of your *`project`*/`include` directory.  
 
-| ![usr_local_dirs](images/usr_local_dirs.png) | ![VS Code Project](images/project_vscode.png) |
+| ![usr_local_dirs](images/usr_local_dirs.png) | ![VS Code Project](images/project_includes.png) |
 
 | Previous | | Next |  
 | :-------------- | :--------------: | --------------: |  
