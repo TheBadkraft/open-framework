@@ -1,10 +1,13 @@
 The toolbox. Will contain single-purose useful libraries.
 
 TBD:
+	; a lot of these exist in ht
     string class
     collections - list, dictionary, hashset, etc
     testing
     keyboard input
     mouse input
     file IO
+    
+    build (build.asm, build.c)
     

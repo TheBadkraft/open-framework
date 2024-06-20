@@ -1,0 +1,4 @@
+src/build.asm [20]:
+  msglen: $ - msg
+processed: msglen:$-msg
+error: illegal instruction.
