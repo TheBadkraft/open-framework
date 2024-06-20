@@ -32,7 +32,7 @@ OpenFramework will develop tools to simplify the processes for developing OP-*co
 All development is taken from VS Code using the built-in terminal
 
 ### Table of Contents
-- (Introduction)[wiki/intro.md]
+- (Introduction) [wiki/intro.md]
 - Project structure
   - IDE
   - Configuration
