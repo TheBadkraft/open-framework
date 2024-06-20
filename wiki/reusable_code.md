@@ -60,11 +60,11 @@ Assuming no errors, we just want to make sure we link to the right `.so` files a
 > `ldd ./bin/motor`
 
 Output:
->         `linux-vdso.so.1 (0x00007ffecadeb000)
-        libstatum.so => /usr/local/lib/libstatum.so (0x00007f062528e000)
-        libfballoc.so => /usr/local/lib/libfballoc.so (0x00007f0625289000)
-        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0625000000)
-        /lib64/ld-linux-x86-64.so.2 (0x00007f062529a000)`
+>        linux-vdso.so.1 (0x00007ffecadeb000)
+>        libstatum.so => /usr/local/lib/libstatum.so (0x00007f062528e000)
+>        libfballoc.so => /usr/local/lib/libfballoc.so (0x00007f0625289000)
+>        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0625000000)
+>        /lib64/ld-linux-x86-64.so.2 (0x00007f062529a000)
 
 Here you can see all the dependencies for your source executable. Lines 2 & 3 list our linked libraries.
 
