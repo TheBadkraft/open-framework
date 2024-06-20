@@ -26,7 +26,7 @@ This creates a *shared object* in the *`bin`* directory. Replace `mulib` with th
 Next is the linking process. In order for the linker (*ld* under the hood), the `LD_LIBRARY_PATH` must be updated with the appropriate location.
 
 From the command line, enter the following:
-> `// replace 'gedit' with your editor`
+> `// replace 'gedit' with your editor`  
 > `sudo gedit ~/.bashrc`
 
 Add this to the bottom:
