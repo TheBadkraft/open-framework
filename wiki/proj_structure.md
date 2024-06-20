@@ -19,7 +19,7 @@ Let's zero in on the *statum* directory:
 1. right-click *statum*
 2. right-click *Open with...*
 3. select *VS Code*  
-  <font size="2">*note: trying to get a screen shot of the context menus on Linux is not simple (scrot is not working)*</font>
+  <small>*note: trying to get a screen shot of the context menus on Linux is not simple (scrot is not working)*</small>
 
 When VS Code opens, you will see this directory structure:
 ![VS Code Project](images/project_vscode.png)
