@@ -49,7 +49,7 @@ When you are working on a project, your `#include` preprocessor should reference
 
 All of these specifications are intended to create a standard between all developer systems. Since this specification is still in its infancy, it is within expectation that structures could change. Final specification will be annotated appriately so that everyone will know how to follow the standard.
 
-At some point, it is likely that there will be a `build_dll ` executable to perform all the steps above. Likely, also a `link_dll`. These will use JSON configurations to assist in switches and options.
+At some point, it is likely that there will be a `build_dll ` executable to perform all the steps above. Likely, also a `link_dll`. These will use JSON configurations to assist in switches and options. To add value to the idea of custom *build* tooling, the specification may require documentation via `#pragma` directives. These would build documentation at compile time, ensuring a high level of quality be standardized.
 
 
 | Previous | | Next |  
