@@ -36,7 +36,7 @@ Then save and close. In your command line enter:
 > `source ~/.bashrc`
 
 This will reload the environment variables. Test it from the *VS Code Terminal* like so:
-![echo ld lib path](echo_ld_lib_path.png)
+![echo ld lib path](images/echo_ld_lib_path.png)
 
 To link, say *statum* (also a shared object) to *fballoc*, we would do the following:
 > `gcc -shared -fpic -o bin/libfballoc.so src/*.c`
