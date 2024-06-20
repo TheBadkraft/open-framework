@@ -1,4 +1,5 @@
-#include "../include/fault.h"
+#include "op/fault.h"
+
 #include "../include/state_machine.h"
 
 // Generates an external event. Called once per external event 

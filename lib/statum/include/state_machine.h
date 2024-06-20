@@ -18,8 +18,8 @@
 
 #include <stdlib.h>
 
-#include "data_types.h"
-#include "fault.h"
+#include "op/data_types.h"
+#include "op/fault.h"
 
 /*  ************************************************************
     We are not using sm_allocator because there is a lot there that

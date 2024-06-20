@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "../include/fault.h"
+#include "op/fault.h"
 
 /*
 	Pure C - no windows code
