@@ -18,7 +18,7 @@ The project source we want to look at is *statum*.
 Let's zero in on the *statum* directory:
 1. right-click *statum*
 2. right-click *Open with...*
-3. select *VS Code*
+3. select *VS Code*  
   <font size="2">*note: trying to get a screen shot of the context menus on Linux is not simple (scrot is not working)*</font>
 
 When VS Code opens, you will see this directory structure:
