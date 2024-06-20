@@ -33,15 +33,15 @@ All development is taken from VS Code using the built-in terminal
 
 ### Table of Contents
 - [Introduction](wiki/intro.md)
-- Project structure
+- [Project structure](wiki/proj_structure.md)
   - IDE
   - Configuration
   - Tasks
   - Scripts
-- Languages: C & ASM
-- Reusable Code (Modular Development)
+- [Languages: C & ASM](wiki/languages.md)
+- [Reusable Code (Modular Development)](wiki/reusable_code.md)
   - Shared Objects (libraries)
   - Linking to Shared Objects (.so files)
   - Header files
-- Extensibility
+- [Extensibility](wiki/extensibility.md)
 
