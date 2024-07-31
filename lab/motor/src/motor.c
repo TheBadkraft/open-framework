@@ -23,37 +23,33 @@ STATE_DECLARE(ChangeSpeed, MotorData)
 
 // State map to define state function order
 BEGIN_STATE_MAP(Motor)
-    STATE_MAP_ENTRY(ST_Idle)
-    STATE_MAP_ENTRY(ST_Stop)
-    STATE_MAP_ENTRY(ST_Start)
-    STATE_MAP_ENTRY(ST_ChangeSpeed)
+STATE_MAP_ENTRY(ST_Idle)
+STATE_MAP_ENTRY(ST_Stop)
+STATE_MAP_ENTRY(ST_Start)
+STATE_MAP_ENTRY(ST_ChangeSpeed)
 END_STATE_MAP(Motor)
 
 // Set motor speed external event
-EVENT_DEFINE(MTR_SetSpeed, MotorData)
-{
-    // Given the SetSpeed event, transition to a new state based upon 
+EVENT_DEFINE(MTR_SetSpeed, MotorData){
+    // Given the SetSpeed event, transition to a new state based upon
     // the current state of the state machine
-    BEGIN_TRANSITION_MAP                        // - Current State -
-        TRANSITION_MAP_ENTRY(ST_START)          // ST_Idle       
-        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)     // ST_Stop       
-        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)   // ST_Start      
-        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)   // ST_ChangeSpeed
-    END_TRANSITION_MAP(Motor, pEventData)
-}
+    BEGIN_TRANSITION_MAP                  // - Current State -
+        TRANSITION_MAP_ENTRY(ST_START)    // ST_Idle
+    TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)   // ST_Stop
+    TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED) // ST_Start
+    TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED) // ST_ChangeSpeed
+    END_TRANSITION_MAP(Motor, pEventData)}
 
 // Halt motor external event
-EVENT_DEFINE(MTR_Halt, NoEventData)
-{
-    // Given the Halt event, transition to a new state based upon 
+EVENT_DEFINE(MTR_Halt, NoEventData){
+    // Given the Halt event, transition to a new state based upon
     // the current state of the state machine
-    BEGIN_TRANSITION_MAP                        // - Current State -
-        TRANSITION_MAP_ENTRY(EVENT_IGNORED)     // ST_Idle
-        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)     // ST_Stop
-        TRANSITION_MAP_ENTRY(ST_STOP)           // ST_Start
-        TRANSITION_MAP_ENTRY(ST_STOP)           // ST_ChangeSpeed
-    END_TRANSITION_MAP(Motor, pEventData)
-}
+    BEGIN_TRANSITION_MAP                    // - Current State -
+        TRANSITION_MAP_ENTRY(EVENT_IGNORED) // ST_Idle
+    TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)     // ST_Stop
+    TRANSITION_MAP_ENTRY(ST_STOP)           // ST_Start
+    TRANSITION_MAP_ENTRY(ST_STOP)           // ST_ChangeSpeed
+    END_TRANSITION_MAP(Motor, pEventData)}
 
 // State machine sits here when motor is not running
 STATE_DEFINE(Idle, NoEventData)
@@ -61,11 +57,11 @@ STATE_DEFINE(Idle, NoEventData)
     printf("%s ST_Idle\n", self->name);
 }
 
-// Stop the motor 
+// Stop the motor
 STATE_DEFINE(Stop, NoEventData)
 {
     // Get pointer to the instance data and update currentSpeed
-    Motor* pInstance = SM_GetInstance(Motor);
+    Motor *pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = 0;
 
     // Perform the stop motor processing here
@@ -81,7 +77,7 @@ STATE_DEFINE(Start, MotorData)
     ASSERT_TRUE(pEventData);
 
     // Get pointer to the instance data and update currentSpeed
-    Motor* pInstance = SM_GetInstance(Motor);
+    Motor *pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
 
     // Set initial motor speed processing here
@@ -94,7 +90,7 @@ STATE_DEFINE(ChangeSpeed, MotorData)
     ASSERT_TRUE(pEventData);
 
     // Get pointer to the instance data and update currentSpeed
-    Motor* pInstance = SM_GetInstance(Motor);
+    Motor *pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
 
     // Perform the change motor speed here
@@ -104,7 +100,6 @@ STATE_DEFINE(ChangeSpeed, MotorData)
 // Get current speed
 GET_DEFINE(MTR_GetSpeed, INT)
 {
-    Motor* pInstance = SM_GetInstance(Motor);
+    Motor *pInstance = SM_GetInstance(Motor);
     return pInstance->currentSpeed;
 }
-
