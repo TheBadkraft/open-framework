@@ -1,7 +1,7 @@
-## CTau ##
-What is CTau? A new derivative of C. The name may change to something else but I hope it retains the `C` moniker.
+## Sigma.C ##
+What is **Sigma.C** (or, *Sig.C*)? A new derivative of C. The name may change to something else but I hope it retains the `C` moniker.
 
-The goal is that most C will compile under CTau. We wil be extending the features allowing some "work" to be done under the hood.
+The goal is that most C will compile under *Sig.C*. We wil be extending the features allowing some "work" to be done under the hood.
 
 There are 4 goals with the simple main program. Each of the following are valid:
 
@@ -15,18 +15,18 @@ It is also worth noting that `return 0` is not necessary.
 Furthermore, testing `main` entry with variadic parameters: `int main(int argc, ...) { ... }`
 GCC does compile this adding about 15 lines of source to the resulting ASM.
 
-Right off, I think we need to be able to call C functions from CTau. Knowing what that looks like from ASM is not difficult.
+Right off, I think we need to be able to call C functions from *Sig.C*. Knowing what that looks like from ASM is not difficult.
 
-The CTau specification will provide for all 5 of the accepted entry points in addition to a method-less approach:
+The *Sig.C* specification will provide for all 5 of the accepted entry points in addition to a method-less approach:
 
 ``` c
 //  main.ct
 
-printf("Welcom to CTau\n");
+printf("Welcom to Sig.C\n");
 ```
 
 This brings into question how we access command parameters. Before we do that, however, let's resolved iterating over variadic parameters.
-One of the goals with CTau is to reduce dependency on `#define` as a mechnanism to generate code. Aside from the fragility of `#define`, it is error-prone, ugly, and hides a lot from the reader.
+One of the goals with *Sig.C* is to reduce dependency on `#define` as a mechnanism to generate code. Aside from the fragility of `#define`, it is error-prone, ugly, and hides a lot from the reader.
 
 Variadic iteratation depends on telling the compiler the last arg prior to the `...` (ellipses). Then the compiler gets to do some fumbly stuff depending on ... once again, `#define`d source and some *`__built_in`* goodies.
 
@@ -35,7 +35,7 @@ We ought to have an iterator mechanism. Let's use a `keyword` to let the compile
 An `Iterator` mechanism then brings us to understand how collections work and, therefore, how an *iterator* traverses the collection, knowing when it is done.  
 
 First, however, let's accomplish 2 goals:
-1. generate source **as** source (ASM) from CTau (*method-less* `main.ct`)
+1. generate source **as** source (ASM) from *Sig.C* (*method-less* `main.ct`)
 2. include (import ...???) C function `printf`
 
 ## ASM ##
@@ -107,7 +107,7 @@ Lastly, unless there needs to be some reason to add the `.` directives that GCC 
 
 What are we going to write the CT toolchain in? That is, the parsers, pre-processors, etc, etc.? I am looking at a hybrid approach. I think it is extremely noble that *FASM* is written in assembly. But, I'm partial to letting the bits that have already been developed to do certain tasks be put to use. I don't have a particular inclination to introduce any C++. So, we will use a combination of ASM & C ... maybe, eventually, CT will take the place of C. For now, though, I think C is perfectly suited for the task at hand.
 
-What are our expectations? Well, let's jump right in and see how I envision CTau and you will see right away where I expect similarities to remain.
+What are our expectations? Well, let's jump right in and see how I envision *Sig.C* and you will see right away where I expect similarities to remain.
 Let's assume what we want is the following:
 ``` c#
 .global	_start
@@ -125,24 +125,26 @@ _start:
 	int   $0x80      # see previous
 .data
 msg:
-	.ascii  "Welcom to CTau!\n"  # inline ascii string
+	.ascii  "Welcom to Sig.C!\n"  # inline ascii string
 	len =   . - msg           	 # assign (current address - address of msg start) to symbol "len"
 ``` 
 Given the above assembly from our intermediate compilation, we might expect:
 ``` c
+//	file: main.ct
+
 //  include syntax is similar; simplified grammaticals
 #include io.h;
 
 //  standard return data type
 int main () {
     //  standard modernized output syntax
-    writef("Greeting from CTau\n");
+    writef("Welcom to Sig.C\n");
 
     //  return value is not implicitly required
 }
 ```
 
-Why keep the *`#include *.h;`* syntax? Options ... C# doesn't require a *header* file because it generates symbol files. We could have symbol files generated as CTau matures. Then we have a hybrid approach. Symbol files are a partially compiled format where headers are fully legible. There are advantages to both and likely may have reasons that both make sense. My initial approach at this point (because I don't have any compiled source or header files) is to create something of a symbol file. Might look something like this:
+Why keep the *`#include *.h;`* syntax? Options ... C# doesn't require a *header* file because it generates symbol files. We could have symbol files generated as *Sig.C* matures. Then we have a hybrid approach. Symbol files are a partially compiled format where headers are fully legible. There are advantages to both and likely may have reasons that both make sense. My initial approach at this point (because I don't have any compiled source or header files) is to create something of a symbol file. Might look something like this:
 
 ``` c#
 !# as
