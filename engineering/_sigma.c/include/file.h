@@ -3,13 +3,22 @@
 
 #include <unistd.h>
 
-#include "../include/sigctypes.h"
+#include "sigctypes.h"
+#include "token.h"
 
 typedef struct file_t
 {
     char *name;
+    size_t size;
     bool exists;
 } file;
+
+typedef struct srcdoc_t
+{
+    file *pFile;
+    char *source;
+    token *pToken;
+} srcdoc;
 
 file *file_exists(char *);
 
