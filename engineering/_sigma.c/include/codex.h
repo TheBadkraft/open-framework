@@ -1,6 +1,8 @@
 #ifndef _CODEX_H
 #define _CODEX_H
 
+#include "sigctypes.h"
+
 /*
     Codex encapsulates the full set of glyphs, lexicals, symbols, punctuals,
     and grammars for the entire Sigma.C language
@@ -15,18 +17,19 @@ struct glyph_t;
 enum Glyph
 {
     LETTER,
-    DIGIT
+    DIGIT,
+    SYMBOL
 };
-#define cdxglyphs enum Glyph
+
 /*
     Codex API
 */
 extern const struct Codex_T
 {
-    void (*load)();
+    bool (*load)();
     void (*destroy)();
     void (*info)();
-    void (*glyphs)(cdxglyphs);
+    void (*glyphs)(enum Glyph);
 } Codex;
 
 #endif //  _CODEX_H

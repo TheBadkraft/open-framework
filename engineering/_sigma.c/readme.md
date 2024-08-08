@@ -1,4 +1,4 @@
-## Sigma.C ##
+## Sigma.C ## 
 What is **Sigma.C** (or, *Sig.C*)? A new derivative of C. The name may change to something else but I hope it retains the `C` moniker.
 
 The goal is that most C will compile under *Sig.C*. We wil be extending the features allowing some "work" to be done under the hood.
@@ -19,7 +19,7 @@ Right off, I think we need to be able to call C functions from *Sig.C*. Knowing 
 
 The *Sig.C* specification will provide for all 5 of the accepted entry points in addition to a method-less approach:
 
-``` c
+``` c#
 //  main.ct
 
 printf("Welcom to Sig.C\n");
@@ -52,7 +52,7 @@ _start:
 .data
 ```
 
-This effectively renders in CT as:
+This theoretically renders as:
 ``` c
 // basic, bare-bones executable
 int main()
@@ -62,7 +62,7 @@ int main()
 
 What does the equivalent GCC .s source look like?
 ``` c#
-	.file	"main_d2.c"
+	.file	"main.c"
 	.text
 	.globl	main
 	.type	main, @function
@@ -102,12 +102,14 @@ main:
 4:
 ```
 
-*I would like to keep comments in the structure. This can help track comments like place holders and know where the code is.*
+*NOTE: I would like to keep comments in the structure. This can help track comments like place holders and know where the code is.*  
+
 Lastly, unless there needs to be some reason to add the `.` directives that GCC employs, we are going to try and stick to forming correct **as** ASM. It is part of the GCC tool chain so we should be able to find all the necessary documentation to make this work.
 
-What are we going to write the CT toolchain in? That is, the parsers, pre-processors, etc, etc.? I am looking at a hybrid approach. I think it is extremely noble that *FASM* is written in assembly. But, I'm partial to letting the bits that have already been developed to do certain tasks be put to use. I don't have a particular inclination to introduce any C++. So, we will use a combination of ASM & C ... maybe, eventually, CT will take the place of C. For now, though, I think C is perfectly suited for the task at hand.
+What are we going to write the *Sigma.C* toolchain in? That is, the parsers, pre-processors, etc, etc.? I am looking at a hybrid approach. I think it is extremely noble that *FASM* is written in assembly. But, I'm partial to letting the bits that have already been developed to do certain tasks be put to use. I don't have a particular inclination to introduce any C++. So, we will use a combination of ASM & C ... maybe, eventually, *Sigma.C* will take the place of C. For now, though, I think C is perfectly suited for the task at hand.
 
-What are our expectations? Well, let's jump right in and see how I envision *Sig.C* and you will see right away where I expect similarities to remain.
+What are our expectations? Well, let's jump right in and see what I envision for *Sigma.C*.  
+
 Let's assume what we want is the following:
 ``` c#
 .global	_start
@@ -125,11 +127,11 @@ _start:
 	int   $0x80      # see previous
 .data
 msg:
-	.ascii  "Welcom to Sig.C!\n"  # inline ascii string
+	.ascii  "Welcome to Sigma.C!\n"  # inline ascii string
 	len =   . - msg           	 # assign (current address - address of msg start) to symbol "len"
 ``` 
 Given the above assembly from our intermediate compilation, we might expect:
-``` c
+``` c#
 //	file: main.ct
 
 //  include syntax is similar; simplified grammaticals
@@ -138,16 +140,18 @@ Given the above assembly from our intermediate compilation, we might expect:
 //  standard return data type
 int main () {
     //  standard modernized output syntax
-    writef("Welcom to Sig.C\n");
+    writef("Welcome to Sigma.C\n");
 
     //  return value is not implicitly required
 }
 ```
 
-Why keep the *`#include *.h;`* syntax? Options ... C# doesn't require a *header* file because it generates symbol files. We could have symbol files generated as *Sig.C* matures. Then we have a hybrid approach. Symbol files are a partially compiled format where headers are fully legible. There are advantages to both and likely may have reasons that both make sense. My initial approach at this point (because I don't have any compiled source or header files) is to create something of a symbol file. Might look something like this:
+Why keep the *`#include *.h;`* syntax? 
+Options ... C# doesn't require a *header* file because it generates symbol files. We could have symbol files generated as *Sig.C* matures. Then we have a hybrid approach. Symbol files are a partially compiled format where headers are fully legible. There are advantages to both and likely may have reasons that both make sense. My initial approach at this point (because I don't have any compiled source or header files) is to create something of a symbol file. Might look something like this:
 
 ``` c#
-!# as
+!# sigma.c(asm)
+
 void writef(len, msg) {
     movl  $4, %eax   // 4 (code for "write" syscall) -> EAX register
 	movl  $1, %ebx   // 1 (file descriptor for stdout) -> EBX (1st argument to syscall)
@@ -157,6 +161,67 @@ void writef(len, msg) {
 }
 ```
 
-
 That's it ... simple.
-So, now we need a parser.
+So, now we just need a ~~parser~~ *Lexer*, right? Okay. But that's just the beginning ...
+
+## Parsing ##
+We are going to start small. We want to understand what we are doing. I found a great article by Nora Sandler that seems like it will get things going in the right direction. I also looked at how we might write our own custom front end for GCC. Both of these are viable options; indeed, both will likely be the intention. With a custom compiler we are going to be able to know exactly what we want from a GCC front end.
+
+Without further ado ...
+
+**NOTE: Nora is using AT&T _assembly syntax_. We will be using GCC's AS syntax.**
+
+Nora writes a simple *C* `main` method:
+
+``` c
+int main() {
+    return 2;
+}
+```
+
+This will be our first task - to parse our *Sigma.C* `main` method. At this point, we look identical.
+
+We need 3 things:
+1. Codex -- provides information about how we build our language
+2. Lexer -- identifies terms built from the Codex
+3. Parser -- parses source files based on instructions by the Lexer
+
+We are going to start simple. The *Codex* contains **_glyphs_** and **_terms_**.
+
+**Glyphs**
+- letters
+- digits
+- symbols
+
+**Terms**
+- keywords
+- data types
+- decorators
+- identifiers
+- operators
+- terminals
+- etc (TBD)
+
+Nora suggests using *regex* to parse. I'm not too keen (*personally*) on regex. I will take a kind of Backus-Naur approach. Regardless, Here is what we need to identify:
+
+_data type_:
+ **int**
+
+_identifier_:
+ **main**
+
+_decorators_:
+ **()**
+ **{}**
+
+_keyword_
+ **return**
+
+_value_
+ **2**
+
+_terminal_
+ **;**
+
+References:
+[Nora Sandler](https://norasandler.com/2017/11/29/Write-a-Compiler.html)
