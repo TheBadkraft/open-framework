@@ -183,8 +183,8 @@ This will be our first task - to parse our *Sigma.C* `main` method. At this poin
 
 We need 3 things:
 1. Codex -- provides information about how we build our language
-2. Lexer -- identifies terms built from the Codex
-3. Parser -- parses source files based on instructions by the Lexer
+2. Lexer -- tokenizes source code
+3. Parser -- parses tokens
 
 We are going to start simple. The *Codex* contains **_glyphs_** and **_terms_**.
 
@@ -227,8 +227,11 @@ As of 8/8/2024 ...
 *Lexer* is performing basic functions:
 1. *naive* tokenization - with a naive set of rules, the *Lexer* creates a linked list of tokens
 2. basic term recognition - determines **keyword**, **paired**, etc.
-*3. counts all paired symbols to ensure each is closed* (by the end of the day ...)
+3. counts all paired symbols to ensure each is closed
 
+Ensuring paired closures - that is `(..)`, `{..}`, and `[..]` - is also naive from the perspective of the *Lexer*. Counting paired closures will not look at syntax, grammar, etc. That will be the job of the *Parser* to ensure proper use and syntax.
+
+To this end, the mechanism is like a register. One register for each `(`, `{`, and `[`. For every `(`, `{`, or `[`, the respective register increments; for every `)`, `}`, or `]`, the register decrements. After tokenization, the *Parser* will review the statistics and ensure it is okay to proceed.
 
 References:
 [Nora Sandler](https://norasandler.com/2017/11/29/Write-a-Compiler.html)
