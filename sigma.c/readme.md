@@ -230,5 +230,8 @@ As of 8/8/2024 ...
 *3. counts all paired symbols to ensure each is closed* (by the end of the day ...)
 
 
+In my previous attempts to develop a compiler, I had not built a *Lexer*. I was putting all the work into the *Parser*. I have been aware of *Backus-Naur* and under `C#` I had a great parser using *Backus-Naur*. Nora goes into *Backus_Naur* as well. As we move forward, I won't intentionally use any *RegEx*.
+
+
 References:
 [Nora Sandler](https://norasandler.com/2017/11/29/Write-a-Compiler.html)

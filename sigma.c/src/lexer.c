@@ -39,6 +39,8 @@ char **lex_paired = (char*[] ) { "(", ")", "{", "}", "[", "]", NULL };
 char **lex_terminal = (char*[] ) { ";", NULL };
 char **lex_literal = (char*[] ) { NULL };
 
+static int reg_paired[3];
+
 static bool is_whitespace(char *c) {
 	return c[0] == SPACE;
 }
@@ -49,6 +51,25 @@ static bool is_paired(char *c) {
 	return is(c, SMB_OPN_PAREN) || is(c, SMB_CLS_PAREN) || is(c, SMB_OPN_BRACE)
 			|| is(c, SMB_CLS_BRACE) || is(c, SMB_OPN_BRACK)
 			|| is(c, SMB_CLS_BRACK);
+}
+static void resolve_pair(char *c) {
+	static size_t count = 3;
+	static char reg_pair_inc[] = { SMB_OPN_PAREN, SMB_OPN_BRACE, SMB_OPN_BRACK };
+	static char reg_pair_dec[] = { SMB_CLS_PAREN, SMB_CLS_BRACE, SMB_CLS_BRACK };
+
+	size_t ndx = 0;
+	while (ndx < count) {
+		if (c[0] == reg_pair_inc[ndx]) {
+			reg_paired[ndx]++;
+//			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
+		}
+		else if(c[0] == reg_pair_dec[ndx]) {
+			reg_paired[ndx]--;
+//			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
+		}
+
+		++ndx;
+	}
 }
 static bool is_symbol(char *c) {
 	return is_paired(c) || is(c, SMB_TERMINAL);
@@ -103,6 +124,9 @@ static void eval_tokens(struct token *pToken) {
 		while(lexTerms[ndx] != NONE){
 			if (is_lexical(word, lexTerms[ndx])) {
 				pCurrent->type = lexTerms[ndx];
+				if(is_paired(word)) {
+					resolve_pair(word);
+				}
 			}
 			++ndx;
 		}
