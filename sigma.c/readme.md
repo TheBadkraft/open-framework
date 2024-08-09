@@ -289,10 +289,12 @@ NOTE: we can use JSON to describe (persist) expression trees.
 > ```
 
 For the *EBNF* we can start with something like:
+> ``` html
 >	<program>	:= <function>
 >	<function> 	:= "int" <id> "(" ")" "{" <statement> "}"
 >	<statement> := "return" <expr> ";"
 >	<expr> 		:= <int>
+> ```
 
 This is directly from Nora's example.  
 *Non-terminal* tokens are identified by wrapping them in **'<..>'**. We should be able to draw a corellation between the *expression tree's* **<expr>** and the *EBNF's* **<expr>**. Obviously, if we are going to have and EBNF document, then we need an EBNF parser.  
