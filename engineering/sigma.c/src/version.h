@@ -1,7 +1,7 @@
 #ifndef _VERSION_H
 #define _VERSION_H
 
-#include "../include/sigctypes.h"
+#include "sigctypes.h"
 
 enum RC
 {

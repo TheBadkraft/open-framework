@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "../include/file.h"
+#include "file.h"
 
 static size_t get_file_size(char *pPath)
 {

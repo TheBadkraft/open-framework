@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/version.h"
+#include "version.h"
 
 char **CANDIDATES = (char *[]){
     "alpha", "beta", "release"};
