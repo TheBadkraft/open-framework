@@ -28,6 +28,7 @@ char **LEXTYPES = (char*[] ) { "UNKNOWN", "KEYWORD", "NAMED", "OPERATOR",
 				NULL };
 
 static lexicon *LEXICON = NULL;
+
 char **lex_unknown = (char*[] ) { NULL };
 char **lex_keyword = (char*[] ) {
 	"int", "return", NULL
@@ -124,6 +125,7 @@ static void eval_tokens(struct token *pToken) {
 		while(lexTerms[ndx] != NONE){
 			if (is_lexical(word, lexTerms[ndx])) {
 				pCurrent->type = lexTerms[ndx];
+
 				if(is_paired(word)) {
 					resolve_pair(word);
 				}
@@ -233,10 +235,25 @@ void lexer_tokenize(srcdoc *pDoc) {
 lexentry lexer_get_lexType(enum LexType lt) {
 	return LEXICON->catalog[lt];
 }
+int lexer_stat(enum LexerStat lexStat) {
+	int result = -1;
+
+	switch (lexStat) {
+	case PAIRED_PARENS:
+	case PAIRED_BRACES:
+	case PAIRED_BRACKS:
+		result = reg_paired[lexStat];
+
+	break;
+	}
+
+	return result;
+}
 
 const struct Lexer_T Lexer = {
 		.init = &lexer_init,
 		.tokenize = &lexer_tokenize,
-		.get_lexicon = &lexer_get_lexType
+		.get_lexicon = &lexer_get_lexType,
+		.stat = &lexer_stat
 };
 
