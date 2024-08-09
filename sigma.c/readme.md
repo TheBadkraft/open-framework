@@ -270,12 +270,12 @@ NOTE: we can use JSON to describe (persist) expression trees.
 >		"type": "_Expr",
 >		"left": {
 >			"type": "_Expr",
->			"value": x
+>			"value": // some string- or numeric-literal
 >		},
 >		"operator": "op",
 >		"right": {
 >			"type": "_Expr",
->			...
+>			/* ... */
 >		}
 >	}
 > ```
