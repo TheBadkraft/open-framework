@@ -290,10 +290,10 @@ NOTE: we can use JSON to describe (persist) expression trees.
 
 For the *EBNF* we can start with something like:
 > ``` html
->	<program>	:= <function>
->	<function> 	:= "int" <id> "(" ")" "{" <statement> "}"
+>	<program>   := <function>
+>	<function>  := "int" <id> "(" ")" "{" <statement> "}"
 >	<statement> := "return" <expr> ";"
->	<expr> 		:= <int>
+>	<expr>      := <int>
 > ```
 
 This is directly from Nora's example.  
