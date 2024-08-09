@@ -37,7 +37,9 @@ First, however, let's accomplish 2 goals:
 1. generate source **as** source (ASM) from *Sig.C* (*method-less* `main.ct`)
 2. include (import ...???) C function `printf`
 
-A note about *Sigma.C* source/header file extensions: source file extensiions will use an uppercase '**.C**' and header files will have use an uppercase '**.H**'.
+A note about *Sigma.C* source/header file extensions: source file extensiions will use an uppercase '**.C**' and header files will have use an uppercase '**.H**'.  
+
+Keep this in mind above all: this is documenting my journey to develop *Sigma.C*. A formal specification will come along. There will be a lot of changes following this document but the idea is that anyone reading here will understand my approach, thoughts, ideas, and motivations.  
 
 ## ASM ##
 What does the `as` look like?
@@ -206,25 +208,24 @@ We are going to start simple. The *Codex* contains **_glyphs_** and **_terms_**.
 
 Nora suggests using *regex* to parse. I'm not too keen (*personally*) on regex. I will take a kind of Backus-Naur approach. Regardless, Here is what we need to identify:
 
-_identifier_:
- **main**
+_identifier_:  
+ **main**  
 
-~~_decorators_~~ _paired_:
- **()**
- **{}**
+~~_decorators_~~ _paired_:  
+ **()**  
+ **{}**  
 
-_keyword_:
- **int**
- **return**
+_keyword_:  
+ **int**  
+ **return**  
 
-_value_:
- **2**
+_value_:  
+ **2**  
 
-_terminal_:
- **;**
+_terminal_:  
+ **;**  
 
-As of 8/8/2024 ... 
-*Lexer* is performing basic functions:
+As of 8/8/2024 ... *Lexer* is performing basic functions:
 1. *naive* tokenization - with a naive set of rules, the *Lexer* creates a linked list of tokens  
 2. basic term recognition - determines **keyword**, **paired**, etc.  
 3. counts all paired symbols to ensure each is closed  
@@ -233,7 +234,7 @@ Ensuring paired closures - that is `(..)`, `{..}`, and `[..]` - is also naive fr
 
 To this end, the mechanism is like a register. One register for each `(`, `{`, and `[`. For every `(`, `{`, or `[`, the respective register increments; for every `)`, `}`, or `]`, the register decrements. After tokenization, the *Parser* will review the statistics and ensure it is okay to proceed.  
 
-In my previous attempts to develop a compiler, I had not built a *Lexer* per se. I was putting all the work into the *Parser* with an *Analyzer* component. Effectively, the results were a set of tokens and some sort of understanding of the syntax. Using `C#` I had a great parser using a form of *Backus-Naur* that I modified to work better with consuming and creating delegates and expressions. Nora goes into *Backus-Naur* as well. As my understanding of *Backus-Naur* improves, we will likely integrate more of the form into the *Lexer*.  
+In my previous attempts to develop a compiler, I had not built a *Lexer* per se. I was putting all the work into the *Parser* with an *Analyzer* component. Effectively, the results were a set of tokens and some sort of understanding of the syntax. Using `C#` I had a great parser using a form of *Backus-Naur* that I modified for easier consumption. Nora goes into *Backus-Naur* as well. As my understanding (*and comfort*) of *Backus-Naur* improves, we will likely integrate more of the form into the *Lexer*.  
 
 ## Expressions ## 
 Expressions are how we put it all together. The *Parser* is the component responsible for putting all the expressions together. While Nora's project is helpful, it is written entirely in Python. We are writing in *C* ... and while I do have experience in some older Python, she is far more advanced than I and making sense of some of it is not easy. So, I've begun tooling around the inter-webz looking for more learning with *C*. And, I think I found some really helpful bits.  
@@ -255,6 +256,8 @@ A couple of thoughts right off the bat are the following:
 > NOTE: A **literal_expr** can have 2 general variations - *string* or *numeric*. 
 > - *string* literal includes ***char***; 
 > - *numeric* literal includes any numeric type - ***byte***, ***int***, ***float***, etc.
+>
+> We can resolve this with the C99 approach with better terms.
 
 Now we can come up with what the *Backus-Naur* Form will be. I'll draw from another well-established document - [C99, Annex A][3] is an excellent source.
 
