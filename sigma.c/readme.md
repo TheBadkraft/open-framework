@@ -233,5 +233,8 @@ Ensuring paired closures - that is `(..)`, `{..}`, and `[..]` - is also naive fr
 
 To this end, the mechanism is like a register. One register for each `(`, `{`, and `[`. For every `(`, `{`, or `[`, the respective register increments; for every `)`, `}`, or `]`, the register decrements. After tokenization, the *Parser* will review the statistics and ensure it is okay to proceed.
 
+In my previous attempts to develop a compiler, I had not built a *Lexer*. I was putting all the work into the *Parser*. I have been aware of *Backus-Naur* and under `C#` I had a great parser using *Backus-Naur*. Nora goes into *Backus_Naur* as well. As we move forward, I won't intentionally use any *RegEx*.
+
+
 References:
 [Nora Sandler](https://norasandler.com/2017/11/29/Write-a-Compiler.html)

@@ -40,7 +40,7 @@ char **lex_paired = (char*[] ) { "(", ")", "{", "}", "[", "]", NULL };
 char **lex_terminal = (char*[] ) { ";", NULL };
 char **lex_literal = (char*[] ) { NULL };
 
-int reg_paired[3];
+static int reg_paired[3];
 
 static bool is_whitespace(char *c) {
 	return c[0] == SPACE;
@@ -62,11 +62,11 @@ static void resolve_pair(char *c) {
 	while (ndx < count) {
 		if (c[0] == reg_pair_inc[ndx]) {
 			reg_paired[ndx]++;
-			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
+//			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
 		}
 		else if(c[0] == reg_pair_dec[ndx]) {
 			reg_paired[ndx]--;
-			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
+//			printf("resolved pair [%c]: %d\n", c[0], reg_paired[ndx]);
 		}
 
 		++ndx;
