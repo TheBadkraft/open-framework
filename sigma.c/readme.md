@@ -261,7 +261,24 @@ A couple of thoughts right off the bat are the following:
 >
 > We can resolve this with the C99 approach with better terms.
 
-Now we can come up with what the *Backus-Naur* Form will be. I'll draw from another well-established document - [C99, Annex A][3] is an excellent source.
+Now we can come up with what the *Backus-Naur* Form will be. I'll draw from another well-established document - [C99, Annex A][3] is an excellent source.  
+NOTE: we can use JSON to describe (persist) expression trees.
+> *For example:*
+>
+> ``` json
+	{
+		"type": "_Expr",
+		"left": {
+			"type": "_Expr",
+			"value": x
+		},
+		"operator": "op",
+		"right": {
+			"type": "_Expr",
+			...
+		}
+	}
+> ```
 
 
 ### ======================================================================== ###
