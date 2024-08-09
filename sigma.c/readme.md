@@ -266,18 +266,18 @@ NOTE: we can use JSON to describe (persist) expression trees.
 > *For example:*
 >
 > ``` json
-	{
-		"type": "_Expr",
-		"left": {
-			"type": "_Expr",
-			"value": x
-		},
-		"operator": "op",
-		"right": {
-			"type": "_Expr",
-			...
-		}
-	}
+>	{
+>		"type": "_Expr",
+>		"left": {
+>			"type": "_Expr",
+>			"value": x
+>		},
+>		"operator": "op",
+>		"right": {
+>			"type": "_Expr",
+>			...
+>		}
+>	}
 > ```
 
 
