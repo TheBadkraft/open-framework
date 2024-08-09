@@ -188,12 +188,14 @@ We need 3 things:
 2. Lexer -- tokenizes source code
 3. Parser -- parses tokens
 
-We are going to start simple. The *Codex* contains **_glyphs_** and **_terms_**.
+We are going to start simple. The *Codex* contains **_glyphs_** ~~and **_terms_**~~.
 
 **Glyphs**
 - letters
 - digits
-- symbols
+- ~~symbols~~ punctuators
+
+The companion to the *Codex* is the *Lexicon*. It will expand on the basic knowledge of **_glyphs_** by adding **_terms_**.
 
 **Terms**
 - keywords
@@ -222,7 +224,7 @@ _keyword_:
 _value_:  
  **2**  
 
-_terminal_:  
+_punctuator_:  
  **;**  
 
 As of 8/8/2024 ... *Lexer* is performing basic functions:
