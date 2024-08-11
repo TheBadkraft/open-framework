@@ -4,12 +4,6 @@
 
 #include "version.h"
 
-#ifdef __version_h_ver
-#ifndef __version_c_ver
-#define __version_c_ver "001-a"
-#endif
-#endif
-
 char **CANDIDATES = (char *[]){
     "alpha", "beta", "release"};
 

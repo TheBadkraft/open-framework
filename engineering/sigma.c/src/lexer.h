@@ -1,24 +1,28 @@
 #ifndef _LEXER_H
-#ifndef __lexer_h_ver
-#define __lexer_h_ver "001-a"
-#endif
 #define _LEXER_H
 
-#include <stdio.h>
+#include "file.h"
 
-#include "token.h"
+typedef struct lexentry_t {
+	char *name;
+	char **entry;
+} lexentry;
 
-typedef token *(*tokenizer)(document *);
+typedef struct lexicon_t {
+	lexentry *catalog;
+} lexicon;
 
-typedef struct lexer_t
-{
-    const char *name;
-    tokenizer tokenize;
-} lexer;
+enum LexerStat {
+	PAIRED_PARENS = 0,
+	PAIRED_BRACES = 1,
+	PAIRED_BRACKS = 2
+};
 
-extern const struct Lexer_T
-{
-    lexer *(*init)();
-    tokenizer tokenize;
+extern const struct Lexer_T {
+	void (*init)();
+	void (*tokenize)(srcdoc*);
+	lexentry (*get_lexicon)(enum LexType);
+	int (*stat)(enum LexerStat);
 } Lexer;
+
 #endif //  _LEXER_H

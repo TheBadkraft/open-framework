@@ -1,7 +1,4 @@
 #ifndef _VERSION_H
-#ifndef __version_h_ver
-#define __version_h_ver "001-a"
-#endif
 #define _VERSION_H
 
 #include "sigctypes.h"

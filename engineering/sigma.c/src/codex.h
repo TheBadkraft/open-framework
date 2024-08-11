@@ -11,24 +11,23 @@ struct codex_t;
 struct glyph_t;
 
 enum Glyph {
-    LETTER = 	0,
-    DIGIT = 	1,
-    SYMBOL = 	2
+    LETTER = 		0,
+    DIGIT = 		1,
+    PUNCTUATOR = 	2
 };
 
 enum LexType {
-	NONE = 		-1,
-	UNKNOWN = 	0,
-	KEYWORD = 	1,
-	NAMED = 	2,
-	OPERATOR = 	3,
+	NONE = 			-1,
+	UNKNOWN = 		0,
+	KEYWORD = 		1,
+	IDENTIFIER = 	2,
+	OPERATOR = 		3,
 //	PARENS,
 //	BRACES,
 //	BRACKETS,
-	MATCHED = 	4,		//	' & "
-	PAIRED = 	5,		//	[ & ]  ( & )
-	TERMINAL = 	6,
-	LITERAL = 	7
+	MATCHED = 		4,		//	' & "
+	PAIRED = 		5,		//	[ & ]  ( & )
+	LITERAL = 		6
 };
 
 /*

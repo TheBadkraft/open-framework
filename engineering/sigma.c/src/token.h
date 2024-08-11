@@ -1,52 +1,20 @@
 #ifndef _TOKEN_H
-#ifndef __version_h_ver
-#define __version_h_ver "001-a"
-#endif
 #define _TOKEN_H
 
-#include <stddef.h>
+#include "sigctypes.h"
+#include "codex.h"
 
-#include "file.h"
-#include "cstring.h"
-
-struct token_t
-{
-    // enum
-    // {
-    //     unknown,
-    //     program,
-    //     function,
-    //     identifier,
-    //     statement,
-    //     numeric,
-    //     expr
-    // } type;
-    // int line;
+struct token {
+    int line;
     glyph *pBeg;
     size_t length;
-    //    struct token *prev;
-    struct token_t *next;
+    enum LexType type;
+//    struct token *prev;
+    struct token *next;
 };
 
-typedef struct document_t
-{
-    file *pFile;
-    string *pContent;
-} document;
-
-//  non-specialized token
-typedef struct token_t token;
-
-extern const struct Document_T
-{
-    document *(*loadp)(char *);
-    document *(*loadf)(file *);
-} Document;
-
-extern const struct Token_T
-{
-    // Create a new token from begin and length
-    token *(*new)(char *, size_t);
-    char *(*word)(token *);
+extern const struct Token_T {
+	struct token *(*new)(char*, size_t);
+	char *(*word)(struct token*);
 } Token;
 #endif //  _TOKEN_H
