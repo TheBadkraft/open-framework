@@ -261,7 +261,44 @@ A couple of thoughts right off the bat are the following:
 >
 > We can resolve this with the C99 approach with better terms.
 
-Now we can come up with what the *Backus-Naur* Form will be. I'll draw from another well-established document - [C99, Annex A][3] is an excellent source.
+Now we can come up with what the *Backus-Naur* Form will be. I'll draw from another well-established document - [C99, Annex A][3] is an excellent source.  
+NOTE: we can use JSON to describe (persist) expression trees.
+> *For example:*
+>
+> ``` json
+>	{
+>		"type": "<expr>",
+>		"left": {
+>			"type": "<expr>",
+>			"value": 2
+>		},
+>		"operator": "_op_",
+>		"right": {
+>			"type": "<expr>",
+>			"left": {
+>				"type": "<expr>",
+>				"value": 4
+>			},
+>			"operator": "_op_",
+>			"right": {
+>				"type": "<expr>",
+>				"value": 10
+>			}
+>		}
+>	}
+> ```
+
+For the *EBNF* we can start with something like:
+> ``` html
+>	<program>   := <function>
+>	<function>  := "int" <id> "(" ")" "{" <statement> "}"
+>	<statement> := "return" <expr> ";"
+>	<expr>      := <int>
+> ```
+
+This is directly from Nora's example.  
+*Non-terminal* tokens are identified by wrapping them in **'<..>'**. We should be able to draw a corellation between the *expression tree's* **<expr>** and the *EBNF's* **<expr>**. Obviously, if we are going to have and EBNF document, then we need an EBNF parser.  
+
 
 
 ### ======================================================================== ###
