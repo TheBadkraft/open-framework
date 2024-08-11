@@ -5,7 +5,6 @@
 
 #define byte unsigned char
 #define sbyte char
-#define ushort unsigned short
 
 #define glyph char
 

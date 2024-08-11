@@ -16,6 +16,13 @@ string *format_str(const char *format, ...);
 void truncate_str(string *pStr, size_t len);
 //  -------------------
 
+bool str_null_or_empty(string *pStr)
+{
+    if (!pStr || strcmp(String.empty, pStr->buffer) == 0)
+    {
+        return true;
+    }
+}
 string *new_str()
 {
     string *pStr = malloc(sizeof(string));
@@ -95,13 +102,6 @@ void truncate_str(string *pStr, size_t len)
     if (get_length(pStr) > len)
     {
         memset(pStr->buffer + len, 0, 1);
-    }
-}
-bool str_null_or_empty(string *pStr)
-{
-    if (!pStr || strcmp(String.empty, pStr->buffer) == 0)
-    {
-        return true;
     }
 }
 

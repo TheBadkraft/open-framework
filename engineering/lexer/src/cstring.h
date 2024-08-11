@@ -7,8 +7,6 @@
 
 #include "sigctypes.h"
 
-// struct string_t;
-
 typedef struct string_t
 {
     char *buffer;

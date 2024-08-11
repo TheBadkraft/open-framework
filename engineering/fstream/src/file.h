@@ -2,7 +2,6 @@
 #define _FILE_H
 
 #include <unistd.h>
-#include <stdbool.h>
 
 #include "sigctypes.h"
 

@@ -1,8 +1,7 @@
 #ifndef _FILE_H
 #define _FILE_H
 
-#include <unistd.h>
-#include <stdbool.h>
+#include <stdio.h>
 
 #include "sigctypes.h"
 
