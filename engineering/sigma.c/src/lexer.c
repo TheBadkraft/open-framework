@@ -5,17 +5,23 @@
 #include "lexer.h"
 #include "token.h"
 
-const size_t LEX_ENTRIES = 7;
+const size_t LEX_ENTRIES = 8;
 //                                     ...
 const char SPACE = ' ';
 const char NEWLINE = '\n';
-const char PCT_OPN_BRACE = '{';		// 2:'{'!'}'
-const char PCT_CLS_BRACE = '}'; 	// ...
-const char PCT_OPN_BRACK = '['; 	// 2:'['!']'
-const char PCT_CLS_BRACK = ']'; 	//
-const char PCT_OPN_PAREN = '('; 	// 2:'('!')'
-const char PCT_CLS_PAREN = ')'; 	// ...
-const char PCT_ENDLINE = ';';  	// 2:';'
+const char SMB_OPN_BRACE = '{';		// 2:'{'!'}'
+const char SMB_CLS_BRACE = '}'; 	// ...
+const char SMB_OPN_BRACK = '['; 	// 2:'['!']'
+const char SMB_CLS_BRACK = ']'; 	//
+const char SMB_OPN_PAREN = '('; 	// 2:'('!')'
+const char SMB_CLS_PAREN = ')'; 	// ...
+const char SMB_TERMINAL = ';';  	// 2:';'
+
+const char *KWD_INT = "int";       	// 0:['int', 'byte', 'short', ...]
+const char *KWD_RETURN = "return"; 	// 0:['return', 'void', 'while', ...]
+
+const char *IDENTIFIER = "0:*";  	// * = any letters
+const char *INT_LITERAL = "1:*"; 	// * = any digit
 
 char **LEXTYPES = (char*[] ) { "UNKNOWN", "KEYWORD", "NAMED", "OPERATOR",
 				"MATCHED", "PAIRED", "TERMINAL", "LITERAL",
@@ -36,21 +42,21 @@ char **lex_literal = (char*[] ) { NULL };
 
 static int reg_paired[3];
 
+static bool is_whitespace(char *c) {
+	return c[0] == SPACE;
+}
 static bool is(char *c, char cmp) {
 	return c[0] == cmp;
 }
-static bool is_whitespace(char *c) {
-	return is(c, SPACE);
-}
 static bool is_paired(char *c) {
-	return is(c, PCT_OPN_PAREN) || is(c, PCT_CLS_PAREN) || is(c, PCT_OPN_BRACE)
-			|| is(c, PCT_CLS_BRACE) || is(c, PCT_OPN_BRACK)
-			|| is(c, PCT_CLS_BRACK);
+	return is(c, SMB_OPN_PAREN) || is(c, SMB_CLS_PAREN) || is(c, SMB_OPN_BRACE)
+			|| is(c, SMB_CLS_BRACE) || is(c, SMB_OPN_BRACK)
+			|| is(c, SMB_CLS_BRACK);
 }
 static void resolve_pair(char *c) {
 	static size_t count = 3;
-	static char reg_pair_inc[] = { PCT_OPN_PAREN, PCT_OPN_BRACE, PCT_OPN_BRACK };
-	static char reg_pair_dec[] = { PCT_CLS_PAREN, PCT_CLS_BRACE, PCT_CLS_BRACK };
+	static char reg_pair_inc[] = { SMB_OPN_PAREN, SMB_OPN_BRACE, SMB_OPN_BRACK };
+	static char reg_pair_dec[] = { SMB_CLS_PAREN, SMB_CLS_BRACE, SMB_CLS_BRACK };
 
 	size_t ndx = 0;
 	while (ndx < count) {
@@ -67,7 +73,7 @@ static void resolve_pair(char *c) {
 	}
 }
 static bool is_symbol(char *c) {
-	return is_paired(c) || is(c, PCT_ENDLINE);
+	return is_paired(c) || is(c, SMB_TERMINAL);
 }
 static bool is_lexical(char *c, enum LexType lexType) {
 	char **ptr = LEXICON->catalog[lexType].entry;
@@ -107,7 +113,7 @@ static char* get_word(char *ptr, size_t *wrdLen, size_t strLen) {
 }
 static void eval_tokens(struct token *pToken) {
 	static enum LexType lexTerms[] = {
-		KEYWORD, MATCHED, PAIRED, NONE
+		KEYWORD, MATCHED, PAIRED, TERMINAL, NONE
 	};
 	int ndx = 0;
 
@@ -149,7 +155,7 @@ void lexer_init() {
 	lexEntry = malloc(sizeof(lexentry));
 	lexEntry->name = "NAMED";
 	lexEntry->entry = lex_named;
-	LEXICON->catalog[IDENTIFIER] = *lexEntry;
+	LEXICON->catalog[NAMED] = *lexEntry;
 
 	lexEntry = malloc(sizeof(lexentry));
 	lexEntry->name = "OPERATOR";
@@ -165,6 +171,11 @@ void lexer_init() {
 	lexEntry->name = "PAIRED";
 	lexEntry->entry = lex_paired;
 	LEXICON->catalog[PAIRED] = *lexEntry;
+
+	lexEntry = malloc(sizeof(lexentry));
+	lexEntry->name = "TERMINAL";
+	lexEntry->entry = lex_terminal;
+	LEXICON->catalog[TERMINAL] = *lexEntry;
 
 	lexEntry = malloc(sizeof(lexentry));
 	lexEntry->name = "LITERAL";
@@ -193,6 +204,7 @@ void lexer_tokenize(srcdoc *pDoc) {
 			++ndx;
 			continue;
 		} else if (is_symbol(ptr)) {
+//    		++ndx;
 			pWrd = ptr;
 			length = 1;
 		} else {
