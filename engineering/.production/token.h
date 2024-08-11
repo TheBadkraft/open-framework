@@ -1,6 +1,6 @@
 #ifndef _TOKEN_H
-#ifndef __token_h_ver
-#define __token_h_ver "001-a"
+#ifndef __version_h_ver
+#define __version_h_ver "001-a"
 #endif
 #define _TOKEN_H
 
