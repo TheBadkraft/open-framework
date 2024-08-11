@@ -36,11 +36,11 @@ char **lex_literal = (char*[] ) { NULL };
 
 static int reg_paired[3];
 
-static bool is_whitespace(char *c) {
-	return c[0] == SPACE;
-}
 static bool is(char *c, char cmp) {
 	return c[0] == cmp;
+}
+static bool is_whitespace(char *c) {
+	return is(c, SPACE);
 }
 static bool is_paired(char *c) {
 	return is(c, PCT_OPN_PAREN) || is(c, PCT_CLS_PAREN) || is(c, PCT_OPN_BRACE)
@@ -193,7 +193,6 @@ void lexer_tokenize(srcdoc *pDoc) {
 			++ndx;
 			continue;
 		} else if (is_symbol(ptr)) {
-//    		++ndx;
 			pWrd = ptr;
 			length = 1;
 		} else {
