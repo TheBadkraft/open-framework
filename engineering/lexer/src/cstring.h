@@ -1,4 +1,7 @@
 #ifndef STRING_H
+#ifndef __cstring_h_ver
+#define __cstring_h_ver "002-a"
+#endif
 #define STRING_H
 
 #include <stdio.h>

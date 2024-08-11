@@ -4,6 +4,12 @@
 
 #include "cstring.h"
 
+#ifdef __cstring_h_ver
+#ifndef __cstring_c_ver
+#define __cstring_c_ver "002-a"
+#endif
+#endif
+
 //  prototypes
 string *new_str();
 string *alloc_str(const char *text);
@@ -16,6 +22,13 @@ string *format_str(const char *format, ...);
 void truncate_str(string *pStr, size_t len);
 //  -------------------
 
+bool str_null_or_empty(string *pStr)
+{
+    if (!pStr || strcmp(String.empty, pStr->buffer) == 0)
+    {
+        return true;
+    }
+}
 string *new_str()
 {
     string *pStr = malloc(sizeof(string));
@@ -95,13 +108,6 @@ void truncate_str(string *pStr, size_t len)
     if (get_length(pStr) > len)
     {
         memset(pStr->buffer + len, 0, 1);
-    }
-}
-bool str_null_or_empty(string *pStr)
-{
-    if (!pStr || strcmp(String.empty, pStr->buffer) == 0)
-    {
-        return true;
     }
 }
 

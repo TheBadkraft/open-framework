@@ -1,11 +1,17 @@
 
-// #include <stdio.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
 #include "file.h"
 #include "cstring.h"
+
+#ifdef __file_h_ver
+#ifndef __file_c_ver
+#define __file_c_ver "002-a"
+#endif
+#endif
 
 size_t file_size(char *pPath)
 {
@@ -27,12 +33,6 @@ const char *file_mode(file *pFile)
     const byte mCreate = 16;
 
     const char *mode = String.empty;
-
-    // bool isBinary = (pFile->mode & mBinary) != 0;
-    // bool isRead = (pFile->mode & mRead) != 0;
-    // bool isWrite = (pFile->mode & mWrite) != 0;
-    // bool isAppend = (pFile->mode & mAppend) != 0;
-    // bool isCreate = (pFile->mode & mCreate) != 0;
 
     //  I'm certain this can be more glamorous
     if (pFile->mode == mRead)
