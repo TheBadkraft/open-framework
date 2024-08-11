@@ -1,4 +1,7 @@
 #ifndef _FILE_H
+#ifndef __file_h_ver
+#define __file_h_ver "002-a"
+#endif
 #define _FILE_H
 
 #include <stdio.h>
