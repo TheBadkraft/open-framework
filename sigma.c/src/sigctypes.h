@@ -6,8 +6,6 @@
 
 #include <stdbool.h>
 
-#include <stdbool.h>
-
 #define byte unsigned char
 #define sbyte char
 

@@ -1,6 +1,6 @@
 #ifndef _TOKEN_H
-#ifndef __version_h_ver
-#define __version_h_ver "001-a"
+#ifndef __token_build
+#define __token_build "0003"
 #endif
 #define _TOKEN_H
 
@@ -22,7 +22,7 @@ struct token_t
     //     expr
     // } type;
     // int line;
-    glyph *pBeg;
+    char *pBeg;
     size_t length;
     //    struct token *prev;
     struct token_t *next;

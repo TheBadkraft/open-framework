@@ -1,12 +1,12 @@
 #ifndef _FILE_H
-#ifndef __file_h_ver
-#define __file_h_ver "002-a"
+#ifndef __file_build
+#define __file_build "0003"
 #endif
 #define _FILE_H
 
 #include <stdio.h>
 
-#include "sigctypes.h"
+#include "ctypes.h"
 
 typedef struct file_t
 {
