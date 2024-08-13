@@ -14,6 +14,9 @@ It is also worth noting that `return 0` is not necessary.
 Furthermore, testing `main` entry with variadic parameters: `int main(int argc, ...) { ... }`  
 GCC does compile this adding about 15 lines of source to the resulting ASM.  
 
+> **NOTE:** I just found out about this:  
+> `int main (int argc, char *argv[], char *envp[])`
+
 Right off, I think we need to be able to call C functions from *Sig.C*. Knowing what that looks like from ASM is not difficult.  
 
 The *Sig.C* specification will provide for all 5 of the accepted entry points in addition to a method-less approach:
