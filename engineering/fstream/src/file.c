@@ -7,9 +7,9 @@
 #include "file.h"
 #include "cstring.h"
 
-#ifdef __file_h_ver
-#ifndef __file_c_ver
-#define __file_c_ver "002-a"
+#ifdef __file_build
+#ifndef __file
+#define __file __file_build
 #endif
 #endif
 
