@@ -20,9 +20,10 @@ int main(int argc, char **argv) {
 	}
 	sigC *sigc = SC.instance();
 //	printf("completed %s initialization ...\n", sigc->name);
-	int arg_count = sigc->parse_args(argv);
+	sigc->configure(argv);
 
 //	printf("processed (%d) arg%s\n", arg_count, arg_count > 1 ? "s" : "");
+	int arg_count = sigc->cfgc;
 	if (arg_count) {
 		sigc->execute();
 	}

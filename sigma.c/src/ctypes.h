@@ -12,5 +12,6 @@ typedef unsigned short ushort;
 typedef char sbyte;
 
 #define TF(val) val ? "true" : "false"
+#define CHAR_NE(val) val == '\0'
 
 #endif //  _CTYPES_H
