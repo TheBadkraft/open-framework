@@ -4,9 +4,9 @@
 
 #include "cstring.h"
 
-#ifdef __cstring_h_ver
-#ifndef __cstring_c_ver
-#define __cstring_c_ver "002-a"
+#ifdef __cstring_build
+#ifndef __cstring
+#define __cstring __cstring_build
 #endif
 #endif
 

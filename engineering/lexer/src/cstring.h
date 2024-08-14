@@ -1,14 +1,14 @@
-#ifndef STRING_H
-#ifndef __cstring_h_ver
-#define __cstring_h_ver "002-a"
+#ifndef _CSTRING_H
+#ifndef __cstring_build
+#define __cstring_build "0004"
 #endif
-#define STRING_H
+#define _CSTRING_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "sigctypes.h"
+#include "ctypes.h"
 
 typedef struct string_t
 {
@@ -31,4 +31,4 @@ extern const struct String_T
     void (*truncate)(string *, size_t);
 } String;
 
-#endif //  STRING_H
+#endif //  _CSTRING_H

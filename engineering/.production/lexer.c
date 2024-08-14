@@ -2,9 +2,9 @@
 
 #include "lexer.h"
 
-#ifdef __lexer_h_ver
-#ifndef __lexer_c_ver
-#define __lexer_c_ver "001-a"
+#ifdef __lexer_build
+#ifndef __lexer
+#define __lexer __lexer_build
 #endif
 #endif
 

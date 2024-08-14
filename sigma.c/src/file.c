@@ -1,27 +1,147 @@
+
+#include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
 #include "file.h"
+#include "cstring.h"
 
-static size_t get_file_size(char *pPath)
+#ifdef __file_build
+#ifndef __file
+#define __file __file_build
+#endif
+#endif
+
+size_t file_size(char *pPath)
 {
-    struct stat buffer;
+    struct stat iostat;
     size_t fsize = -1;
-    if (stat(pPath, &buffer) == 0)
+    if (stat(pPath, &iostat) == 0)
     {
-        fsize = buffer.st_size;
+        fsize = iostat.st_size;
     }
 
     return fsize;
 }
-
-file *file_exists(char *filepath)
+const char *file_mode(file *pFile)
 {
-    file *pFile = malloc(sizeof(file));
-    pFile->name = filepath;
-    pFile->exists = access(filepath, F_OK) == 0 ? true : false;
+    const byte mBinary = 1;
+    const byte mRead = 2;
+    const byte mWrite = 4;
+    const byte mAppend = 8;
+    const byte mCreate = 16;
 
-    pFile->size = pFile->exists ? get_file_size(filepath) : -1;
+    const char *mode = String.empty;
+
+    //  I'm certain this can be more glamorous
+    if (pFile->mode == mRead)
+    {
+        mode = "r";
+    }
+    if (pFile->mode == mRead | mWrite)
+    {
+        mode = "rw";
+    }
+
+    return mode;
+}
+stream *file_open(file *pFile)
+{
+    if (!pFile->exists)
+    {
+        //  error
+        return NULL;
+    }
+
+    const char *mode = file_mode(pFile);
+
+    printf("open %s ['%s']\n", pFile->name, mode);
+
+    stream *pStream = malloc(sizeof(stream));
+    pStream->source = pFile->name;
+    pStream->length = pFile->size;
+    pStream->fstream = fopen(pFile->name, mode);
+    pStream->is_open = pStream->fstream != NULL;
+    pStream->pos = ftell(pStream->fstream);
+
+    // if (pFile->size > 0)
+    // {
+    //     doc->source = malloc(pFile->size);
+    //     size_t n = 0;
+    //     int c;
+    //     while ((c = fgetc(f)) != EOF)
+    //     {
+    //         doc->source[n++] = (char)c;
+    //     }
+    //     doc->source[n] = '\0';
+    // }
+
+    return pStream;
+}
+void file_close(stream *pStream)
+{
+    if (pStream->is_open)
+    {
+        fclose(pStream->fstream);
+        pStream->is_open = false;
+    }
+}
+bool file_exists(char *pPath)
+{
+    return access(pPath, F_OK) == 0 ? true : false;
+}
+file *file_new(char *pPath)
+{
+
+    file *pFile = malloc(sizeof(file));
+    pFile->name = pPath;
+    pFile->exists = file_exists(pPath);
+    pFile->size = pFile->exists ? file_size(pPath) : -1;
 
     return pFile;
 }
+bool io_path_or_file(char *pPath, IOType *ioType) {
+	struct stat iostat;
+	*ioType = IO_UNKNOWN;
+	if( stat(pPath, &iostat) == 0 )
+	{
+	    if( iostat.st_mode & S_IFDIR )
+	    {
+	        *ioType = IO_DIRECTORY;
+	    }
+	    else if( iostat.st_mode & S_IFREG )
+	    {
+	        *ioType = IO_FILE;
+	    }
+	    else
+	    {
+	        *ioType = IO_NONE;
+	    }
+	}
+
+	return *ioType != IO_UNKNOWN || *ioType != IO_NONE;
+}
+//  ==================================================
+bool stream_read(stream *pStream, char *out)
+{
+    int c;
+    if ((c = fgetc(pStream->fstream)) != EOF)
+    {
+        (*out) = (char)c;
+        pStream->pos = ftell(pStream->fstream);
+    }
+
+    return c != EOF;
+}
+
+const struct File_T File = {
+    .exists = &file_exists,
+    .new = &file_new,
+    .size = &file_size,
+    .open = &file_open,
+    .close = &file_close,
+	.path_or_file = &io_path_or_file};
+
+const struct Stream_T Stream = {
+    .read = &stream_read};

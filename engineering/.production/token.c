@@ -3,9 +3,9 @@
 
 #include "token.h"
 
-#ifdef __token_h_ver
-#ifndef __token_c_ver
-#define __token_c_ver "001-a"
+#ifdef __token_build
+#ifndef __token
+#define __token __token_build
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 #ifndef _LEXER_H
-#ifndef __lexer_h_ver
-#define __lexer_h_ver "001-a"
+#ifndef __lexer_build
+#define __lexer_build "0002"
 #endif
 #define _LEXER_H
 

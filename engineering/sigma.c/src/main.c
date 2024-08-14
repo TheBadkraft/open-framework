@@ -69,16 +69,16 @@ int main(int argc, char **argv)
 //				printf("[%d] [ %-8s ] :: %d\n", pTkn->line, Token.word(pTkn), pTkn->type);
 //				pTkn = pTkn->next;
 //			}
-//			struct token *pTkn = pDoc->pToken;
-//
-//			while(pTkn) {
-//				printf("[%d] [ %-8s ] :: %d\n", pTkn->line, Token.word(pTkn), pTkn->type);
-//				pTkn = pTkn->next;
-//			}
-//			int parens_count = Lexer.stat(PAIRED_PARENS);
-//			int braces_count = Lexer.stat(PAIRED_BRACES);
-//			int bracks_count = Lexer.stat(PAIRED_BRACKS);
-//			printf("'()': %d   '{}': %d   '[]': %d\n", parens_count, braces_count, bracks_count);
+			struct token *pTkn = pDoc->pToken;
+
+			while(pTkn) {
+				printf("[%d] [ %-8s ] :: %d\n", pTkn->line, Token.word(pTkn), pTkn->type);
+				pTkn = pTkn->next;
+			}
+			int parens_count = Lexer.stat(PAIRED_PARENS);
+			int braces_count = Lexer.stat(PAIRED_BRACES);
+			int bracks_count = Lexer.stat(PAIRED_BRACKS);
+			printf("'()': %d   '{}': %d   '[]': %d\n", parens_count, braces_count, bracks_count);
 
 			/*	********************************************************
 			 * 	Now that we have our linked token list, we can run through the Parser.
