@@ -4,17 +4,17 @@
 #include "../../.production/ctypes.h"
 #include "../../.production/cstring.h"
 #include "../../.production/file.h"
-#include "../../.production/lexer.h"
+#include "../../.production/tokenizer.h"
 #include "../../.production/version.h"
 
 const char *const CSTRING = "cstring";
 const char *const CFILE = "file";
-const char *const LEXER = "lexer";
+const char *const LEXER = "tokenizer";
 const char *const CTYPES = "ctypes";
 const char *const VERSION = "version";
 
 const char **const COMPONENTS = (const char *[]){
-	"cstring", "file", "lexer", "ctypes", "version", NULL};
+	"cstring", "file", "tokenizer", "ctypes", "version", NULL};
 
 char *lookup_build(int);
 
@@ -56,8 +56,8 @@ char *lookup_build(int ndx)
 #ifdef __file_build
 		CASE(1, file);
 #endif
-#ifdef __lexer_build
-		CASE(2, lexer);
+#ifdef __tokenizer_build
+		CASE(2, tokenizer);
 #endif
 #ifdef __ctypes_build
 		CASE(3, ctypes);
