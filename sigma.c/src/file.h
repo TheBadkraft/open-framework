@@ -40,7 +40,7 @@ extern const struct File_T {
 	file* (*new)(char*);
 	stream* (*open)(file*);
 	void (*close)(stream*);
-	IOType (*path_or_file)(char*);
+	bool (*path_or_file)(char*, IOType*);
 } File;
 
 extern const struct Stream_T {

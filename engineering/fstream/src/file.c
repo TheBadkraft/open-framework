@@ -15,11 +15,11 @@
 
 size_t file_size(char *pPath)
 {
-    struct stat buffer;
+    struct stat iostat;
     size_t fsize = -1;
-    if (stat(pPath, &buffer) == 0)
+    if (stat(pPath, &iostat) == 0)
     {
-        fsize = buffer.st_size;
+        fsize = iostat.st_size;
     }
 
     return fsize;
@@ -101,6 +101,27 @@ file *file_new(char *pPath)
 
     return pFile;
 }
+IOType io_path_or_file(char *pPath) {
+	struct stat iostat;
+	IOType ioType = IO_UNKNOWN;
+	if( stat(pPath, &iostat) == 0 )
+	{
+	    if( iostat.st_mode & S_IFDIR )
+	    {
+	        ioType = IO_DIRECTORY;
+	    }
+	    else if( iostat.st_mode & S_IFREG )
+	    {
+	        ioType = IO_FILE;
+	    }
+	    else
+	    {
+	        ioType = IO_NONE;
+	    }
+	}
+
+	return ioType;
+}
 //  ==================================================
 bool stream_read(stream *pStream, char *out)
 {
@@ -119,7 +140,8 @@ const struct File_T File = {
     .new = &file_new,
     .size = &file_size,
     .open = &file_open,
-    .close = &file_close};
+    .close = &file_close,
+	.path_or_file = &io_path_or_file};
 
 const struct Stream_T Stream = {
     .read = &stream_read};

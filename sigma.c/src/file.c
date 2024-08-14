@@ -101,26 +101,26 @@ file *file_new(char *pPath)
 
     return pFile;
 }
-IOType io_path_or_file(char *pPath) {
+bool io_path_or_file(char *pPath, IOType *ioType) {
 	struct stat iostat;
-	IOType ioType = IO_UNKNOWN;
+	*ioType = IO_UNKNOWN;
 	if( stat(pPath, &iostat) == 0 )
 	{
 	    if( iostat.st_mode & S_IFDIR )
 	    {
-	        ioType = IO_DIRECTORY;
+	        *ioType = IO_DIRECTORY;
 	    }
 	    else if( iostat.st_mode & S_IFREG )
 	    {
-	        ioType = IO_FILE;
+	        *ioType = IO_FILE;
 	    }
 	    else
 	    {
-	        ioType = IO_NONE;
+	        *ioType = IO_NONE;
 	    }
 	}
 
-	return ioType;
+	return *ioType != IO_UNKNOWN || *ioType != IO_NONE;
 }
 //  ==================================================
 bool stream_read(stream *pStream, char *out)
