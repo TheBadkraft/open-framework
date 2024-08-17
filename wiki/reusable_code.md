@@ -22,7 +22,7 @@ Create a source project (download one of the projects from the **OpenFramework**
 Use the following **GCC** command to **_compile_** the source:
 > `gcc -shared -fpic -o bin/mylib.so src/*.c`  
 
-This creates a *shared object* in the *`bin`* directory. Replace `mulib` with the name you want to use for your library. Next copy the *`.so`* file to *`usr/local/lib`*.
+This creates a *shared object* in the *`bin`* directory. Replace `mylib` with the name you want to use for your library. Next copy the *`.so`* file to *`usr/local/lib`*.
 Next is the linking process. In order for the linker (*ld* under the hood), the `LD_LIBRARY_PATH` must be updated with the appropriate location.
 
 From the command line, enter the following:
