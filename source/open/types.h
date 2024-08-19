@@ -15,12 +15,4 @@ typedef unsigned short ushort;
 
 typedef char sbyte;
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
-#ifndef B
-#define B(b) b ? "true" : "false"
-#endif
-
 #endif // _OPEN_TYPES_H

@@ -20,6 +20,7 @@ void set_capacity(string *pStr, size_t len);
 void append_str(string *pStr, const char *text);
 string *format_str(const char *format, ...);
 void truncate_str(string *pStr, size_t len);
+size_t parse_format(const char *);
 //  -------------------
 
 bool str_null_or_empty(string *pStr)
@@ -86,14 +87,18 @@ void append_str(string *pStr, const char *text)
     set_capacity(pStr, pStr->capacity + strlen(text) + 1);
     strcat(pStr->buffer, text);
 }
-string *vformat_str(const char *format, va_list args)
+size_t parse_format(const char *format)
 {
-    int capacity = vsnprintf(NULL, 0, format, args);
+    size_t count = 0;
+    while (*format)
+    {
+        if (*format++ == '%')
+        {
+            ++count;
+        }
+    }
 
-    string *pStr = new_str();
-    set_capacity(pStr, capacity + 1);
-
-    vsprintf(pStr->buffer, format, args);
+    return count;
 }
 string *format_str(const char *format, ...)
 {
@@ -140,6 +145,16 @@ void write_line(string *pStr)
 {
     printf("%s\n", pStr->buffer);
 }
+string *join_str(char *delim, ...)
+{
+    //  not yet implemented
+    return String.new();
+}
+string *split_str(char delim, string *pStr)
+{
+    //  not yet implemented
+    return String.new();
+}
 
 const struct Open_String String = {
     .empty = "",
@@ -151,8 +166,9 @@ const struct Open_String String = {
     .length = &get_length,
     .capacity = &set_capacity,
     .append = &append_str,
-    .appednf = &append_format_str,
+    .appendf = &append_format_str,
     .format = &format_str,
     .truncate = &truncate_str,
     .writeln = &write_line,
-};
+    .join = &join_str,
+    .split = &split_str};
