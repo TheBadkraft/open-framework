@@ -60,9 +60,9 @@ char *label = "tuxedo";
 static void parse_built_in_options();
 static void parse_options();
 
-static void sc_build_configuration(char**);
+static bool sc_load_configuration(char**);
 static int process_args(char**);
-static bool sc_execute();
+static bool sc_configure();
 
 static sigC_option *get_option_by_tag(char*);
 static sigC_option *get_option_by_key(char);
@@ -76,19 +76,33 @@ static bool display_version(sigC_param*);
 static bool id10t_compatibility_mode(sigC_param*);
 static bool set_output_file(sigC_param*);
 
-static void sc_init() {
-	sigc = malloc(sizeof(sigC));
+static bool sc_init() {
+	bool retOk = (sigc = malloc(sizeof(sigC))) != NULL;
+
+	if(retOk) {
 	sigc->name = "Sigma.C";
 	sigc->ver = Version.new(maj, min, bld, rc, label);
-	sigc->configure = &sc_build_configuration;
-	sigc->execute = &sc_execute;
+	sigc->load = &sc_load_configuration;
+	sigc->configure = &sc_configure;
+	sigc->cwd = Directory.current_directory();
+	sigc->path = File.get_directory(__FILE__);
+	sigc->cdx_definition = "sigmac.def";
 
 	printf("===== %s =====\n", sigc->name);
+	printf("cwd:  %s\n", sigc->cwd);
+	printf("path: %s\n", sigc->path);
 
 	parse_built_in_options();
 	parse_options();
+	}
+	else {
+		//	pError("initialization error");
+	}
+
+	return retOk;
 }
-static void sc_build_configuration(char **argv) {
+static bool sc_load_configuration(char **argv) {
+	bool retOk = true;
 	//	skip arg[0] CL: sigma.c
 	int arg_count = process_args(++argv);
 	int ndx = 0;
@@ -112,6 +126,8 @@ static void sc_build_configuration(char **argv) {
 	}
 
 	sigc->cfgc = arg_count;
+
+	return retOk;
 }
 static int process_args(char **argv) {
 	char **ndx = argv;
@@ -175,7 +191,7 @@ static int process_args(char **argv) {
 
 	return arg_count;
 }
-static bool sc_execute() {
+static bool sc_configure() {
 	bool retOk = true;
 	sigC_config *ptr = sigC_settings;
 	sigC_config cfg = *ptr;
@@ -224,9 +240,8 @@ static bool set_source_param(sigC_param* param) {
 	//	TODO: read source input parameter
 	printf("[TODO] Source: %s\n", param->params);
 
-	//	returning false will terminate the compiler upon executing the current (this) task
-	//	this should be the last option parameter anyway...
-	return false;
+
+	return true;
 }
 static void parse_built_in_options() {
 	sigC_option *ndx = bltin_optns;
@@ -295,12 +310,23 @@ static bool set_output_file(sigC_param* param) {
 }
 //==============================================
 
-sigC* sc_instance() {
-	if (!sigc) {
-		sc_init();
+/*
+ * 	Relays reference to the Sigma.C compiler. If the compiler has not
+ * 	been initialized, this will run initialization.
+ *
+ * 	sigC*:	reference to compiler object
+ * 	bool:	returns TRUE if valid reference;
+ * 			otherwise FALSE
+ */
+bool sc_instance(sigC *sc) {
+	if (!sigc && sc_init()) {
+		*sc = *sigc;
+	}
+	else {
+		sc = NULL;
 	}
 
-	return sigc;
+	return sc != NULL;
 }
 
 const struct sigmac SC = {

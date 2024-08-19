@@ -8,10 +8,12 @@
 #define _SIGMAC_H_
 
 #include "version.h"
-
+#include "codex.h"
 
 enum sc_opt_type {
-	SC_OPT_SOURCE = 0
+	SC_OPT_SOURCE = 0,
+	SC_OPT_OUTPUT = 1,
+	SC_OPT_LOGOUT = 2,
 };
 
 /*
@@ -47,15 +49,25 @@ struct sc_opt {
 };
 
 struct sigc {
+	//	compiler name
 	const char *name;
+	//	compiler version
 	version *ver;
+	//	number of configuration arguments
 	int cfgc;
-	void (*configure)(char**);
+	//	delegate handler to load options
+	bool (*load)(char**);
+	//	collection of sc_opt objects
 	struct sc_opt *options;
-	bool (*execute)(void);
+	//	delegate handler to configure the compiler
+	bool (*configure)(void);
+	//	current working dir is what the CL path is
+	char *cwd;
+	//	the path from which sigmac executes
+	char *path;
 	/*
 	 * TODO:
-	 *	add exit mode - SILENT, WHISPER, SHOUT
+	 *	add exit mode - SILENT, WHISPER, SHOUT, SCREAM
 	 */
 };
 
@@ -70,6 +82,8 @@ typedef struct sc_opt_param sigC_param;
 typedef struct sc_conf sigC_config;
 
 extern const struct sigmac {
-	sigC *(*instance)();
+	//	relays a reference to the Sigma.C compiler
+	//	TRUE if valid instance; otherwise FALSE
+	bool (*instance)(sigC*);
 } SC;
 #endif /* _SIGMAC_H_ */

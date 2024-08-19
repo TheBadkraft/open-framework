@@ -1,12 +1,21 @@
-#ifndef _FILE_H
-#ifndef __file_build
-#define __file_build "0005"
-#endif
-#define _FILE_H
+/*	Created on: Aug 16, 2024
+ *	Author: Badkraft
+ *	
+ *	sigma_io.h: 
+ */
+
+#ifndef _SIGMA_IO_H_
+#define _SIGMA_IO_H_
 
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "ctypes.h"
+#include "sigC/sigma_types.h"
+#include "sigC/sigma_string.h"
+
+#include "sigma_io_file.h"
+#include "sigma_io_directory.h"
+#include "sigma_io_stream.h"
 
 enum io_type
 {
@@ -15,30 +24,6 @@ enum io_type
 	IO_FILE = 1,
 	IO_DIRECTORY = 2
 };
-
-typedef struct io_file
-{
-	enum
-	{
-		BINARY = 1,
-		READ = 2,
-		WRITE = 4,
-		APPEND = 8,
-		CREATE = 16
-	} mode;
-	char *name;
-	size_t size;
-	bool exists;
-} file;
-
-typedef struct io_stream
-{
-	size_t length;
-	size_t pos;
-	char *source;
-	bool is_open;
-	FILE *fstream;
-} stream;
 
 typedef enum io_type IOType;
 
@@ -50,7 +35,7 @@ extern const struct IO_File
 	stream *(*open)(file *);
 	void (*close)(stream *);
 	bool (*path_or_file)(char *, IOType *);
-	char *(*get_directory)(const char *);
+	char *(*directory)(const char *);
 } File;
 
 extern const struct IO_Directory
@@ -68,4 +53,6 @@ extern const struct IO_Stream
 	bool (*read)(stream *, char *);
 } Stream;
 
-#endif //  _FILE_H
+bool io_path_or_file(char*, IOType*);
+
+#endif /* _SIGMA_IO_H_ */
