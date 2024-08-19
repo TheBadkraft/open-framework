@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "build tests",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-o",
+				"${workspaceFolder}/bin/open_string_tests",
+				"${workspaceFolder}/string/*.c"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "debug tests",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/bin/open_string_tests",
+				"${workspaceFolder}/string/*.c"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		}
+	]
+}

@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	printf("'%s' size: %ld\n", pFile->name, pFile->size);
 	printf("************************************************\n\n");
 
-	pFile = File.new("./.target/001/main.C");
+	pFile = File.new("/.target/001/main.C");
 	pFile->mode = READ | WRITE;
 
 	printf("'%s' exists [%s]\n", pFile->name, pFile->exists ? "true" : "false");

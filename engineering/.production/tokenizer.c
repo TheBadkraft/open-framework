@@ -1,16 +1,16 @@
 #include <stdio.h>
 
-#include "lexer.h"
+#include "tokenizer.h"
 
-#ifdef __lexer_build
-#ifndef __lexer
-#define __lexer __lexer_build
+#ifdef __tokenizer_build
+#ifndef __tokenizer
+#define __tokenizer __tokenizer_build
 #endif
 #endif
 
 token *default_tokenizer(document *);
 
-static tokenizer tokenizer_handler = default_tokenizer;
+static tokenize tokenizer_handler = default_tokenizer;
 
 token *default_tokenizer(document *pDoc)
 {
@@ -24,12 +24,12 @@ token *default_tokenizer(document *pDoc)
 }
 //  =========================================================
 
-lexer *lexer_init(char *name, tokenizer delegate)
+tokenizer *tknizer_init(char *name, tokenize delegate)
 {
     printf("Sig.C Lexer [%s]... initializing\n", name);
-    lexer *pLexer = malloc(sizeof(lexer));
+    tokenizer *pTknizer = malloc(sizeof(tokenizer));
 
-    if (!pLexer)
+    if (!pTknizer)
     {
         //  throwErr()
         printf("Error initializing Lexer ... OOPS!\n");
@@ -37,23 +37,23 @@ lexer *lexer_init(char *name, tokenizer delegate)
     }
 
     //  configure
-    pLexer->name = name;
+    pTknizer->name = name;
     if (delegate)
     {
-        pLexer->tokenize = delegate;
+        pTknizer->tokenize = delegate;
     }
     else
     {
-        pLexer->tokenize = tokenizer_handler;
+        pTknizer->tokenize = tokenizer_handler;
     }
 
-    return pLexer;
+    return pTknizer;
 }
-token *lexer_tokenize(document *pDoc)
+token *tknizer_tokenize(document *pDoc)
 {
     return tokenizer_handler(pDoc);
 }
 
-const struct Lexer_T Lexer = {
-    .init = &lexer_init,
-    .tokenize = &lexer_tokenize};
+const struct OP_Tokenizer Tokenizer = {
+    .init = &tknizer_init,
+    .tokenize = &tknizer_tokenize};

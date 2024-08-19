@@ -39,7 +39,7 @@ const char *file_mode(file *pFile)
     {
         mode = "r";
     }
-    if (pFile->mode == mRead | mWrite)
+    if (pFile->mode == (mRead | mWrite))
     {
         mode = "rw";
     }
@@ -101,26 +101,43 @@ file *file_new(char *pPath)
 
     return pFile;
 }
-IOType io_path_or_file(char *pPath) {
+char *file_get_directory(const char *pFile) {
+	char *slash = strrchr(pFile, '/');
+	if (!slash) {
+		perror("expected path delimeter not found.");
+	}
+
+	return strndup(pFile, (++slash) - pFile);
+}
+char *dir_getcwd() {
+	char *pDir;
+
+	if((pDir=getcwd(NULL, 0)) == NULL) {
+		perror("failed to get current working directory.");
+	}
+
+	return pDir;
+}
+bool io_path_or_file(char *pPath, IOType *ioType) {
 	struct stat iostat;
-	IOType ioType = IO_UNKNOWN;
+	*ioType = IO_UNKNOWN;
 	if( stat(pPath, &iostat) == 0 )
 	{
 	    if( iostat.st_mode & S_IFDIR )
 	    {
-	        ioType = IO_DIRECTORY;
+	        *ioType = IO_DIRECTORY;
 	    }
 	    else if( iostat.st_mode & S_IFREG )
 	    {
-	        ioType = IO_FILE;
+	        *ioType = IO_FILE;
 	    }
 	    else
 	    {
-	        ioType = IO_NONE;
+	        *ioType = IO_NONE;
 	    }
 	}
 
-	return ioType;
+	return *ioType != IO_UNKNOWN || *ioType != IO_NONE;
 }
 //  ==================================================
 bool stream_read(stream *pStream, char *out)
@@ -135,13 +152,19 @@ bool stream_read(stream *pStream, char *out)
     return c != EOF;
 }
 
-const struct File_T File = {
+//  ==================================================
+const struct IO_File File = {
     .exists = &file_exists,
     .new = &file_new,
     .size = &file_size,
     .open = &file_open,
     .close = &file_close,
+	.get_directory = &file_get_directory,
 	.path_or_file = &io_path_or_file};
 
-const struct Stream_T Stream = {
+const struct IO_Directory Directory = {
+	.current_directory = &dir_getcwd
+};
+
+const struct IO_Stream Stream = {
     .read = &stream_read};

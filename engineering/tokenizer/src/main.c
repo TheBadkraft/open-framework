@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "token.h"
-#include "lexer.h"
+#include "tokenizer.h"
 
 token *ebnf_tokenize(document *);
 
@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
 	// printf("document:\n  source: %s\n  size: %ld\n", doc->pFile->name, String.length(doc->pContent));
 	// printf("%s\n", doc->pContent->buffer);
 
-	lexer *pLex = Lexer.init("Generic", NULL);
-	token *defTkn = pLex->tokenize(doc);
+	tokenizer *pTknzr = Tokenizer.init("Generic", NULL);
+	token *defTkn = pTknzr->tokenize(doc);
 	char *word = Token.word(defTkn);
 	printf("token:\n%s\n", word);
 
-	pLex = Lexer.init("EBNF", ebnf_tokenize);
-	token *lexTkn = pLex->tokenize(doc);
+	pTknzr = Tokenizer.init("EBNF", ebnf_tokenize);
+	token *lexTkn = pTknzr->tokenize(doc);
 	while (lexTkn)
 	{
 		printf("tkn: %s\n", Token.word(lexTkn));

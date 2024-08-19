@@ -13,26 +13,65 @@
 
 #include "sigmac.h"
 
+#define STATUS(okay) okay ? EXIT_SUCCESS : EXIT_FAILURE
+
 int main(int argc, char **argv) {
-	int retOk = EXIT_SUCCESS;
-	if(argc < 2) {
+	bool retOk = true;
+	int status = STATUS(retOk);
+	sigC sigc = {};
+
+	if(!retOk) {
 		goto quit_sigmac;
 	}
-	sigC *sigc = SC.instance();
-//	printf("completed %s initialization ...\n", sigc->name);
-	sigc->configure(argv);
 
+	/*
+	 *	initialize Sigma.C compiler
+	 */
+	retOk = SC.instance(&sigc);
+	if(!retOk) {
+		goto quit_sigmac;
+	}
+//	printf("completed %s initialization ...\n", sigc->name);
+
+	/*
+	 * 	have compiler load the command line arguments
+	 */
+	retOk = sigc.load(argv);
+	if(!retOk) {
+		goto quit_sigmac;
+	}
 //	printf("processed (%d) arg%s\n", arg_count, arg_count > 1 ? "s" : "");
-	int arg_count = sigc->cfgc;
-	if (arg_count) {
-		sigc->execute();
+
+	/*
+	 * 	configure the compiler
+	 *
+	 * 	NOTE: Even when a source is supplied, we are getting 0 `cfgc`. It is not causing the compiler to bail, but
+	 * 	we do get the [WARNING] message below with 0 args.
+	 */
+	retOk = sigc.configure();
+	if (!sigc.cfgc) {
+		printf("WARNING: args (%d) :: ", sigc.cfgc);
 	}
-	else {
-		retOk = EXIT_FAILURE;
-	}
+
+	/*
+	 * 	load the Codex
+
+	 SC.load_codex("./.data/sigmac.def");
+	 //	validate sigc.codex has lexer, document, etc.
+
+	 */
+
+	/*
+	 * 	load the Parser
+	 SC.load_parser("SOURCE");
+	 //	validate sigc.parser has lexer, document, etc.
+
+	 */
 
 	// this is the first time in 20+ years I've used a label to go to (other than ASM)
 	quit_sigmac:
-	printf("exiting Sigma.C Compiler (%d) ...\n", retOk);
-	return retOk;
+	status = STATUS(retOk);
+	printf("exiting Sigma.C Compiler (%d) ...\n", status);
+
+	return status;
 }
