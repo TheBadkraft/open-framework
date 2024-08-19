@@ -1,13 +1,16 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#include "../../source/open/core.h"
+#include "open/core.h"
 
 void print_header(char *);
 void output_string(string *);
 
 int main(int argc, char **argv)
 {
+    print_header("Test: string.so");
+    //  =========================================================
+
     print_header("String.new");
     string *str = String.new();
     assert(str != NULL);

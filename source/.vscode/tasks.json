@@ -31,6 +31,23 @@
 			],
 			"group": "build",
 			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "make shared",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-shared",
+				"-fpic",
+				"-o",
+				"${workspaceFolder}/lib/lib_string.so",
+				"${workspaceFolder}/string/string.c"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
 		}
 	]
 }

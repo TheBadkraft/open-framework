@@ -21,8 +21,6 @@ struct open_string
 
 typedef struct open_string string;
 
-string *vformat_str(const char *, va_list);
-
 extern const struct Open_String
 {
     const char *empty;
@@ -34,12 +32,12 @@ extern const struct Open_String
     size_t (*length)(string *);
     void (*capacity)(string *, size_t);
     void (*append)(string *, const char *);
-    void (*appednf)(string *, const char *, ...);
+    void (*appendf)(string *, const char *, ...);
     string *(*format)(const char *, ...);
     void (*truncate)(string *, size_t);
     void (*writeln)(string *);
     string *(*join)(char *, ...);
-    string *(*split)(char);
+    string *(*split)(char, string *);
 } String;
 
 #endif //  _SIGC_STRING_H
