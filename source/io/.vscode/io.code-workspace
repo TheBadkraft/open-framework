@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../open"
+		},
+		{
+			"path": "../../bin"
+		},
+		{
+			"path": "../../lib"
+		},
+		{
+			"path": "../../../testing"
+		}
+	],
+	"settings": {}
+}

@@ -2,13 +2,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define pub_open_string 0
-
-#if pub_open_string
-#include "open/string.h"
-#else
 #include "../open/string.h"
-#endif
 
 //  prototypes
 string *new_str();

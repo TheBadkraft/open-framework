@@ -1,0 +1,73 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "build tests",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-o",
+				"${workspaceFolder}/../bin/io_tests",
+				"${workspaceFolder}/*.c",
+				"-l_string"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "debug tests",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/../bin/io_tests",
+				"${workspaceFolder}/*.c",
+				"-l_string"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "make so",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-shared",
+				"-fpic",
+				"-o",
+				"${workspaceFolder}/../lib/lib_io.so",
+				"${workspaceFolder}/io*.c",
+				"-l_string"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "debug so",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/../bin/shared_io",
+				"${workspaceFolder}/test.c",
+				"-l_string"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		}
+	]
+}

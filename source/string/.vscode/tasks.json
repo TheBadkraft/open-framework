@@ -7,8 +7,8 @@
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-o",
-				"${workspaceFolder}/bin/open_string_tests",
-				"${workspaceFolder}/string/*.c"
+				"${workspaceFolder}/../bin/string_tests",
+				"${workspaceFolder}/*.c"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -23,8 +23,8 @@
 			"args": [
 				"-g3",
 				"-o",
-				"${workspaceFolder}/bin/open_string_tests",
-				"${workspaceFolder}/string/*.c"
+				"${workspaceFolder}/../bin/string_tests",
+				"${workspaceFolder}/*.c"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -34,14 +34,31 @@
 		},
 		{
 			"type": "cppbuild",
-			"label": "make shared",
+			"label": "make so",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-shared",
 				"-fpic",
 				"-o",
-				"${workspaceFolder}/lib/lib_string.so",
-				"${workspaceFolder}/string/string.c"
+				"${workspaceFolder}/../lib/lib_string.so",
+				"${workspaceFolder}/string.c"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: gcc"
+		},
+		{
+			"type": "cppbuild",
+			"label": "debug so",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/../bin/shared_string",
+				"${workspaceFolder}/test.c",
+				"-l_string"
 			],
 			"problemMatcher": [
 				"$gcc"

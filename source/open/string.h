@@ -5,13 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define pub_open_string 0
-
-#if pub_open_string
-#include "open/types.h"
-#else
 #include "types.h"
-#endif
 
 struct open_string
 {
