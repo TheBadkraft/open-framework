@@ -5,16 +5,17 @@
 #include "../open/string.h"
 
 //  prototypes
-string *new_str();
-string *alloc_str(const char *text);
-void copy_str(string *pStr, const char *text);
-void free_str(string *pStr);
-size_t get_length(string *pStr);
-void set_capacity(string *pStr, size_t len);
-void append_str(string *pStr, const char *text);
-string *format_str(const char *format, ...);
-void truncate_str(string *pStr, size_t len);
-size_t parse_format(const char *);
+string *__str_new();
+string *__str_alloc(const char *);
+void __str_copy(string *, const char *);
+string *__str_sub_copy(string *, int, int);
+void __str_free(string *);
+size_t __get_str_len(string *);
+void __set_str_cap(string *, size_t);
+void __str_append(string *, const char *);
+string *__str_format(const char *, ...);
+void __str_trunc(string *, size_t);
+size_t __fmt_count(const char *);
 //  -------------------
 
 bool str_null_or_empty(string *pStr)
@@ -24,7 +25,7 @@ bool str_null_or_empty(string *pStr)
         return true;
     }
 }
-string *new_str()
+string *__str_new()
 {
     string *pStr = malloc(sizeof(string));
     pStr->buffer = NULL;
@@ -32,69 +33,65 @@ string *new_str()
 
     return pStr;
 }
-string *alloc_str(const char *text)
+string *__str_alloc(const char *text)
 {
-    string *pStr = new_str();
+    string *pStr = __str_new();
     // printf("size: %ld\n", pStr->capacity);
 
-    copy_str(pStr, text);
+    __str_copy(pStr, text);
 
     // printf("set string capacity: %ld (%ld)\n", pStr->capacity, strlen(pStr->buffer));
 
     return pStr;
 }
-void copy_str(string *pStr, const char *text)
+void __str_copy(string *pStr, const char *text)
 {
-    set_capacity(pStr, strlen(text) + 1);
+    __set_str_cap(pStr, strlen(text) + 1);
     strcpy(pStr->buffer, text);
 }
-void free_str(string *pStr)
+string *__str_sub_copy(string *pStr, int pos, int len)
 {
-    if (pStr->buffer != NULL)
-    {
-        free(pStr->buffer);
-    }
+    string *pNew = String.new();
+    __set_str_cap(pNew, len + 1);
+    strncpy(pNew->buffer, pStr->buffer + pos, len);
+
+    return pNew;
+}
+void __str_free(string *pStr)
+{
+    // printf("free(str)\n");
     if (pStr != NULL)
     {
+        if (pStr->buffer != NULL)
+        {
+            free(pStr->buffer);
+        }
         free(pStr);
     }
 }
-size_t get_length(string *pStr)
+size_t __get_str_len(string *pStr)
 {
     return (pStr->buffer == NULL) ? 0 : strlen(pStr->buffer);
 }
-void set_capacity(string *pStr, size_t cap)
+void __set_str_cap(string *pStr, size_t cap)
 {
     if (pStr->buffer == NULL)
     {
         pStr->buffer = malloc(cap);
     }
-    else if (get_length(pStr) != cap)
+    else if (__get_str_len(pStr) != cap)
     {
         pStr->buffer = realloc(pStr->buffer, cap);
     }
 
     pStr->capacity = cap;
 }
-void append_str(string *pStr, const char *text)
+void __str_append(string *pStr, const char *text)
 {
-    set_capacity(pStr, pStr->capacity + strlen(text) + 1);
+    __set_str_cap(pStr, pStr->capacity + strlen(text) + 1);
     strcat(pStr->buffer, text);
 }
-size_t parse_format(const char *format)
-{
-    size_t count = 0;
-    while (*format)
-    {
-        if (*format++ == '%')
-        {
-            ++count;
-        }
-    }
-
-    return count;
-}
-string *format_str(const char *format, ...)
+string *__str_format(const char *format, ...)
 {
     va_list args;
 
@@ -102,8 +99,8 @@ string *format_str(const char *format, ...)
     int capacity = vsnprintf(NULL, 0, format, args);
     va_end(args);
 
-    string *pStr = new_str();
-    set_capacity(pStr, capacity + 1);
+    string *pStr = __str_new();
+    __set_str_cap(pStr, capacity + 1);
 
     va_start(args, format);
     vsprintf(pStr->buffer, format, args);
@@ -111,7 +108,7 @@ string *format_str(const char *format, ...)
 
     return pStr;
 }
-void append_format_str(string *pStr, const char *format, ...)
+void __str_appendf(string *pStr, const char *format, ...)
 {
     va_list args;
 
@@ -128,41 +125,55 @@ void append_format_str(string *pStr, const char *format, ...)
     String.append(pStr, pBuff);
     free(pBuff);
 }
-void truncate_str(string *pStr, size_t len)
+void __str_trunc(string *pStr, size_t len)
 {
-    if (get_length(pStr) > len)
+    if (__get_str_len(pStr) > len)
     {
         memset(pStr->buffer + len, 0, 1);
     }
 }
-void write_line(string *pStr)
+void __str_write_ln(string *pStr)
 {
-    printf("%s\n", pStr->buffer);
+    printf("%s\n", pStr->buffer != NULL ? pStr->buffer : "NULL");
 }
-string *join_str(char *delim, ...)
+string *__str_join(char *delim, ...)
 {
     //  not yet implemented
     return String.new();
 }
-string *split_str(char delim, string *pStr)
+string *__str_split(char delim, string *pStr)
 {
     //  not yet implemented
     return String.new();
+}
+size_t __fmt_count(const char *format)
+{
+    size_t count = 0;
+    while (*format)
+    {
+        if (*format++ == '%')
+        {
+            ++count;
+        }
+    }
+
+    return count;
 }
 
 const struct Open_String String = {
     .empty = "",
     .is_null_or_empty = &str_null_or_empty,
-    .new = &new_str,
-    .alloc = &alloc_str,
-    .copy = &copy_str,
-    .free = &free_str,
-    .length = &get_length,
-    .capacity = &set_capacity,
-    .append = &append_str,
-    .appendf = &append_format_str,
-    .format = &format_str,
-    .truncate = &truncate_str,
-    .writeln = &write_line,
-    .join = &join_str,
-    .split = &split_str};
+    .new = &__str_new,
+    .alloc = &__str_alloc,
+    .copy = &__str_copy,
+    .release = &__str_free,
+    .free = &__str_free,
+    .length = &__get_str_len,
+    .capacity = &__set_str_cap,
+    .append = &__str_append,
+    .appendf = &__str_appendf,
+    .format = &__str_format,
+    .truncate = &__str_trunc,
+    .writeln = &__str_write_ln,
+    .join = &__str_join,
+    .split = &__str_split};

@@ -9,6 +9,7 @@
 				"-o",
 				"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
 				"${workspaceFolder}/*.c",
+				"${workspaceFolder}/../string/string.c",
 				"-l_except"
 			],
 			"problemMatcher": [
@@ -26,6 +27,7 @@
 				"-o",
 				"${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
 				"${workspaceFolder}/*.c",
+				"${workspaceFolder}/../string/string.c",
 				"-l_except"
 			],
 			"problemMatcher": [
@@ -43,7 +45,8 @@
 				"-fpic",
 				"-o",
 				"${workspaceFolder}/../lib/lib_${workspaceFolderBasename}.so",
-				"${workspaceFolder}/${workspaceFolderBasename}*.c",
+				"${workspaceFolder}/version.c",
+				"${workspaceFolder}/../string/string.c"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -60,7 +63,6 @@
 				"-o",
 				"${workspaceFolder}/../bin/shared_${workspaceFolderBasename}",
 				"${workspaceFolder}/test.c",
-				"-l_string"
 			],
 			"problemMatcher": [
 				"$gcc"

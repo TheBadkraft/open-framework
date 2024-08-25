@@ -22,6 +22,8 @@ extern const struct Open_String
     string *(*new)();
     string *(*alloc)(const char *);
     void (*copy)(string *, const char *);
+    string *(*subcopy)(string *, int, int);
+    void (*release)(string *);
     void (*free)(string *);
     size_t (*length)(string *);
     void (*capacity)(string *, size_t);

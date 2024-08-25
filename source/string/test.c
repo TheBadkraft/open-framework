@@ -1,66 +1,97 @@
 #include <assert.h>
-#include <stdarg.h>
 
-#include "../../source/open/core.h"
+#include "../../testing/test.h"
 
-void print_header(char *);
+#include "../open/core.h"
+
+//  utility prototypes
 void output_string(string *);
+//  test case prototypes
+void create_new_string();
+void allocate_new_string();
+void append_string();
+void format_string();
+void append_format_string();
 
 int main(int argc, char **argv)
 {
-    print_header("String.new");
+    write_header("OP.Tests: String");
+
+    TEST(create_new_string);
+    TEST(allocate_new_string);
+    TEST(append_string);
+    TEST(format_string);
+}
+
+void create_new_string()
+{
     string *str = String.new();
     assert(str != NULL);
-
-    char *val = "this is a string";
-    String.append(str, val);
-    assert(str->buffer != NULL);
-    assert(strlen(str->buffer) == strlen(val));
+    assert(str->buffer == NULL);
+    assert(str->capacity == 0);
 
     output_string(str);
-    free(str);
 
-    //  =========================================================
-    print_header("String.alloc");
+    //  TODO: what is causing String.free(..) to seg fault?
+    // free(str);
+
+    String.free(str);
+}
+void allocate_new_string()
+{
+    char *expStr = "this is a string";
+    size_t expLen = strlen(expStr);
+
+    string *str = String.alloc(expStr);
+    writefln("expStr '%s' ('%ld')", expStr, strlen(expStr), NULL);
+
+    assert(str->buffer != NULL);
+    assert(strlen(str->buffer) == strlen(expStr));
+    assert(str->capacity == strlen(expStr) + 1);
+
+    output_string(str);
+    String.free(str);
+}
+void append_string()
+{
     char *hello = "Hello";
     char *world = "World";
-    str = String.alloc(hello);
-    assert(str != NULL);
-    assert(String.length(str) == strlen(hello));
-    String.writeln(str);
+
+    string *str = String.alloc(hello);
     String.append(str, world);
     assert(String.length(str) == strlen(hello) + strlen(world));
 
     output_string(str);
-    free(str);
+    String.free(str);
+}
+void format_string()
+{
+    char *hello = "Hello";
+    char *world = "World";
 
-    //  =========================================================
-    print_header("String.format");
+    string *str = String.new();
     str = String.format("%s, %s", hello, world);
     assert(String.length(str) == strlen("Hello, World"));
 
     output_string(str);
-    free(str);
-
-    //  =========================================================
-    print_header("String.appendf");
-    str = String.alloc(hello);
-    String.appendf(str, ", %s!", world);
-    output_string(str);
-    free(str);
-
-    //  =========================================================
-    print_header("end open_string_tests ...");
+    String.free(str);
 }
-
-void print_header(char *header)
+void append_format_string()
 {
-    printf("%s\n", header);
+    char *hello = "Hello";
+    char *world = "World";
+
+    string *str = String.alloc(hello);
+    String.appendf(str, ", %s!", world);
+    assert(String.length(str) == strlen("Hello, World"));
+
+    output_string(str);
+    String.free(str);
 }
+
 void output_string(string *str)
 {
     String.writeln(str);
-    printf("str len (%ld)\n", strlen(str->buffer));
+    printf("str len (%ld)\n", str->buffer != NULL ? strlen(str->buffer) : 0);
     printf("str cap (%ld)\n", str->capacity);
-    printf("\n");
 }

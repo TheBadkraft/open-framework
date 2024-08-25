@@ -4,17 +4,19 @@
 			"path": ".."
 		},
 		{
-			"path": "../../open"
-		},
-		{
 			"path": "../../bin"
 		},
 		{
 			"path": "../../lib"
 		},
 		{
-			"path": "../../../testing"
+			"path": "../../open"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"main.C": "c",
+			"io.h": "c"
+		}
+	}
 }

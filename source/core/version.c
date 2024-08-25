@@ -2,13 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "version.h"
-
-#ifdef __version_build
-#ifndef __version
-#define __version __version_build
-#endif
-#endif
+#include "../open/version.h"
 
 char **CANDIDATES = (char *[]){
     "alpha", "beta", "release"};

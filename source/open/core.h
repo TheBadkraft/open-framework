@@ -1,7 +1,7 @@
 #ifndef _OPEN_CORE_H
 #define _OPEN_CORE_H
 
-#include "../open.h"
+// #include "../open.h"
 
 #include "types.h"
 #include "string.h"

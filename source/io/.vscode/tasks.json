@@ -2,14 +2,15 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "build",
 			"type": "cppbuild",
-			"label": "build tests",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-o",
-				"${workspaceFolder}/../bin/io_tests",
+				"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
 				"${workspaceFolder}/*.c",
-				"-l_string"
+				"-l_string",
+				"-l_except"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -18,15 +19,16 @@
 			"detail": "compiler: gcc"
 		},
 		{
+			"label": "build debug",
 			"type": "cppbuild",
-			"label": "debug tests",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-g3",
 				"-o",
-				"${workspaceFolder}/../bin/io_tests",
+				"${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
 				"${workspaceFolder}/*.c",
-				"-l_string"
+				"-l_string",
+				"-l_except"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -35,15 +37,15 @@
 			"detail": "compiler: gcc"
 		},
 		{
+			"label": "build so",
 			"type": "cppbuild",
-			"label": "make so",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-shared",
 				"-fpic",
 				"-o",
-				"${workspaceFolder}/../lib/lib_io.so",
-				"${workspaceFolder}/io*.c",
+				"${workspaceFolder}/../lib/lib_${workspaceFolderBasename}.so",
+				"${workspaceFolder}/${workspaceFolderBasename}*.c",
 				"-l_string"
 			],
 			"problemMatcher": [
@@ -53,13 +55,13 @@
 			"detail": "compiler: gcc"
 		},
 		{
-			"type": "cppbuild",
 			"label": "debug so",
+			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-g3",
 				"-o",
-				"${workspaceFolder}/../bin/shared_io",
+				"${workspaceFolder}/../bin/shared_${workspaceFolderBasename}",
 				"${workspaceFolder}/test.c",
 				"-l_string"
 			],
@@ -68,6 +70,6 @@
 			],
 			"group": "build",
 			"detail": "compiler: gcc"
-		}
+		},
 	]
 }

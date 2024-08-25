@@ -1,10 +1,7 @@
-#ifndef _VERSION_H
-#ifndef __version_build
-#define __version_build "0002"
-#endif
-#define _VERSION_H
+#ifndef _OPEN_VERSION_H
+#define _OPEN_VERSION_H
 
-#include "ctypes.h"
+#include "core.h"
 
 enum RC
 {
@@ -31,4 +28,4 @@ extern const struct Version_T
     version *(*new)(byte, byte, ushort, relc, char *);
 } Version;
 
-#endif //  _VERSION_H
+#endif //  _OPEN_VERSION_H
