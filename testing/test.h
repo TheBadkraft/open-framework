@@ -11,6 +11,9 @@
 #include "Except.h"
 #include "Assert.h"
 
+int test_count = 0;
+int pass_count = 0;
+
 void writeln(char *);
 void writefln(const char *, ...);
 void vwritefln(const char *, va_list);
@@ -26,6 +29,7 @@ except_class_define(AssertException, Exception);
         try                                                                                          \
         {                                                                                            \
             __test_func();                                                                           \
+            ++pass_count;                                                                            \
         }                                                                                            \
         catch (Throwable, e)                                                                         \
         {                                                                                            \
@@ -34,9 +38,13 @@ except_class_define(AssertException, Exception);
         finally                                                                                      \
         {                                                                                            \
             writefln("==========================================   [%-4s]", pass ? "PASS" : "FAIL"); \
+            ++test_count;                                                                            \
         }                                                                                            \
     })
-
+#define WRITE_STATS() ({                       \
+    writefln("Total Tests: %29d", test_count); \
+    writefln("Tests PASS:  %29d", pass_count); \
+})
 void write_header(char *header)
 {
     writefln("%s", header);

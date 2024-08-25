@@ -20,6 +20,9 @@ void new_stream_r_pass();
 void new_stream_rw_fail();
 void new_stream_rw_pass();
 void new_stream_rwc();
+void read_stream_c_fail();
+void read_stream_open();
+void read_stream_c_pass();
 //	utility prototypes
 void __output_file_info(file *);
 void __output_stream_info(stream *);
@@ -47,6 +50,11 @@ int main(int argc, char *argv[])
 	TEST(new_stream_rw_fail);
 	TEST(new_stream_rw_pass);
 	TEST(new_stream_rwc);
+	TEST(read_stream_c_fail);
+	TEST(read_stream_open);
+	TEST(read_stream_c_pass);
+
+	WRITE_STATS();
 }
 void __output_file_info(file *pFile)
 {
@@ -60,6 +68,7 @@ void __output_stream_info(stream *pStream)
 	writefln("file: %s", pStream->source->name->buffer);
 	writefln("created: %s", File.exists(pStream->source) ? "true" : "false");
 	writefln("length:  %ld", pStream->length);
+	writefln("handle:  %s", pStream->fstream != NULL ? "yes" : "no");
 	writefln("mode:    %s", get_mode_label(pStream->mode));
 	writefln("status:  %s", pStream->status == OK ? "OK" : "ERROR");
 	if (pStream->status == ERR)
@@ -259,5 +268,64 @@ void new_stream_rwc()
 		writefln("deleting %s", pStream->source->name->buffer);
 		File.delete(pStream->source);
 	}
+	Stream.free(pStream);
+}
+void read_stream_c_fail()
+{
+	/*
+		NOTE: pfSource (./.data/main.C) already exists so CREATE actually does nothing.
+
+		When a stream is created (.new(...)) with only CREATE mode, a file stream has not yet
+		been supplied by the system. We have a couple of options demonstrated in the next test cases
+	*/
+	enum io_mode mode = CREATE;
+	writefln("Stream.read(ERROR: %s)  %s", Stream.err_info(BAD_MODE), get_mode_label(mode));
+	stream *pStream;
+
+	Stream.new(File.new(pfSource), mode, &pStream);
+	char c;
+	assert(!Stream.read(pStream, &c));
+	__output_stream_info(pStream);
+	Stream.free(pStream);
+}
+void read_stream_open()
+{
+	enum io_mode mode = CREATE;
+	enum io_mode expMode = READ;
+	writefln("Stream.open  %s --> %s", get_mode_label(mode), get_mode_label(expMode));
+	stream *pStream;
+
+	/*
+		Option 1: when a stream object returns without error, call `.open(...)` with the desired
+		modes - READ, READ | WRITE, APPEND, etc - to have the modes set and retrieve a file stream
+		handle from the system.
+	*/
+	Stream.new(File.new(pfSource), mode, &pStream);
+	assert(Stream.open(pStream, expMode));
+	assert(pStream->mode == expMode);
+
+	char c;
+	assert(Stream.read(pStream, &c));
+	__output_stream_info(pStream);
+	Stream.free(pStream);
+}
+void read_stream_c_pass()
+{
+	enum io_mode mode = CREATE;
+	enum io_mode expMode = READ;
+	writefln("Stream.open  %s --> %s", get_mode_label(mode), get_mode_label(expMode));
+	stream *pStream;
+
+	/*
+		Option 2: when a stream object returns without error, set the `mode` to something compatible
+		with the operation - READ, READ | WRITE, APPEND, etc. This will prevent Stream from returning
+		false with an *incompatible mode* complaint.
+	*/
+	Stream.new(File.new(pfSource), mode, &pStream);
+	pStream->mode = expMode;
+
+	char c;
+	assert(Stream.read(pStream, &c));
+	__output_stream_info(pStream);
 	Stream.free(pStream);
 }
