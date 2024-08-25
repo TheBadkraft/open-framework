@@ -7,11 +7,11 @@ typedef enum io_mode iomode;
 typedef enum io_error ioerr;
 
 char **ERR_MSGS = (char *[]){
-    "No error",
-    "File not found"};
+    "No error", "File not found", "Incompatible mode"};
 
 bool __stream_new(file *, iomode, stream **);
-//
+bool __stream_open(stream *, iomode);
+bool __stream_read(stream *, char *);
 void __stream_free(stream *);
 void __stream_get_error(stream *, string **);
 
@@ -73,6 +73,24 @@ char *get_mode_label(iomode mode)
 
 char *__get_mode(iomode mode);
 
+bool __open_file_stream(stream **pStream, char *pfmode)
+{
+    bool retOk = false;
+
+    if ((retOk = ((*pStream)->status != ERR)) && strcmp("", pfmode) != 0)
+    {
+        string *path;
+        File.full_path((*pStream)->source, &path);
+        (*pStream)->fstream = fopen(path->buffer, pfmode);
+
+        if ((*pStream)->fstream)
+        {
+            (*pStream)->status = OK;
+        }
+    }
+
+    return retOk;
+}
 bool __stream_new(file *pFile, iomode mode, stream **pStream)
 {
     char *pfmode = __get_mode(mode);
@@ -103,18 +121,18 @@ bool __stream_new(file *pFile, iomode mode, stream **pStream)
             (*pStream)->status = ERR;
         }
     }
-    if ((retOk = ((*pStream)->status != ERR)) && strcmp("", pfmode) != 0)
+    if (retOk = __open_file_stream(pStream, pfmode))
     {
-        {
-            string *path;
-            File.full_path((*pStream)->source, &path);
-            (*pStream)->fstream = fopen(path->buffer, pfmode);
+        // {
+        //     string *path;
+        //     File.full_path((*pStream)->source, &path);
+        //     (*pStream)->fstream = fopen(path->buffer, pfmode);
 
-            if ((*pStream)->fstream)
-            {
-                (*pStream)->status = OK;
-            }
-        }
+        //     if ((*pStream)->fstream)
+        //     {
+        //         (*pStream)->status = OK;
+        //     }
+        // }
 
         (*pStream)->length = pFile->size;
     }
@@ -125,6 +143,8 @@ void __stream_free(stream *pStream)
 {
     if (pStream)
     {
+        //  should we leave this free call to the caller since it is created outside
+        //  the scope of Stream ...???
         File.free(pStream->source);
         if (pStream->fstream)
         {
@@ -203,9 +223,50 @@ char *__get_mode(iomode mode)
 
     return m;
 }
+bool __stream_open(stream *pStream, iomode mode)
+{
+    bool retOk = false;
+    char *pfmode = __get_mode(mode);
+
+    if (retOk = __open_file_stream(&pStream, pfmode))
+    {
+        pStream->mode = mode;
+    }
+
+    return retOk;
+}
+bool __stream_read(stream *pStream, char *out)
+{
+    bool retOk = (READ & pStream->mode) == READ;
+    if (!retOk)
+    {
+        pStream->status = ERR;
+        pStream->error = BAD_MODE;
+    }
+    else if (!pStream->fstream)
+    {
+        retOk = __open_file_stream(&pStream, __get_mode(pStream->mode));
+    }
+
+    if (retOk)
+    {
+        int c;
+        if ((c = fgetc(pStream->fstream)) != EOF)
+        {
+            (*out) = (char)c;
+            pStream->pos = ftell(pStream->fstream);
+        }
+
+        return c != EOF;
+    }
+
+    return retOk;
+}
 
 const struct IO_Stream Stream = {
     .new = &__stream_new,
+    .open = &__stream_open,
+    .read = &__stream_read,
     .free = &__stream_free,
     .get_error = &__stream_get_error,
     .err_info = &__get_err_info,

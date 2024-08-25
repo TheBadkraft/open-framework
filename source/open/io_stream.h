@@ -16,6 +16,7 @@ enum io_error
 {
     NONE = 0,
     FILE_NOT_FOUND = 1,
+    BAD_MODE = 2,
 };
 
 struct io_stream
@@ -41,7 +42,8 @@ typedef struct io_stream stream;
 extern const struct IO_Stream
 {
     bool (*new)(file *, enum io_mode, stream **);
-
+    bool (*open)(stream *, enum io_mode);
+    bool (*read)(stream *, char *);
     void (*free)(stream *);
     void (*get_error)(stream *, string **);
     char *(*err_info)(enum io_error);
