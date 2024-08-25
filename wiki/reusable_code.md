@@ -72,7 +72,7 @@ Using **VSCode** we will be able to forego all the terminal commands throughout 
 <details>
 	<summary>`tasks.json` <small>*(click to expand)*</small></summary>
 	
-	```json
+	``` json
 	{
 		"version": "2.0.0",
 		"tasks": [
