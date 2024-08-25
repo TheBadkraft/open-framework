@@ -34,7 +34,7 @@
     >File.new("./my_file.txt", &pFile);
     >Stream.new(pFile, READ | WRITE, &pStream);
     >```
-  - Both are correct implementations of the specification. The intent behind this specification is to convey to the caller that they are responsible for calling `free(...)` when it is appropriate. In this particular implementation, `Stream.free`(stream *)` will also close the encapsulated `file`.
+  - Both are correct implementations of the specification. The intent behind this specification is to convey to the caller that they are responsible for calling `free(...)` when it is appropriate. In this particular implementation, `Stream.free(stream *)` will also close the encapsulated `file`.
 
 
 | Previous | | Next |  
