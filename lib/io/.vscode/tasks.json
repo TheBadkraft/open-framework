@@ -44,7 +44,7 @@
 				"-shared",
 				"-fpic",
 				"-o",
-				"${workspaceFolder}/../lib/lib_${workspaceFolderBasename}.so",
+				"${workspaceFolder}/../shared/lib_${workspaceFolderBasename}.so",
 				"${workspaceFolder}/${workspaceFolderBasename}*.c",
 				"-l_string"
 			],
@@ -61,9 +61,11 @@
 			"args": [
 				"-g3",
 				"-o",
-				"${workspaceFolder}/../bin/shared_${workspaceFolderBasename}",
+				"${workspaceFolder}/../bin/shared_dbg_${workspaceFolderBasename}",
 				"${workspaceFolder}/test.c",
-				"-l_string"
+				"-l_string",
+				"-l_except",
+				"-l_${workspaceFolderBasename}"
 			],
 			"problemMatcher": [
 				"$gcc"

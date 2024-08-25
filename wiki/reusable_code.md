@@ -68,6 +68,91 @@ Output:
 
 Here you can see all the dependencies for your source executable. Lines 2 & 3 list our linked libraries.
 
+Using **VSCode** we will be able to forego all the terminal commands throughout developement. The folder structure makes it easy to copy *`tasks.json`* across projects.
+<details>
+	<summary>`tasks.json` <small>*(click to expand)*</small></summary>
+	
+	``` json
+	{
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "build",
+				"type": "cppbuild",
+				"command": "/usr/bin/gcc",
+				"args": [
+					"-o",
+					"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
+					"${workspaceFolder}/*.c",
+					"-l_string",
+					"-l_except"
+				],
+				"problemMatcher": [
+					"$gcc"
+				],
+				"group": "build",
+				"detail": "compiler: gcc"
+			},
+			{
+				"label": "build debug",
+				"type": "cppbuild",
+				"command": "/usr/bin/gcc",
+				"args": [
+					"-g3",
+					"-o",
+					"${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
+					"${workspaceFolder}/*.c",
+					"-l_string",
+					"-l_except"
+				],
+				"problemMatcher": [
+					"$gcc"
+				],
+				"group": "build",
+				"detail": "compiler: gcc"
+			},
+			{
+				"label": "build so",
+				"type": "cppbuild",
+				"command": "/usr/bin/gcc",
+				"args": [
+					"-shared",
+					"-fpic",
+					"-o",
+					"${workspaceFolder}/../shared/lib_${workspaceFolderBasename}.so",
+					"${workspaceFolder}/${workspaceFolderBasename}*.c",
+					"-l_string"
+				],
+				"problemMatcher": [
+					"$gcc"
+				],
+				"group": "build",
+				"detail": "compiler: gcc"
+			},
+			{
+				"label": "debug so",
+				"type": "cppbuild",
+				"command": "/usr/bin/gcc",
+				"args": [
+					"-g3",
+					"-o",
+					"${workspaceFolder}/../bin/shared_${workspaceFolderBasename}",
+					"${workspaceFolder}/test.c",
+					"-l_string",
+					"-l_except",
+					"-l_${workspaceFolderBasename}"
+				],
+				"problemMatcher": [
+					"$gcc"
+				],
+				"group": "build",
+				"detail": "compiler: gcc"
+			},
+		]
+	}
+	```
+</details>
+
 
 | Previous | | Next |  
 | :-------------- | :--------------: | --------------: |  
