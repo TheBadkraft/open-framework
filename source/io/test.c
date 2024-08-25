@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
 {
 	write_header("OP Tests: IO");
 
-	// TEST(file_path_exists);
-	// TEST(file_size);
-	// TEST(create_file_obj);
+	TEST(file_path_exists);
+	TEST(file_size);
+	TEST(create_file_obj);
 	TEST(create_file);
-	// TEST(get_abs_path);
+	TEST(get_abs_path);
 	// TEST(combine_paths);
 
 	write_header("OP Tests: IO.Stream");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	TEST(read_stream_open);
 	TEST(read_stream_c_pass);
 
-	WRITE_STATS();
+	TEST_STATS();
 }
 void __output_file_info(file *pFile)
 {
