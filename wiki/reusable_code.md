@@ -153,6 +153,7 @@ Using **VSCode** we will be able to forego all the terminal commands throughout 
 	```
 </details>
 
+We have added a new task to the json above to display dependencies.
 
 | Previous | | Next |  
 | :-------------- | :--------------: | --------------: |  

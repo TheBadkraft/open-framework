@@ -33,7 +33,10 @@
 			"problemMatcher": [
 				"$gcc"
 			],
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"detail": "compiler: gcc"
 		},
 		{
@@ -73,5 +76,21 @@
 			"group": "build",
 			"detail": "compiler: gcc"
 		},
+		{
+			"label": "dependencies",
+			"type": "process",
+			"command": "/usr/bin/ldd",
+			"args": [
+				"${workspaceFolder}/../bin/shared_dbg_${workspaceFolderBasename}"
+			],
+			"dependsOn": [
+				"debug so"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "test",
+			"detail": "linker info: ldd"
+		}
 	]
 }
