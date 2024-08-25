@@ -9,15 +9,15 @@
 
 *OpenPlatform* specifications for **C**:
 - With rare exceptions, objects that should be *`freed`* by the caller will not be returned by a function. Instead, construct the function definition with an *out* parameter.
- - *Example*
- - > *Don't*
- ``` c
- string *get_name(int id);
- ```
- - > *Do*
- ``` c
- bool get_name(int id, string **);
- ```
+  - *Example*
+    - > *Don't*
+      >``` c
+      >string *get_name(int id);
+      >```
+    - > *Do*
+      >``` c
+      >bool get_name(int id, string **);
+      >```
 
 
 | Previous | | Next |  
