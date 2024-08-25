@@ -7,7 +7,7 @@
 			"path": "../../bin"
 		},
 		{
-			"path": "../../lib"
+			"path": "../../shared"
 		},
 		{
 			"path": "../../open"

@@ -137,7 +137,7 @@ void get_abs_path()
 {
 	writeln("Path.absolute: get the absolute members of a relative path");
 
-	char *expPath = "/home/david/OpenPlatform/open_framework/source/io/.data/main.C";
+	char *expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
 	string *actPath; // = String.new();
 
 	bool retOk = Path.absolute(pfSource, &actPath);
@@ -164,9 +164,9 @@ void combine_paths()
 {
 	writeln("Path.combine: combine path elements with a base path");
 
-	char *expPath = "/home/david/OpenPlatform/open_framework/source/io/.data/main.C";
+	char *expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
 
-	string *pBase = String.alloc("/home/david/OpenPlatform/open_framework/source/io");
+	string *pBase = String.alloc("/home/david/OpenPlatform/open_framework/lib/io");
 	Path.combine(&pBase, ".data", "main.C", NULL);
 	assert(strcmp(expPath, pBase->buffer) == 0);
 
