@@ -71,7 +71,8 @@ Here you can see all the dependencies for your source executable. Lines 2 & 3 li
 Using **VSCode** we will be able to forego all the terminal commands throughout developement. The folder structure makes it easy to copy *`tasks.json`* across projects.
 <details>
 	<summary>`tasks.json` <small>*(click to expand)*</small></summary>
-	``` json
+	
+	```json
 	{
 		"version": "2.0.0",
 		"tasks": [
