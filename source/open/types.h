@@ -3,10 +3,7 @@
 
 #include <stdbool.h>
 
-/*
-	Pure C - no windows code
-	removed any win32/cpp defines, typedefs, etc
-*/
+typedef signed long int64_t;
 
 typedef unsigned int uint;
 typedef unsigned long ulong;

@@ -5,13 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define pub_open_string 0
-
-#if pub_open_string
-#include "open/types.h"
-#else
 #include "types.h"
-#endif
 
 struct open_string
 {
@@ -28,6 +22,8 @@ extern const struct Open_String
     string *(*new)();
     string *(*alloc)(const char *);
     void (*copy)(string *, const char *);
+    string *(*subcopy)(string *, int, int);
+    void (*release)(string *);
     void (*free)(string *);
     size_t (*length)(string *);
     void (*capacity)(string *, size_t);
