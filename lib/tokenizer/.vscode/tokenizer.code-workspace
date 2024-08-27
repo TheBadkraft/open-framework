@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../open"
+		},
+		{
+			"path": "../../bin"
+		},
+		{
+			"path": "../../lib"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"core.h": "c",
+			"string.h": "c"
+		}
+	},
+}
