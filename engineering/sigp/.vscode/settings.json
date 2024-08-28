@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "locale_t.h": "c",
-        "__locale_t.h": "c"
-    }
-}
