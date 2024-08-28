@@ -5,6 +5,7 @@
 #include "../open/string.h"
 
 //  prototypes
+bool __str_null_or_empty(string *);
 string *__str_new();
 string *__str_alloc(const char *);
 void __str_copy(string *, const char *);
@@ -18,12 +19,14 @@ void __str_trunc(string *, size_t);
 size_t __fmt_count(const char *);
 //  -------------------
 
-bool str_null_or_empty(string *pStr)
+bool __str_null_or_empty(string *pStr)
 {
-    if (!pStr || strcmp(String.empty, pStr->buffer) == 0)
+    if (!pStr || !(pStr->buffer) || strcmp(String.empty, pStr->buffer) == 0)
     {
         return true;
     }
+
+    return false;
 }
 string *__str_new()
 {
@@ -162,7 +165,7 @@ size_t __fmt_count(const char *format)
 
 const struct Open_String String = {
     .empty = "",
-    .is_null_or_empty = &str_null_or_empty,
+    .is_null_or_empty = &__str_null_or_empty,
     .new = &__str_new,
     .alloc = &__str_alloc,
     .copy = &__str_copy,

@@ -1,7 +1,6 @@
 #include <assert.h>
 
-#include "../../testing/test.h"
-
+#include "../open/test.h"
 #include "../open/core.h"
 
 //  utility prototypes

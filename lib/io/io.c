@@ -207,14 +207,18 @@ bool __path_absolute(char *pRelPath, string **pAbsPath)
 }
 void __path_combine(string **pBasePath, ...)
 {
+    int lastPos = 0, lastChar = 0;
     //  append the last '/'
     char *buffer = (*pBasePath)->buffer;
-    int lastPos = strlen(buffer) - 1;
-    int lastChar = strrchr((*pBasePath)->buffer, '/') - buffer;
+    if (buffer)
+    {
+        lastPos = strlen(buffer) - 1;
+        lastChar = strrchr((*pBasePath)->buffer, '/') - buffer;
+    }
 
     if (lastChar != lastPos)
     {
-        String.append(*pBasePath, "/");
+        String.append((*pBasePath), "/");
     }
 
     va_list args;
@@ -222,12 +226,12 @@ void __path_combine(string **pBasePath, ...)
     char *arg = va_arg(args, char *);
     while (arg)
     {
-        String.append(*pBasePath, arg);
+        String.append((*pBasePath), arg);
         arg = va_arg(args, char *);
 
         if (arg)
         {
-            String.append(*pBasePath, "/");
+            String.append((*pBasePath), "/");
         }
     }
     va_end(args);

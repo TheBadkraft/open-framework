@@ -24,7 +24,7 @@ except_class_declare(AssertException, Exception);
 
 except_class_define(AssertException, Exception);
 
-bool doTests;
+bool doTests = true;
 
 #define BEGIN_SET(__test_set, __do_tests)                                    \
     {                                                                        \
