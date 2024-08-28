@@ -10,13 +10,14 @@
 			"path": "../../bin"
 		},
 		{
-			"path": "../../lib"
+			"path": "../../shared"
 		}
 	],
 	"settings": {
 		"files.associations": {
 			"core.h": "c",
-			"string.h": "c"
+			"string.h": "c",
+			"io_stream.h": "c"
 		}
 	},
 }

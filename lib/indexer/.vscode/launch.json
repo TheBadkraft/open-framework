@@ -6,7 +6,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
-            "args": [],
+            "args": [
+                "-g"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
