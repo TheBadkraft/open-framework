@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../open"
+		},
+		{
+			"path": "../../bin"
+		},
+		{
+			"path": "../../shared"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"core.h": "c",
+			"string.h": "c",
+			"io_stream.h": "c"
+		}
+	},
+}

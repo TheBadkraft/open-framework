@@ -1,19 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../testing/test.h"
+#include "../open/test.h"
 
 #include "../open/core.h"
 #include "../open/io.h"
 #include "../open/io_stream.h"
 
-//	test case prototypes
+//	FILE: test case prototypes
 void file_path_exists();
 void file_size();
 void create_file_obj();
 void create_file();
+void file_directory();
+//	DIRECTORY: test case prototypes
+void dir_new();
+void dir_exists();
+void dir_current();
+//	PATH: test case prototypes
 void get_abs_path();
 void combine_paths();
+void path_directory();
+void path_file_directory();
+//	STREAM: test case prototypes
 void new_stream_c();
 void new_stream_r_fail();
 void new_stream_r_pass();
@@ -25,43 +34,88 @@ void read_stream_open();
 void read_stream_c_pass();
 //	utility prototypes
 void __output_file_info(file *);
+void __output_directory_info(directory *);
 void __output_stream_info(stream *);
 
 //	test values
+char *pfDir = "./.data";
 char *pfSource = "./.data/main.C";
 char *pfNone = "./.data/bad.log";
 char *pfTemp = "./.data/test.log";
 
 int main(int argc, char *argv[])
 {
-	write_header("OP Tests: IO");
+	if (Utils.path_exists(pfTemp))
+	{
+		remove(pfTemp);
+	}
 
-	TEST(file_path_exists);
-	TEST(file_size);
-	TEST(create_file_obj);
-	TEST(create_file);
+	BEGIN_SET(file, true)
+	{
+		if (doTests)
+			write_header("OP Tests: IO.File");
+		TEST(file_path_exists);
+		TEST(file_size);
+		TEST(create_file_obj);
+		TEST(create_file);
+		TEST(file_directory);
+	}
+	END_SET(file)
+
+	BEGIN_SET(directory, false)
+	{
+		if (doTests)
+			write_header("OP Tests: IO.Directory");
+		TEST(dir_new);
+		TEST(dir_exists);
+		TEST(dir_current);
+	}
+	END_SET(directory)
+
+	BEGIN_SET(Path, true)
+	if (doTests)
+		write_header("OP Tests: IO.Path");
 	TEST(get_abs_path);
-	// TEST(combine_paths);
+	TEST(combine_paths);
+	TEST(path_directory);
+	TEST(path_file_directory);
+	END_SET(Path)
 
-	write_header("OP Tests: IO.Stream");
-	TEST(new_stream_c);
-	TEST(new_stream_r_fail);
-	TEST(new_stream_r_pass);
-	TEST(new_stream_rw_fail);
-	TEST(new_stream_rw_pass);
-	TEST(new_stream_rwc);
-	TEST(read_stream_c_fail);
-	TEST(read_stream_open);
-	TEST(read_stream_c_pass);
+	BEGIN_SET(stream, false)
+	{
+		if (doTests)
+			write_header("OP Tests: IO.Stream");
+		TEST(new_stream_c);
+		TEST(new_stream_r_fail);
+		TEST(new_stream_r_pass);
+		TEST(new_stream_rw_fail);
+		TEST(new_stream_rw_pass);
+		TEST(new_stream_rwc);
+		TEST(read_stream_c_fail);
+		TEST(read_stream_open);
+		TEST(read_stream_c_pass);
+	}
+	END_SET(stream)
 
 	TEST_STATS();
 }
 void __output_file_info(file *pFile)
 {
+	directory *pDir;
+	File.directory(pFile, &pDir);
+
 	writefln("file: %s", pFile->name->buffer);
-	writefln("object:  %s", pFile != NULL ? "true" : "false");
-	writefln("created: %s", File.exists(pFile) ? "true" : "false");
-	writefln("size:    %ld", pFile->size);
+	writefln("object:    %s", pFile != NULL ? "true" : "false");
+	writefln("created:   %s", File.exists(pFile) ? "true" : "false");
+	writefln("directory: %s", pDir->name->buffer);
+	writefln("size:      %ld", pFile->size);
+
+	Directory.free(pDir);
+}
+void __output_directory_info(directory *pDir)
+{
+	writefln("name: %s", pDir->name->buffer);
+	writefln("path: %s", pDir->path->buffer);
 }
 void __output_stream_info(stream *pStream)
 {
@@ -84,8 +138,8 @@ void __output_stream_info(stream *pStream)
 void file_path_exists()
 {
 	writeln("path_exists: determine if path exists");
-	assert(path_exists(pfSource));
-	assert(path_exists(pfNone) == false);
+	assert(Utils.path_exists(pfSource));
+	assert(Utils.path_exists(pfNone) == false);
 }
 void file_size()
 {
@@ -133,6 +187,50 @@ void create_file()
 
 	File.free(pFile);
 }
+void file_directory()
+{
+	writeln("File.directory: get file directory");
+
+	directory *pDir;
+	file *pFile;
+	File.directory(pFile = File.new(pfSource), &pDir);
+	assert(pDir != NULL);
+	assert(strcmp(".data", pDir->name->buffer) == 0);
+	assert(strcmp("./.data", pDir->path->buffer) == 0);
+
+	__output_directory_info(pDir);
+	File.free(pFile);
+	Directory.free(pDir);
+}
+
+void dir_new()
+{
+	directory *pDir = Directory.new(pfDir);
+	assert(pDir != NULL);
+	assert(strcmp(".data", pDir->name->buffer) == 0);
+	assert(strcmp("./.data", pDir->path->buffer) == 0);
+
+	__output_directory_info(pDir);
+	Directory.free(pDir);
+}
+void dir_exists()
+{
+	directory *pDir = Directory.new(pfDir);
+	assert(Directory.exists(pDir));
+
+	__output_directory_info(pDir);
+	Directory.free(pDir);
+}
+void dir_current()
+{
+	directory *pDir;
+	Directory.current(&pDir);
+	assert(pDir != NULL);
+
+	__output_directory_info(pDir);
+	Directory.free(pDir);
+}
+
 void get_abs_path()
 {
 	writeln("Path.absolute: get the absolute members of a relative path");
@@ -173,6 +271,25 @@ void combine_paths()
 	// free(pBase);
 	String.free(pBase);
 }
+void path_directory()
+{
+	writeln("Path.directory: return char* directory from path");
+
+	char *expDir = ".data";
+	char *pDir = Path.directory(pfDir);
+
+	assert(strcmp(expDir, pDir) == 0);
+}
+void path_file_directory()
+{
+	writeln("Path.directory: return char* directory from file path");
+
+	char *expDir = ".data";
+	char *pDir = Path.directory(pfSource);
+
+	assert(strcmp(expDir, pDir) == 0);
+}
+
 void new_stream_c()
 {
 	enum io_mode mode = CREATE;
