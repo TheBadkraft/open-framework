@@ -13,41 +13,35 @@
 
 bool __file_exists(file *);
 void __file_size(file *);
-file *__file_new(char *);
-void __get_file_path(file *, string **);
+file *__file_new(string);
+void __get_file_path(file *, string *);
 void __file_free(file *);
 void __file_delete(file *);
 bool __file_create(file *);
 void __file_get_directory(file *, directory **);
 
-directory *__dir_new(char *);
+directory *__dir_new(string);
 bool __dir_exists(directory *);
 void __dir_cwd(directory **);
 void __dir_free(directory *);
 
-bool __path_absolute(char *, string **);
-void __path_combine(string **, ...);
-char *__path_get_directory(char *);
-IOType __path_io_type(char *);
+bool __path_absolute(string, string *);
+void __path_combine(string, ...);
+bool __path_exists(string);
+string __path_get_directory(string);
+IOType __path_io_type(string);
 //      ===================== Utility Definitions ===========================
-bool __path_exists(char *pPath)
-{
-    return access(pPath, F_OK) == 0 ? true : false;
-}
-bool path_exists(string *pPath)
-{
-    return __path_exists(pPath->buffer);
-}
+
 //      ======================= File Definitions ============================
 bool __file_exists(file *pFile)
 {
     bool retOk = false;
     if (pFile && pFile->path)
     {
-        string *pPath;
+        string pPath;
         __get_file_path(pFile, &pPath);
 
-        retOk = path_exists(pPath);
+        retOk = __path_exists(pPath);
         String.free(pPath);
     }
 
@@ -59,9 +53,9 @@ void __file_size(file *pFile)
     pFile->size = -1;
     if (__file_exists(pFile))
     {
-        string *pPath;
+        string pPath;
         __get_file_path(pFile, &pPath);
-        if (stat(pPath->buffer, &iostat) == 0)
+        if (stat(pPath, &iostat) == 0)
         {
             pFile->size = iostat.st_size;
         }
@@ -69,7 +63,7 @@ void __file_size(file *pFile)
         String.free(pPath);
     }
 }
-file *__file_new(char *pFPath)
+file *__file_new(string pFPath)
 {
     file *pFile = malloc(sizeof(file));
     if (!pFile)
@@ -80,16 +74,16 @@ file *__file_new(char *pFPath)
     // printf("File.new[%s] ", pFPath);
 
     //  function needs to go to Path but we need to know if it's a directory or file
-    pFile->name = String.alloc(basename(pFPath));
+    String.alloc(basename(pFPath), &(pFile->name));
     // printf("%s ", pFile->name->buffer);
 
     //  this is a get_path function for Path
     size_t pathLen = strlen(pFPath) - String.length(pFile->name) - 1;
-    char *path = calloc(pathLen, sizeof(char));
+    string path = calloc(pathLen, sizeof(char));
     strncpy(path, pFPath, pathLen);
 
-    pFile->path = String.alloc(path);
-    // printf("(\"%s\")\n", pFile->path->buffer);
+    String.alloc(path, &(pFile->path));
+    // printf("(\"%s\")\n", pFile=>path);
 
     __file_size(pFile);
 
@@ -97,23 +91,23 @@ file *__file_new(char *pFPath)
 }
 void __file_delete(file *pFile)
 {
-    string *pPath;
+    string pPath;
     __get_file_path(pFile, &pPath);
 
-    remove(pPath->buffer);
+    remove(pPath);
 
     String.free(pPath);
 }
 bool __file_create(file *pFile)
 {
-    string *pPath;
+    string pPath;
     __get_file_path(pFile, &pPath);
 
-    FILE *pStream = fopen(pPath->buffer, "w");
+    FILE *pStream = fopen(pPath, "w");
     fclose(pStream);
     __file_size(pFile);
 
-    bool retOk = path_exists(pPath);
+    bool retOk = __path_exists(pPath);
     String.free(pPath);
 
     return retOk;
@@ -136,37 +130,37 @@ void __file_free(file *pFile)
 }
 void __file_get_directory(file *pFile, directory **pDir)
 {
-    (*pDir) = __dir_new(pFile->path->buffer);
+    (*pDir) = __dir_new(pFile->path);
 }
-void __get_file_path(file *pFile, string **pFullPath)
+void __get_file_path(file *pFile, string *pFullPath)
 {
-    *pFullPath = String.new();
-    String.copy(*pFullPath, pFile->path->buffer);
-    Path.combine(pFullPath, pFile->name->buffer, NULL);
+    String.new(0, pFullPath);
+    String.copy(*pFullPath, pFile->path);
+    Path.combine(*pFullPath, pFile->name, NULL);
 }
 //      ==================== Directory Definitions ==========================
-directory *__dir_new(char *pPath)
+directory *__dir_new(string pPath)
 {
     directory *pDir = malloc(sizeof(directory));
-    char *slash = strrchr(pPath, '/');
+    string slash = strrchr(pPath, '/');
     if (!slash)
     {
         perror("expected path delimeter not found.");
     }
 
-    // char *pfDir = strndup(pPath, (++slash) - pPath);
-    pDir->path = String.alloc(pPath);
-    pDir->name = String.alloc(++slash);
+    // string pfDir = strndup(pPath, (++slash) - pPath);
+    String.alloc(pPath, &(pDir->path));
+    String.alloc(++slash, &(pDir->name));
 
     return pDir;
 }
 bool __dir_exists(directory *pDir)
 {
-    return path_exists(pDir->path);
+    return __path_exists(pDir->path);
 }
 void __dir_cwd(directory **pDir)
 {
-    char *pfDir;
+    string pfDir;
 
     if ((pfDir = getcwd(NULL, 0)) == NULL)
     {
@@ -191,55 +185,54 @@ void __dir_free(directory *pDir)
     }
 }
 //      ======================= Path Definitions ============================
-bool __path_absolute(char *pRelPath, string **pAbsPath)
+bool __path_absolute(string pRelPath, string *pAbsPath)
 {
     bool retOk = __path_exists(pRelPath);
     *pAbsPath = NULL;
 
     if (retOk)
     {
-        *pAbsPath = String.new();
-        String.capacity(*pAbsPath, PATH_MAX);
-        realpath(pRelPath, (*pAbsPath)->buffer);
+        String.new(PATH_MAX, pAbsPath);
+        realpath(pRelPath, *pAbsPath);
     }
 
     return retOk;
 }
-void __path_combine(string **pBasePath, ...)
+void __path_combine(string pBasePath, ...)
 {
-    int lastPos = 0, lastChar = 0;
+    int hasSlash = 0;
     //  append the last '/'
-    char *buffer = (*pBasePath)->buffer;
-    if (buffer)
-    {
-        lastPos = strlen(buffer) - 1;
-        lastChar = strrchr((*pBasePath)->buffer, '/') - buffer;
-    }
+    size_t pos = (strrchr(pBasePath, '/') - pBasePath);
+    hasSlash = (strlen(pBasePath) - 1) - pos;
 
-    if (lastChar != lastPos)
+    if (hasSlash != 0)
     {
-        String.append((*pBasePath), "/");
+        String.append(pBasePath, "/");
     }
 
     va_list args;
     va_start(args, pBasePath);
-    char *arg = va_arg(args, char *);
+    string arg = va_arg(args, string);
     while (arg)
     {
-        String.append((*pBasePath), arg);
-        arg = va_arg(args, char *);
+        String.append(pBasePath, arg);
+        arg = va_arg(args, string);
 
         if (arg)
         {
-            String.append((*pBasePath), "/");
+            String.append(pBasePath, "/");
         }
     }
     va_end(args);
 }
-char *__path_get_directory(char *pPath)
+bool __path_exists(string pPath)
+{
+    return access(pPath, F_OK) == 0 ? true : false;
+}
+string __path_get_directory(string pPath)
 {
     //  TODO: check for '.' or '..' and get full path
-    char *pfDir = NULL;
+    string pfDir = NULL;
     IOType type = __path_io_type(pPath);
 
     switch (type)
@@ -250,7 +243,7 @@ char *__path_get_directory(char *pPath)
         break;
     case IO_FILE:
         //  pfDir is a file name
-        char *slash = strrchr(pPath, '/');
+        string slash = strrchr(pPath, '/');
         if (!slash)
         {
             perror("expected path delimeter not found.");
@@ -266,11 +259,11 @@ char *__path_get_directory(char *pPath)
 
     return pfDir;
 }
-char *__path_get_file_name(char *pPath)
+string __path_get_file_name(string pPath)
 {
     return basename(pPath);
 }
-IOType __path_io_type(char *pPath)
+IOType __path_io_type(string pPath)
 {
     DIR *dir = opendir(pPath);
 

@@ -17,15 +17,15 @@ typedef struct version_t
     byte minor;
     ushort build;
     relc release;
-    char *descr;
+    string descr;
 } version;
 
 extern const struct Version_T
 {
-    char *(*release)(relc);
-    char *(*version)(version *);
-    char *(*to_string)(version *);
-    version *(*new)(byte, byte, ushort, relc, char *);
+    string (*release)(relc);
+    string (*version)(version *);
+    string (*to_string)(version *);
+    version *(*new)(byte, byte, ushort, relc, string);
 } Version;
 
 #endif //  _OPEN_VERSION_H

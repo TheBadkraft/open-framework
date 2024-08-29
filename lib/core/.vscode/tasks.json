@@ -1,30 +1,33 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "build",
-			"type": "cppbuild",
-			"command": "/usr/bin/gcc",
-			"args": [
-				"-o",
-				"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
-				"${workspaceFolder}/*.c",
-				"-l_except"
-			],
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": "build",
-			"detail": "compiler: gcc"
-		},
-		{
-			"label": "build debug",
+		{   "label": "build debug",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-g3",
 				"-o",
 				"${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
+				"${workspaceFolder}/test/test.c",
+				"${workspaceFolder}/*.c",
+				"-l_except"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: gcc"
+		},
+		{   "label": "build",
+			"type": "cppbuild",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-o",
+				"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
+				"${workspaceFolder}/test/test.c",
 				"${workspaceFolder}/*.c",
 				"-l_except"
 			],
@@ -34,8 +37,7 @@
 			"group": "build",
 			"detail": "compiler: gcc"
 		},
-		{
-			"label": "build so",
+		{   "label": "build so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
@@ -43,25 +45,24 @@
 				"-fpic",
 				"-o",
 				"${workspaceFolder}/../shared/lib_${workspaceFolderBasename}.so",
-				"${workspaceFolder}/core.c",
-				"${workspaceFolder}/string.c",
-				"${workspaceFolder}/version.c",
+				"${workspaceFolder}/*.c"
 			],
 			"problemMatcher": [
 				"$gcc"
 			],
 			"group": "build",
+			"dependsOn": [],
 			"detail": "compiler: gcc"
 		},
-		{
-			"label": "debug so",
+		{   "label": "debug so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-g3",
 				"-o",
 				"${workspaceFolder}/../bin/shared_${workspaceFolderBasename}",
-				"${workspaceFolder}/test.c",
+				"${workspaceFolder}/test/test.c",
+				"-l_except",
 				"-l_${workspaceFolderBasename}"
 			],
 			"problemMatcher": [
@@ -70,5 +71,17 @@
 			"group": "build",
 			"detail": "compiler: gcc"
 		},
+		{   "label": "dependencies",
+			"type": "process",
+			"command": "/usr/bin/ldd",
+			"args": [
+				"${workspaceFolder}/../bin/shared_dbg_${workspaceFolderBasename}"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "test",
+			"detail": "linker info: ldd"
+		}
 	]
 }

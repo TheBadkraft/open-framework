@@ -9,7 +9,7 @@
 				"-o",
 				"${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
 				"${workspaceFolder}/*.c",
-				"-l_string",
+				"-l_core",
 				"-l_except"
 			],
 			"problemMatcher": [
@@ -27,7 +27,7 @@
 				"-o",
 				"${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
 				"${workspaceFolder}/*.c",
-				"-l_string",
+				"-l_core",
 				"-l_except"
 			],
 			"problemMatcher": [
@@ -39,8 +39,7 @@
 			},
 			"detail": "compiler: gcc"
 		},
-		{
-			"label": "build so",
+		{   "label": "build so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
@@ -49,7 +48,7 @@
 				"-o",
 				"${workspaceFolder}/../shared/lib_${workspaceFolderBasename}.so",
 				"${workspaceFolder}/${workspaceFolderBasename}*.c",
-				"-l_string"
+				"-l_core",
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -57,8 +56,7 @@
 			"group": "build",
 			"detail": "compiler: gcc"
 		},
-		{
-			"label": "debug so",
+		{   "label": "debug so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
@@ -66,7 +64,7 @@
 				"-o",
 				"${workspaceFolder}/../bin/shared_dbg_${workspaceFolderBasename}",
 				"${workspaceFolder}/test.c",
-				"-l_string",
+				"-l_core",
 				"-l_except",
 				"-l_${workspaceFolderBasename}"
 			],
@@ -76,8 +74,7 @@
 			"group": "build",
 			"detail": "compiler: gcc"
 		},
-		{
-			"label": "dependencies",
+		{   "label": "dependencies",
 			"type": "process",
 			"command": "/usr/bin/ldd",
 			"args": [

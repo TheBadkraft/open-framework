@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "../open/test.h"
-#include "../open/core.h"
+#include "../../open/test.h"
+#include "../../open/core.h"
 
 //  utility prototypes
 void __output_string(string);

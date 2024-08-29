@@ -23,8 +23,8 @@
 #define YN(b) b ? "yes" : "no"
 #endif
 
-extern const struct O_Core
-{
-    bool (*is_allocated)(void *);
-} Core;
+// extern const struct O_Core
+// {
+//     bool (*is_allocated)(void *);
+// } Core;
 #endif //  _OPEN_CORE_H

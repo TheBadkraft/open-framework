@@ -38,12 +38,12 @@ void __output_directory_info(directory *);
 void __output_stream_info(stream *);
 
 //	test values
-char *pfDir = "./.data";
-char *pfSource = "./.data/main.C";
-char *pfNone = "./.data/bad.log";
-char *pfTemp = "./.data/test.log";
+string pfDir = "./.data";
+string pfSource = "./.data/main.C";
+string pfNone = "./.data/bad.log";
+string pfTemp = "./.data/test.log";
 
-int main(int argc, char *argv[])
+int main(int argc, string *argv)
 {
 	if (Utils.path_exists(pfTemp))
 	{
@@ -104,32 +104,32 @@ void __output_file_info(file *pFile)
 	directory *pDir;
 	File.directory(pFile, &pDir);
 
-	writefln("file: %s", pFile->name->buffer);
-	writefln("object:    %s", pFile != NULL ? "true" : "false");
-	writefln("created:   %s", File.exists(pFile) ? "true" : "false");
-	writefln("directory: %s", pDir->name->buffer);
+	writefln("file: %s", pFile->name);
+	writefln("object:    %s", B(pFile != NULL));
+	writefln("created:   %s", B(File.exists(pFile)));
+	writefln("directory: %s", pDir->name);
 	writefln("size:      %ld", pFile->size);
 
 	Directory.free(pDir);
 }
 void __output_directory_info(directory *pDir)
 {
-	writefln("name: %s", pDir->name->buffer);
-	writefln("path: %s", pDir->path->buffer);
+	writefln("name: %s", pDir->name);
+	writefln("path: %s", pDir->path);
 }
 void __output_stream_info(stream *pStream)
 {
-	writefln("file: %s", pStream->source->name->buffer);
-	writefln("created: %s", File.exists(pStream->source) ? "true" : "false");
+	writefln("file: %s", pStream->source->name);
+	writefln("created: %s", B(File.exists(pStream->source)));
 	writefln("length:  %ld", pStream->length);
-	writefln("handle:  %s", pStream->fstream != NULL ? "yes" : "no");
+	writefln("handle:  %s", YN(pStream->fstream != NULL));
 	writefln("mode:    %s", get_mode_label(pStream->mode));
 	writefln("status:  %s", pStream->status == OK ? "OK" : "ERROR");
 	if (pStream->status == ERR)
 	{
-		string *errMsg;
+		string errMsg;
 		Stream.get_error(pStream, &errMsg);
-		writefln("error:   %s", errMsg->buffer);
+		writefln("error:   %s", errMsg);
 
 		String.free(errMsg);
 	}
@@ -164,7 +164,7 @@ void create_file_obj()
 	__output_file_info(pFile);
 	if (File.exists(pFile))
 	{
-		writefln("deleting %s", pFile->name->buffer);
+		writefln("deleting %s", pFile->name);
 		File.delete(pFile);
 	}
 
@@ -181,7 +181,7 @@ void create_file()
 	__output_file_info(pFile);
 	if (File.exists(pFile))
 	{
-		writefln("deleting %s", pFile->name->buffer);
+		writefln("deleting %s", pFile->name);
 		File.delete(pFile);
 	}
 
@@ -195,8 +195,8 @@ void file_directory()
 	file *pFile;
 	File.directory(pFile = File.new(pfSource), &pDir);
 	assert(pDir != NULL);
-	assert(strcmp(".data", pDir->name->buffer) == 0);
-	assert(strcmp("./.data", pDir->path->buffer) == 0);
+	assert(strcmp(".data", pDir->name) == 0);
+	assert(strcmp("./.data", pDir->path) == 0);
 
 	__output_directory_info(pDir);
 	File.free(pFile);
@@ -207,8 +207,8 @@ void dir_new()
 {
 	directory *pDir = Directory.new(pfDir);
 	assert(pDir != NULL);
-	assert(strcmp(".data", pDir->name->buffer) == 0);
-	assert(strcmp("./.data", pDir->path->buffer) == 0);
+	assert(strcmp(".data", pDir->name) == 0);
+	assert(strcmp("./.data", pDir->path) == 0);
 
 	__output_directory_info(pDir);
 	Directory.free(pDir);
@@ -235,14 +235,14 @@ void get_abs_path()
 {
 	writeln("Path.absolute: get the absolute members of a relative path");
 
-	char *expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
-	string *actPath; // = String.new();
+	string expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
+	string actPath; // = String.new();
 
 	bool retOk = Path.absolute(pfSource, &actPath);
 	assert(retOk);
-	assert(strcmp(expPath, actPath->buffer) == 0);
+	assert(strcmp(expPath, actPath) == 0);
 
-	writefln("%s --> %s", pfSource, actPath->buffer);
+	writefln("%s --> %s", pfSource, actPath);
 	if (retOk)
 	{
 		//	if the path does not exist, actPath is never allocated
@@ -262,11 +262,13 @@ void combine_paths()
 {
 	writeln("Path.combine: combine path elements with a base path");
 
-	char *expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
+	string expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
 
-	string *pBase = String.alloc("/home/david/OpenPlatform/open_framework/lib/io");
-	Path.combine(&pBase, ".data", "main.C", NULL);
-	assert(strcmp(expPath, pBase->buffer) == 0);
+	string pBase;
+	String.alloc("/home/david/OpenPlatform/open_framework/lib/io", &pBase);
+	Path.combine(pBase, ".data", "main.C", NULL);
+
+	assert(strcmp(expPath, pBase) == 0);
 
 	// free(pBase);
 	String.free(pBase);
@@ -275,8 +277,8 @@ void path_directory()
 {
 	writeln("Path.directory: return char* directory from path");
 
-	char *expDir = ".data";
-	char *pDir = Path.directory(pfDir);
+	string expDir = ".data";
+	string pDir = Path.directory(pfDir);
 
 	assert(strcmp(expDir, pDir) == 0);
 }
@@ -284,8 +286,8 @@ void path_file_directory()
 {
 	writeln("Path.directory: return char* directory from file path");
 
-	char *expDir = ".data";
-	char *pDir = Path.directory(pfSource);
+	string expDir = ".data";
+	string pDir = Path.directory(pfSource);
 
 	assert(strcmp(expDir, pDir) == 0);
 }
@@ -303,7 +305,7 @@ void new_stream_c()
 	__output_stream_info(pStream);
 	if (File.exists(pFile))
 	{
-		writefln("deleting %s", pFile->name->buffer);
+		writefln("deleting %s", pFile->name);
 		File.delete(pFile);
 	}
 
@@ -335,7 +337,7 @@ void new_stream_r_pass()
 	__output_stream_info(pStream);
 	if (File.exists(pStream->source))
 	{
-		writefln("deleting %s", pStream->source->name->buffer);
+		writefln("deleting %s", pStream->source->name);
 		File.delete(pStream->source);
 	}
 	Stream.free(pStream);
@@ -366,7 +368,7 @@ void new_stream_rw_pass()
 	__output_stream_info(pStream);
 	if (File.exists(pStream->source))
 	{
-		writefln("deleting %s", pStream->source->name->buffer);
+		writefln("deleting %s", pStream->source->name);
 		File.delete(pStream->source);
 	}
 	Stream.free(pStream);
@@ -382,7 +384,7 @@ void new_stream_rwc()
 	__output_stream_info(pStream);
 	if (File.exists(pStream->source))
 	{
-		writefln("deleting %s", pStream->source->name->buffer);
+		writefln("deleting %s", pStream->source->name);
 		File.delete(pStream->source);
 	}
 	Stream.free(pStream);

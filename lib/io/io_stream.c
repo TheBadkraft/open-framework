@@ -6,14 +6,14 @@
 typedef enum io_mode iomode;
 typedef enum io_error ioerr;
 
-char **ERR_MSGS = (char *[]){
+string *ERR_MSGS = (string[]){
     "No error", "File not found", "Incompatible mode"};
 
 bool __stream_new(file *, iomode, stream **);
 bool __stream_open(stream *, iomode);
 bool __stream_read(stream *, char *);
 void __stream_free(stream *);
-void __stream_get_error(stream *, string **);
+void __stream_get_error(stream *, string *);
 
 char *get_mode_label(iomode mode)
 {
@@ -73,15 +73,15 @@ char *get_mode_label(iomode mode)
 
 char *__get_mode(iomode mode);
 
-bool __open_file_stream(stream **pStream, char *pfmode)
+bool __open_file_stream(stream **pStream, string pfmode)
 {
     bool retOk = false;
 
     if ((retOk = ((*pStream)->status != ERR)) && strcmp("", pfmode) != 0)
     {
-        string *path;
+        string path;
         File.full_path((*pStream)->source, &path);
-        (*pStream)->fstream = fopen(path->buffer, pfmode);
+        (*pStream)->fstream = fopen(path, pfmode);
 
         if ((*pStream)->fstream)
         {
@@ -93,8 +93,8 @@ bool __open_file_stream(stream **pStream, char *pfmode)
 }
 bool __stream_new(file *pFile, iomode mode, stream **pStream)
 {
-    char *pfmode = __get_mode(mode);
-    printf("create new stream: %s [%s]\n", pFile->name->buffer, pfmode);
+    string pfmode = __get_mode(mode);
+    printf("create new stream: %s [%s]\n", pFile->name, pfmode);
 
     bool retOk = false;
     iomode rw = READ | WRITE;
@@ -155,10 +155,10 @@ void __stream_free(stream *pStream)
         free(pStream);
     }
 }
-void __stream_get_error(stream *pStream, string **pErrMsg)
+void __stream_get_error(stream *pStream, string *pErrMsg)
 {
-    char *errMsg = ERR_MSGS[pStream->error];
-    (*pErrMsg) = String.alloc(errMsg);
+    string errMsg = ERR_MSGS[pStream->error];
+    String.alloc(errMsg, pErrMsg);
 }
 char *__get_err_info(ioerr err)
 {

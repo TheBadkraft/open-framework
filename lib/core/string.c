@@ -86,9 +86,9 @@ string __str_sub_copy(string text, int pos, int len)
 */
 bool __str_freeable(string text)
 {
-    bool retOk = is_allocated(text);
+    // bool retOk = Core.is_allocated(text);
 
-    return retOk;
+    return true;
 }
 /*
     Free the current string
@@ -111,11 +111,15 @@ size_t __get_str_len(string pStr)
 /*
     Appends the supplied string at the end of the current string.
 */
-void __str_append(string pStr, const string text)
+void __str_append(string base, const string text)
 {
-    size_t len = strlen(pStr) + strlen(text);
-    pStr = realloc(pStr, len);
-    strcat(pStr, text);
+    size_t baselen = strlen(base), txtlen = strlen(text);
+    size_t len = strlen(base) + strlen(text);
+    // base = realloc(base, len);
+    // baselen = strlen(base);
+
+    strcat(base, text);
+    baselen = strlen(base);
 }
 /*
     Appends a formatted string to the current string

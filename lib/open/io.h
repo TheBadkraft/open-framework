@@ -3,8 +3,6 @@
 
 #include "core.h"
 
-bool path_exists(string *);
-
 enum io_type
 {
     IO_NONE = -1,
@@ -15,13 +13,13 @@ enum io_type
 
 struct io_dir
 {
-    string *path;
-    string *name;
+    string path;
+    string name;
 };
 struct io_file
 {
-    string *path;
-    string *name;
+    string path;
+    string name;
     int64_t size;
 };
 
@@ -34,12 +32,12 @@ extern const struct IO_File
     /*  members  */
     bool (*exists)(file *);
     void (*size)(file *);
-    file *(*new)(char *);
+    file *(*new)(string);
     void (*delete)(file *);
     bool (*create)(file *);
     void (*free)(file *);
     void (*directory)(file *, directory **);
-    void (*full_path)(file *, string **);
+    void (*full_path)(file *, string *);
     // char *(*get_directory)(const char *);
 } File;
 
@@ -54,15 +52,17 @@ extern const struct IO_Directory
 
 extern const struct IO_Path
 {
-    /*
-        Thinking about making Path return char* instead of string, file, or
-        directory objects ... ???   \_('')_/
-    */
     /*  members  */
-    bool (*absolute)(char *, string **);
-    void (*combine)(string **, ...);
-    char *(*directory)(char *);
-    IOType (*type)(char *);
+    //
+    bool (*absolute)(string, string *);
+    //
+    void (*combine)(string, ...);
+    //
+    bool (*exists)(string);
+    //
+    char *(*directory)(string);
+    //
+    IOType (*type)(string);
 } Path;
 
 #endif //  _OPEN_IO_H

@@ -45,7 +45,7 @@ extern const struct IO_Stream
     bool (*open)(stream *, enum io_mode);
     bool (*read)(stream *, char *);
     void (*free)(stream *);
-    void (*get_error)(stream *, string **);
+    void (*get_error)(stream *, string *);
     char *(*err_info)(enum io_error);
     char *(*mode_info)(enum io_mode);
 } Stream;

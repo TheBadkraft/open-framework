@@ -21,7 +21,9 @@
 			"lifo.h": "c",
 			"assert.h": "c",
 			"typeinfo": "c",
-			"test.h": "c"
+			"test.h": "c",
+			"core.h": "c",
+			"string.h": "c"
 		}
 	}
 }
