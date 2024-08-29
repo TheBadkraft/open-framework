@@ -12,4 +12,6 @@ typedef unsigned short ushort;
 
 typedef char sbyte;
 
+typedef char *string;
+
 #endif // _OPEN_TYPES_H

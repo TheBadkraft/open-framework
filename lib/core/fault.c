@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include "open/types.h"
-#include "open/fault.h"
+#include "../open/fault.h"
 
 /*
 	Pure C - no windows code

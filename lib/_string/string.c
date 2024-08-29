@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "../open/string.h"
+#include "string.h"
 
 //  prototypes
 bool __str_null_or_empty(string *);

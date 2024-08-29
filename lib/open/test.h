@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <assert.h>
 
-#include "open/core.h"
+#include "core.h"
 #include "../except/Except.h"
 #include "../except/Assert.h"
 
