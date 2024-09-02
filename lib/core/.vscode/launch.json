@@ -1,11 +1,10 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "debug",
+        {   "name": "debug core",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../bin/${workspaceFolderBasename}_dbg_tests",
+            "program": "${workspaceFolder}/../bin/core_tests",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -24,15 +23,14 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build debug",
+            "preLaunchTask": "build core debug",
             "miDebuggerPath": "/usr/bin/gdb",
             "miDebuggerArgs": "${workspaceFolder}"
         },
-        {
-            "name": "launch",
+        {   "name": "debug io",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../bin/${workspaceFolderBasename}_tests",
+            "program": "${workspaceFolder}/../bin/io_tests",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -51,7 +49,33 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build",
+            "preLaunchTask": "build io debug",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "miDebuggerArgs": "${workspaceFolder}"
+        },
+        {   "name": "launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../bin/so_core",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "debug core so",
             "miDebuggerPath": "/usr/bin/gdb",
             "miDebuggerArgs": "${workspaceFolder}"
         }

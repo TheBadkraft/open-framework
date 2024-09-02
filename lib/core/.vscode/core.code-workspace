@@ -1,18 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "core",
 			"path": ".."
 		},
 		{
-			"path": "../../open"
-		},
-		{
+			"name": "bin",
 			"path": "../../bin"
 		},
 		{
-			"path": "../../lib"
+			"name": "shared",
+			"path": "../../shared"
 		}
 	],
 	"settings": {
+		"files.associations": {
+			"core.h": "c",
+			"test.h": "c",
+			"setjmp.h": "c"
+		}
 	},
 }
