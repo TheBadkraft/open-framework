@@ -31,8 +31,12 @@ extern const struct Open_String
     size_t (*length)(string);
     //  Appends the supplied string at the end of thecurrent string
     void (*append)(string, const string);
-    //  Appends a formatted string to the current string
-    void (*appendf)(string, const string, ...);
+
+    /*
+        //  Appends a formatted string to the current string
+        void (*appendf)(string, const string, ...);
+     */
+
     //  Formats the given parameters returning a new string
     void (*format)(const string, string *, ...);
     //  Truncate the current string

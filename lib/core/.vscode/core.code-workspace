@@ -5,10 +5,6 @@
 			"path": ".."
 		},
 		{
-			"name": "open",
-			"path": "../../open"
-		},
-		{
 			"name": "bin",
 			"path": "../../bin"
 		},

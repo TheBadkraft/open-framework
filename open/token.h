@@ -1,23 +1,23 @@
 #ifndef _TOKEN_H
 #define _TOKEN_H
 
-#include "open/types.h"
+#include "types.h"
 
-struct token_t
+struct io_token
 {
     char *pPos;
     size_t length;
-    struct token_t *next;
+    struct io_token *next;
 };
 
 //  non-specialized token
-typedef struct token_t token;
+typedef struct io_token *token;
 
 extern const struct Token_T
 {
     // Create a new token from begin and length
-    token *(*new)(char *, size_t);
-    bool (*word)(token *, char **);
-    void (*free)(token *);
+    token (*new)(char *, size_t);
+    bool (*word)(token, string *);
+    void (*free)(token);
 } Token;
 #endif //  _TOKEN_H

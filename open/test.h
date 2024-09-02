@@ -9,8 +9,8 @@
 #include <assert.h>
 
 #include "core.h"
-#include "../except/Except.h"
-#include "../except/Assert.h"
+#include "except/Except.h"
+#include "except/Assert.h"
 
 int test_count = 0;
 int pass_count = 0;
@@ -19,10 +19,6 @@ int set_count = 0;
 void writeln(string);
 void writefln(const string, ...);
 void vwritefln(const string, va_list);
-
-except_class_declare(AssertException, Exception);
-
-except_class_define(AssertException, Exception);
 
 bool doTests = true;
 

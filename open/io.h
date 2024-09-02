@@ -2,6 +2,7 @@
 #define _OPEN_IO_H
 
 #include "core.h"
+#include "io_stream.h"
 
 enum io_type
 {
@@ -24,33 +25,34 @@ struct io_file
 };
 
 typedef enum io_type IOType;
-typedef struct io_dir directory;
-typedef struct io_file file;
 
-extern const struct IO_File
+typedef struct io_dir *directory;
+typedef struct io_file *file;
+
+extern const struct Open_File
 {
     /*  members  */
-    bool (*exists)(file *);
-    void (*size)(file *);
-    file *(*new)(string);
-    void (*delete)(file *);
-    bool (*create)(file *);
-    void (*free)(file *);
-    void (*directory)(file *, directory **);
-    void (*full_path)(file *, string *);
-    // char *(*get_directory)(const char *);
+    bool (*exists)(file);
+    void (*size)(file);
+    file (*new)(string);
+    void (*delete)(file);
+    bool (*create)(file);
+    bool (*open)(file, stream *, enum io_mode);
+    void (*free)(file);
+    void (*directory)(file, directory *);
+    void (*full_path)(file, string *);
 } File;
 
-extern const struct IO_Directory
+extern const struct Open_Directory
 {
     /*  members  */
-    directory *(*new)(char *);
-    bool (*exists)(directory *);
-    void (*current)(directory **);
-    void (*free)(directory *);
+    directory (*new)(string);
+    bool (*exists)(directory);
+    void (*current)(directory *);
+    void (*free)(directory);
 } Directory;
 
-extern const struct IO_Path
+extern const struct Open_Path
 {
     /*  members  */
     //

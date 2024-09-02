@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "../open/core.h"
+#include "open/core.h"
 
 //  prototypes
 bool __str_empty(string);
@@ -12,6 +12,7 @@ void __str_copy(string, const string);
 string __str_sub_copy(string, int, int);
 void __str_free(string);
 size_t __get_str_len(string);
+size_t __get_str_cap(string);
 void __str_append(string, const string);
 void __str_format(const string, string *, ...);
 void __str_trunc(string, size_t);
@@ -49,9 +50,9 @@ bool __str_null_or_empty(string pStr)
 /*
     Initializes a new '\0'-filled string to the specified length
 */
-void __str_new(size_t len, string *out)
+void __str_new(size_t capacity, string *out)
 {
-    (*out) = calloc(len, sizeof(char));
+    (*out) = calloc(capacity, sizeof(char));
 }
 /*
     Allocates a new string from a copy of the given source
@@ -114,34 +115,35 @@ size_t __get_str_len(string pStr)
 void __str_append(string base, const string text)
 {
     size_t baselen = strlen(base), txtlen = strlen(text);
-    size_t len = strlen(base) + strlen(text);
-    // base = realloc(base, len);
-    // baselen = strlen(base);
+    size_t len = baselen + txtlen + 1;
+    base = realloc(base, len);
 
     strcat(base, text);
-    baselen = strlen(base);
 }
+
 /*
-    Appends a formatted string to the current string
-*/
+   // Appends a formatted string to the current string
+
 void __str_appendf(string dest, const string format, ...)
 {
-    va_list args;
+  va_list args;
 
-    va_start(args, format);
-    int capacity = vsnprintf(NULL, 0, format, args);
-    va_end(args);
+  va_start(args, format);
+  int len = vsnprintf(NULL, 0, format, args);
+  va_end(args);
 
-    string pfStr;
-    __str_new(capacity, &pfStr);
+  string pfStr;
+  __str_new(len, &pfStr);
 
-    va_start(args, format);
-    vsprintf(pfStr, format, args);
-    va_end(args);
+  va_start(args, format);
+  vsprintf(pfStr, format, args);
+  va_end(args);
 
-    String.append(dest, pfStr);
-    free(pfStr);
+  String.append(dest, pfStr);
+  free(pfStr);
 }
+*/
+
 /*
     Formats the given parameters returning a new string
 */
@@ -150,10 +152,10 @@ void __str_format(const string format, string *out, ...)
     va_list args;
 
     va_start(args, out);
-    int capacity = vsnprintf(NULL, 0, format, args);
+    int len = vsnprintf(NULL, 0, format, args);
     va_end(args);
 
-    __str_new(capacity, out);
+    __str_new(len, out);
 
     va_start(args, out);
     vsprintf((*out), format, args);
@@ -174,8 +176,43 @@ void __str_trunc(string pStr, size_t len)
 */
 void __str_join(string delim, string *dest, ...)
 {
-    //  not yet implemented
-    String.new(255, dest);
+    va_list args;
+
+    //  first calculate how large the destination string needs to be
+    va_start(args, dest);
+    //  we play naive and only expect string (char*) args
+    string arg = va_arg(args, string);
+    size_t len = 1; //  set to 1 to account for null terminator
+    while (arg)
+    {
+        len += strlen(arg);
+        arg = va_arg(args, string);
+
+        if (arg)
+        {
+            // __str_append(*dest, delim);
+            len += strlen(delim);
+        }
+    }
+    va_end(args);
+
+    //  allocate the size one time
+    __str_new(len, dest);
+
+    //  iterate the args and join
+    va_start(args, dest);
+    arg = va_arg(args, string);
+    while (arg)
+    {
+        strcat(*dest, arg);
+        //  get the next arg
+        arg = va_arg(args, string);
+        if (arg)
+        {
+            strcat(*dest, delim);
+        }
+    }
+    va_end(args);
 }
 /*
     Split a string on a given delimter.
@@ -216,7 +253,7 @@ const struct Open_String String = {
     .free = &__str_free,
     .length = &__get_str_len,
     .append = &__str_append,
-    .appendf = &__str_appendf,
+    // .appendf = &__str_appendf,
     .format = &__str_format,
     .truncate = &__str_trunc,
     .join = &__str_join,

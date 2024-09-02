@@ -10,20 +10,21 @@
 #include <linux/limits.h>
 
 #include "../open/io.h"
+#include "../open/internal/internal_io.h"
 
-bool __file_exists(file *);
-void __file_size(file *);
-file *__file_new(string);
-void __get_file_path(file *, string *);
-void __file_free(file *);
-void __file_delete(file *);
-bool __file_create(file *);
-void __file_get_directory(file *, directory **);
+bool __file_exists(file);
+void __file_size(file);
+file __file_new(string);
+void __get_file_path(file, string *);
+void __file_free(file);
+void __file_delete(file);
+bool __file_create(file);
+void __file_get_directory(file, directory *);
 
-directory *__dir_new(string);
-bool __dir_exists(directory *);
-void __dir_cwd(directory **);
-void __dir_free(directory *);
+directory __dir_new(string);
+bool __dir_exists(directory);
+void __dir_cwd(directory *);
+void __dir_free(directory);
 
 bool __path_absolute(string, string *);
 void __path_combine(string, ...);
@@ -33,7 +34,7 @@ IOType __path_io_type(string);
 //      ===================== Utility Definitions ===========================
 
 //      ======================= File Definitions ============================
-bool __file_exists(file *pFile)
+bool __file_exists(file pFile)
 {
     bool retOk = false;
     if (pFile && pFile->path)
@@ -47,7 +48,7 @@ bool __file_exists(file *pFile)
 
     return retOk;
 }
-void __file_size(file *pFile)
+void __file_size(file pFile)
 {
     struct stat iostat;
     pFile->size = -1;
@@ -63,9 +64,9 @@ void __file_size(file *pFile)
         String.free(pPath);
     }
 }
-file *__file_new(string pFPath)
+file __file_new(string pFPath)
 {
-    file *pFile = malloc(sizeof(file));
+    file pFile = malloc(sizeof(struct io_file));
     if (!pFile)
     {
         //  handle error
@@ -89,7 +90,7 @@ file *__file_new(string pFPath)
 
     return pFile;
 }
-void __file_delete(file *pFile)
+void __file_delete(file pFile)
 {
     string pPath;
     __get_file_path(pFile, &pPath);
@@ -98,13 +99,18 @@ void __file_delete(file *pFile)
 
     String.free(pPath);
 }
-bool __file_create(file *pFile)
+bool __file_create(file pFile)
 {
     string pPath;
     __get_file_path(pFile, &pPath);
 
+    int fRet = EOF;
     FILE *pStream = fopen(pPath, "w");
-    fclose(pStream);
+    fRet = fclose(pStream);
+    if (fRet != 0)
+    {
+        printf("[%d]ERROR closing file.\n", fRet);
+    }
     __file_size(pFile);
 
     bool retOk = __path_exists(pPath);
@@ -112,8 +118,32 @@ bool __file_create(file *pFile)
 
     return retOk;
 }
-bool __file_truncate(file *pFile) {}
-void __file_free(file *pFile)
+bool __file_open(file pFile, stream *pStream, enum io_mode mode)
+{
+    bool retOk = true;
+    string pFullPath;
+
+    __get_file_path(pFile, &pFullPath);
+    (*pStream) = Stream.new(pFullPath);
+    (*pStream)->length = pFile->size;
+
+    if (!__file_exists(pFile) && (CREATE & mode) != CREATE)
+    {
+        (*pStream)->error = PATH_NOT_FOUND;
+        retOk = false;
+    }
+    if (retOk)
+    {
+        __open_stream(*pStream, mode);
+    }
+
+    return retOk;
+}
+bool __file_truncate(file pFile)
+{
+    //  Not Implemented
+}
+void __file_free(file pFile)
 {
     if (pFile)
     {
@@ -128,20 +158,20 @@ void __file_free(file *pFile)
         free(pFile);
     }
 }
-void __file_get_directory(file *pFile, directory **pDir)
+void __file_get_directory(file pFile, directory *pDir)
 {
     (*pDir) = __dir_new(pFile->path);
 }
-void __get_file_path(file *pFile, string *pFullPath)
+void __get_file_path(file pFile, string *pFullPath)
 {
     String.new(0, pFullPath);
     String.copy(*pFullPath, pFile->path);
     Path.combine(*pFullPath, pFile->name, NULL);
 }
 //      ==================== Directory Definitions ==========================
-directory *__dir_new(string pPath)
+directory __dir_new(string pPath)
 {
-    directory *pDir = malloc(sizeof(directory));
+    directory pDir = malloc(sizeof(struct io_dir));
     string slash = strrchr(pPath, '/');
     if (!slash)
     {
@@ -154,11 +184,11 @@ directory *__dir_new(string pPath)
 
     return pDir;
 }
-bool __dir_exists(directory *pDir)
+bool __dir_exists(directory pDir)
 {
     return __path_exists(pDir->path);
 }
-void __dir_cwd(directory **pDir)
+void __dir_cwd(directory *pDir)
 {
     string pfDir;
 
@@ -169,7 +199,7 @@ void __dir_cwd(directory **pDir)
 
     (*pDir) = Directory.new(pfDir);
 }
-void __dir_free(directory *pDir)
+void __dir_free(directory pDir)
 {
     if (pDir)
     {
@@ -188,7 +218,7 @@ void __dir_free(directory *pDir)
 bool __path_absolute(string pRelPath, string *pAbsPath)
 {
     bool retOk = __path_exists(pRelPath);
-    *pAbsPath = NULL;
+    //*pAbsPath = NULL;
 
     if (retOk)
     {
@@ -203,21 +233,41 @@ void __path_combine(string pBasePath, ...)
     int hasSlash = 0;
     //  append the last '/'
     size_t pos = (strrchr(pBasePath, '/') - pBasePath);
-    hasSlash = (strlen(pBasePath) - 1) - pos;
+    hasSlash = strlen(pBasePath) - pos;
+    size_t len = strlen(pBasePath);
+    va_list args;
 
+    //  first determine how much to resize (realloc) base path
     if (hasSlash != 0)
     {
-        String.append(pBasePath, "/");
+        len += strlen("/");
     }
-
-    va_list args;
     va_start(args, pBasePath);
     string arg = va_arg(args, string);
     while (arg)
     {
+        len += strlen(arg);
+        arg = va_arg(args, string);
+        if (arg)
+        {
+            // String.append(pBasePath, "/");
+            len += strlen("/");
+        }
+    }
+    va_end(args);
+
+    //  now reallocate base path
+    pBasePath = realloc(pBasePath, len);
+    if (hasSlash != 0)
+    {
+        String.append(pBasePath, "/");
+    }
+    va_start(args, pBasePath);
+    arg = va_arg(args, string);
+    while (arg)
+    {
         String.append(pBasePath, arg);
         arg = va_arg(args, string);
-
         if (arg)
         {
             String.append(pBasePath, "/");
@@ -233,6 +283,7 @@ string __path_get_directory(string pPath)
 {
     //  TODO: check for '.' or '..' and get full path
     string pfDir = NULL;
+    string pBasePath;
     IOType type = __path_io_type(pPath);
 
     switch (type)
@@ -281,19 +332,20 @@ IOType __path_io_type(string pPath)
     return IO_UNKNOWN;
 }
 //		=========================== File API ================================
-const struct IO_File File = {
+const struct Open_File File = {
     /*  members  */
     .exists = &__file_exists,
     .size = &__file_size,
     .new = &__file_new,
     .delete = &__file_delete,
     .create = &__file_create,
+    .open = &__file_open,
     .free = &__file_free,
     .full_path = &__get_file_path,
     .directory = &__file_get_directory};
 
 //		======================== Directory API ==============================
-const struct IO_Directory Directory = {
+const struct Open_Directory Directory = {
     /*  members  */
     .new = &__dir_new,
     .exists = &__dir_exists,
@@ -301,9 +353,10 @@ const struct IO_Directory Directory = {
     .free = &__dir_free};
 
 //		=========================== Path API ================================
-const struct IO_Path Path = {
+const struct Open_Path Path = {
     /*  members  */
     .absolute = &__path_absolute,
     .combine = &__path_combine,
+    .exists = &__path_exists,
     .directory = &__path_get_directory,
     .type = &__path_io_type};

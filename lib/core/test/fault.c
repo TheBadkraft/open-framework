@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "open/types.h"
+#include "../open/types.h"
 #include "../open/fault.h"
 
 /*
