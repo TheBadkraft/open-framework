@@ -11,6 +11,7 @@
 void file_path_exists();
 void file_size();
 void create_file_obj();
+void new_file_from_path();
 void create_file();
 void file_directory();
 //	DIRECTORY: test case prototypes
@@ -20,6 +21,7 @@ void dir_current();
 //	PATH: test case prototypes
 void get_abs_path();
 void combine_paths();
+void combine_with_empty_base();
 void path_directory();
 void path_file_directory();
 //	STREAM: test case prototypes
@@ -31,6 +33,9 @@ void open_file_stream();
 void __output_file_info(file);
 void __output_directory_info(directory);
 void __output_stream_info(stream);
+
+//	target subject
+static file def_file = NULL;
 
 //	test values
 string pfDir = "./.data";
@@ -46,38 +51,48 @@ int main(int argc, string *argv)
 	}
 
 	BEGIN_SET(file, true)
-	if (doTests)
-		write_header("OP Tests: IO.File");
-	TEST(file_path_exists);
-	TEST(file_size);
-	TEST(create_file_obj);
-	TEST(create_file);
-	TEST(file_directory);
+	{
+		if (doTests)
+			write_header("OP Tests: IO.File");
+		TEST(file_path_exists);
+		TEST(file_size);
+		TEST(create_file_obj);
+		TEST(create_file);
+		TEST(new_file_from_path);
+		TEST(file_directory);
+	}
 	END_SET(file)
 
-	BEGIN_SET(directory, true)
-	if (doTests)
-		write_header("OP Tests: IO.Directory");
-	TEST(dir_current);
-	TEST(dir_new);
-	TEST(dir_exists);
+	BEGIN_SET(directory, false)
+	{
+		if (doTests)
+			write_header("OP Tests: IO.Directory");
+		TEST(dir_current);
+		TEST(dir_new);
+		TEST(dir_exists);
+	}
 	END_SET(directory)
 
 	BEGIN_SET(Path, true)
-	if (doTests)
-		write_header("OP Tests: IO.Path");
-	TEST(get_abs_path);
-	TEST(combine_paths);
-	TEST(path_directory);
-	TEST(path_file_directory);
+	{
+		if (doTests)
+			write_header("OP Tests: IO.Path");
+		TEST(get_abs_path);
+		TEST(combine_paths);
+		TEST(combine_with_empty_base);
+		TEST(path_directory);
+		TEST(path_file_directory);
+	}
 	END_SET(Path)
 
-	BEGIN_SET(stream, true)
-	if (doTests)
-		write_header("OP Tests: IO.Stream");
-	TEST(get_stream_error);
-	TEST(new_stream);
-	TEST(open_file_stream);
+	BEGIN_SET(stream, false)
+	{
+		if (doTests)
+			write_header("OP Tests: IO.Stream");
+		TEST(get_stream_error);
+		TEST(new_stream);
+		TEST(open_file_stream);
+	}
 	END_SET(stream)
 
 	TEST_STATS();
@@ -151,7 +166,30 @@ void create_file_obj()
 		File.delete(pFile);
 	}
 
-	free(pFile);
+	File.free(pFile);
+}
+void new_file_from_path()
+{
+	/*
+		Duplicating conditions causing 'realloc(): invalid next size'
+	*/
+	static const string __DEF_PATH = ".data/sigmac.def";
+
+	//	get the current working directory
+	directory cwdir;
+	Directory.current(&cwdir);
+
+	string def_path;
+	String.new(0, &def_path);
+	Path.combine(&def_path, cwdir->path, __DEF_PATH, NULL);
+
+	def_file = File.new(def_path);
+	String.free(def_path);
+
+	assert(def_file != NULL);
+	__output_file_info(def_file);
+
+	File.free(def_file);
 }
 void create_file()
 {
@@ -253,10 +291,38 @@ void combine_paths()
 	writefln("strlen:  %d", strlen(startPath));
 	writefln("pBase len: %d", String.length(pBase));
 
-	Path.combine(pBase, ".data", "main.C", NULL);
+	Path.combine(&pBase, ".data", "main.C", NULL);
 
 	assert(strcmp(expPath, pBase) == 0);
 	String.free(pBase);
+}
+void combine_with_empty_base()
+{
+	/*
+		Duplicating an error condition that resulted in 2x '//' at the beginning of the path
+	*/
+	static const string __DEF_PATH = ".data/main.C";
+	writeln("Path.combine: combine path elements from an empty base path");
+
+	//	get the current working directory
+	directory cwdir;
+	Directory.current(&cwdir);
+
+	//	this actually works ...
+	string expPath = "/home/david/OpenPlatform/open_framework/lib/%s/.data/main.C";
+	String.format(expPath, &expPath, cwdir->name);
+	writefln("expected: %s", expPath);
+
+	//	in the initial test, pBase is initialized with a starting path.
+	string pBase;
+	String.new(0, &pBase);
+
+	Path.combine(&pBase, cwdir->path, __DEF_PATH, NULL);
+
+	writefln("combined: %s", pBase);
+
+	assert(strcmp(expPath, pBase) == 0);
+	Directory.free(cwdir);
 }
 void path_directory()
 {

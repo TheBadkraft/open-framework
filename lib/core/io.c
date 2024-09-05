@@ -11,6 +11,7 @@
 
 #include "open/io.h"
 #include "open/internal/internal_io.h"
+#include "open/internal/internal_string.h"
 
 bool __file_exists(file);
 void __file_size(file);
@@ -27,7 +28,7 @@ void __dir_cwd(directory *);
 void __dir_free(directory);
 
 bool __path_absolute(string, string *);
-void __path_combine(string, ...);
+void __path_combine(string *, ...);
 bool __path_exists(string);
 string __path_get_directory(string);
 IOType __path_io_type(string);
@@ -166,7 +167,7 @@ void __get_file_path(file pFile, string *pFullPath)
 {
     String.new(0, pFullPath);
     String.copy(*pFullPath, pFile->path);
-    Path.combine(*pFullPath, pFile->name, NULL);
+    Path.combine(pFullPath, pFile->name, NULL);
 }
 //      ==================== Directory Definitions ==========================
 directory __dir_new(string pPath)
@@ -228,53 +229,115 @@ bool __path_absolute(string pRelPath, string *pAbsPath)
 
     return retOk;
 }
-void __path_combine(string pBasePath, ...)
+
+void __path_combine(string *basePath, ...)
+{
+    /*
+        re-engineering this method to implement String.join and more gracefully handle several factors:
+        1. basePath may come in uninitialized
+        2. basePath may (or may not) have a root path (not empty)
+        2. basePath may (or may not) have a trailing '/'
+    */
+    bool hasSlash = false;
+
+    //  freshly initialized
+    if (basePath == NULL)
+    {
+        //  also means there can be no trailing '/'
+        String.new(0, basePath);
+    }
+    size_t baseLen = String.length(*basePath);
+    //  if empty then there is no trailing '/'
+    if (baseLen == 0)
+    {
+        //  we are done here, just pass everything to __str_vjoin(...)
+        va_list args;
+        va_start(args, basePath);
+        __str_vjoin("/", basePath, args);
+        va_end(args);
+        return;
+    }
+    else
+    {
+        //  check for trailing '/'
+        size_t slashPos = strrchr(*basePath, '/') - *basePath;
+        hasSlash = (baseLen - slashPos) > 0;
+    }
+
+    //  combine all arg members
+    string dest;
+    String.new(0, &dest);
+    va_list args;
+
+    //  first get a required length
+    va_start(args, basePath);
+    int pathLen = __str_vsnjoin("/", &dest, args);
+    va_end(args);
+
+    dest = realloc(dest, pathLen);
+    va_start(args, basePath);
+    __str_vjoin("/", &dest, args);
+    va_end(args);
+
+    if (hasSlash)
+    {
+        String.append(*basePath, dest);
+    }
+    else
+    {
+        String.join("/", basePath, dest);
+    }
+}
+
+/*
+void __path_combine(string *pBasePath, ...)
 {
     int hasSlash = 0;
-    //  append the last '/'
-    size_t pos = (strrchr(pBasePath, '/') - pBasePath);
-    hasSlash = strlen(pBasePath) - pos;
-    size_t len = strlen(pBasePath);
+    size_t pos = (strrchr(*pBasePath, '/') - *pBasePath);
+    hasSlash = String.length(*pBasePath) - pos;
+    size_t len = String.length(*pBasePath);
     va_list args;
 
     //  first determine how much to resize (realloc) base path
-    if (hasSlash != 0)
+    if (hasSlash != 0 && len > 0)
     {
-        len += strlen("/");
+        len += String.length("/");
     }
     va_start(args, pBasePath);
     string arg = va_arg(args, string);
     while (arg)
     {
-        len += strlen(arg);
+        len += String.length(arg);
         arg = va_arg(args, string);
         if (arg)
         {
             // String.append(pBasePath, "/");
-            len += strlen("/");
+            len += String.length("/");
         }
     }
     va_end(args);
 
     //  now reallocate base path
-    pBasePath = realloc(pBasePath, len);
-    if (hasSlash != 0)
+    (*pBasePath) = realloc(*pBasePath, len + 1);
+    if (hasSlash != 0 && !String.is_empty(*pBasePath))
     {
-        String.append(pBasePath, "/");
+        String.append(*pBasePath, "/");
     }
     va_start(args, pBasePath);
     arg = va_arg(args, string);
     while (arg)
     {
-        String.append(pBasePath, arg);
+        String.append(*pBasePath, arg);
         arg = va_arg(args, string);
         if (arg)
         {
-            String.append(pBasePath, "/");
+            String.append(*pBasePath, "/");
         }
     }
     va_end(args);
 }
+ */
+
 bool __path_exists(string pPath)
 {
     return access(pPath, F_OK) == 0 ? true : false;

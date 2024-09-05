@@ -58,7 +58,7 @@ extern const struct Open_Path
     //
     bool (*absolute)(string, string *);
     //
-    void (*combine)(string, ...);
+    void (*combine)(string *, ...);
     //
     bool (*exists)(string);
     //

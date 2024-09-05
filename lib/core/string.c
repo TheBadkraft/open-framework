@@ -3,6 +3,7 @@
 #include <stdarg.h>
 
 #include "open/core.h"
+#include "open/internal/internal_string.h"
 
 //  prototypes
 bool __str_empty(string);
@@ -198,10 +199,44 @@ void __str_join(string delim, string *dest, ...)
 
     //  allocate the size one time
     __str_new(len, dest);
-
-    //  iterate the args and join
     va_start(args, dest);
-    arg = va_arg(args, string);
+    __str_vjoin(delim, dest, args);
+    va_end(args);
+
+    // //  iterate the args and join
+    // va_start(args, dest);
+    // arg = va_arg(args, string);
+    // while (arg)
+    // {
+    //     strcat(*dest, arg);
+    //     //  get the next arg
+    //     arg = va_arg(args, string);
+    //     if (arg)
+    //     {
+    //         strcat(*dest, delim);
+    //     }
+    // }
+    // va_end(args);
+}
+/*
+    Split a string on a given delimter.
+*/
+string *__str_split(char delim, string pStr)
+{
+    //  not yet implemented
+    return (char *[]){NULL};
+}
+
+//  INTERNAL FUNCTIONS
+
+/*
+    In this internal implementation, we expect that 'dest' is malloc'd, and of the proper
+    length.
+*/
+void __str_vjoin(string delim, string *dest, va_list args)
+{
+    //  iterate the args and join
+    string arg = va_arg(args, string);
     while (arg)
     {
         strcat(*dest, arg);
@@ -212,21 +247,37 @@ void __str_join(string delim, string *dest, ...)
             strcat(*dest, delim);
         }
     }
-    va_end(args);
 }
 /*
-    Split a string on a given delimter.
+    Expect 'dest' to NOT be NULL. Count the final string length of a join with delimeter
 */
-string *__str_split(char delim, string pStr)
+int __str_vsnjoin(string delim, string *dest, va_list args)
 {
-    //  not yet implemented
-    return (char *[]){NULL};
+    size_t delimLen = String.length(delim);
+    size_t outLen = String.length(*dest);
+
+    string arg = va_arg(args, string);
+    while (arg)
+    {
+        outLen += delimLen + String.length(arg);
+        arg = va_arg(args, string);
+    }
+
+    return delimLen;
 }
+
+//  MISCELLANEOUS
 /*
     Count the number of placeholders in a string format
+
+    NAIVE
 */
 int __fmt_count(const string format)
 {
+    /*
+        NOT USED in any functions.
+        ASSUMPTION: any '%' is a format placeholder.
+    */
     char *p = format;
     int count = 0;
     while (p)
