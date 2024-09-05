@@ -4,7 +4,7 @@
         {   "name": "debug core",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../bin/core_tests",
+            "program": "${workspaceFolder}/../bin/${fileBasenameNoExtension}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -23,7 +23,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build core debug",
+            "preLaunchTask": "build debug",
             "miDebuggerPath": "/usr/bin/gdb",
             "miDebuggerArgs": "${workspaceFolder}"
         },

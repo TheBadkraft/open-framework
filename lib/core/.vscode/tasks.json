@@ -1,25 +1,17 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{   "label": "build core debug",
-			"type": "cppbuild",
+		{   "label": "build debug",
+			"type": "shell",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-g3",
 				"-o",
-				"${workspaceFolder}/../bin/core_tests",
-				"${workspaceFolder}/test/core_tests.c",
+				"${workspaceFolder}/../bin/${fileBasenameNoExtension}",
+				"${workspaceFolder}/test/${fileBasename}",
 				"${workspaceFolder}/*.c",
 				"-l_except"
 			],
-			"presentation": {
-				"echo": true,
-				"reveal": "silent",
-				"focus": false,
-				"panel": "shared",
-				"showReuseMessage": false,
-				"clear": true
-			},
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -29,36 +21,8 @@
 			},
 			"detail": "compiler: gcc"
 		},
-		{   "label": "build io debug",
-			"type": "cppbuild",
-			"command": "/usr/bin/gcc",
-			"args": [
-				"-g3",
-				"-o",
-				"${workspaceFolder}/../bin/io_tests",
-				"${workspaceFolder}/test/io_tests.c",
-				"${workspaceFolder}/*.c",
-				"-l_except"
-			],
-			"presentation": {
-				"echo": true,
-				"reveal": "silent",
-				"focus": false,
-				"panel": "shared",
-				"showReuseMessage": false,
-				"clear": true
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"detail": "compiler: gcc"
-		},
-		{   "label": "build core so",
-			"type": "cppbuild",
+		{   "label": "build so",
+			"type": "shell",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-shared",
@@ -85,7 +49,7 @@
 			"dependsOn": [],
 			"detail": "compiler: gcc"
 		},
-		{   "label": "debug core so",
+		{   "label": "debug so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
