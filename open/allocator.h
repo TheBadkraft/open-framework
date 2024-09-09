@@ -5,32 +5,41 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Mem_Pointer
+#if DEBUG
+#include "../open/test.h"
+#endif
+
+enum Alloc_Mode
 {
-    uintptr_t addr;
-    void *item;
+    INITIALIZED,
+    UNITITIALIZED
 };
 
-struct Mem_Allocator
+struct Mem_Block
 {
-    struct Mem_Pointer *stack;
+    uintptr_t uptr;
+};
+
+struct Mem_Page
+{
+    bool is_initialized;
+    struct Mem_Block *page;
     size_t count;
     size_t capacity;
 };
 
-typedef struct Mem_Pointer *mem_ptr;
-typedef struct Mem_Allocator *mem_allocator;
+typedef enum Alloc_Mode allocMode;
+typedef struct Mem_Block *mem_block;
+typedef struct Mem_Page *mem_page;
 
 extern const struct Open_Allocator
 {
-    bool (*init)();
     size_t (*count)();
     size_t (*capacity)();
-    void (*clear)();
-    void (*terminate)();
-    void *(*alloc)(size_t);
+    void *(*alloc)(size_t, enum Alloc_Mode);
     bool (*dealloc)(void *);
-    mem_ptr (*pointer)(uintptr_t);
+    void (*flush)();
+    void (*terminate)();
 } Allocator;
 
 #endif //  _ALLOCATOR_H

@@ -1,8 +1,6 @@
 #ifndef _TESTING_H
 #define _TESTING_H
 
-#define DEBUG
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>

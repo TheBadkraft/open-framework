@@ -5,6 +5,7 @@
 
 #include "types.h"
 #include "string.h"
+#include "allocator.h"
 
 enum io_mode
 {
