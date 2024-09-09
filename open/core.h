@@ -8,10 +8,6 @@
 #include "string.h"
 #include "version.h"
 
-#ifndef DEBUG
-#define DEBUG !NDEBUG
-#endif
-
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
@@ -23,8 +19,4 @@
 #define YN(b) b ? "yes" : "no"
 #endif
 
-// extern const struct O_Core
-// {
-//     bool (*is_allocated)(void *);
-// } Core;
 #endif //  _OPEN_CORE_H

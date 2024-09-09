@@ -6,6 +6,7 @@
 #include "../open/core.h"
 #include "../open/io.h"
 #include "../open/io_stream.h"
+#include "../open/allocator.h"
 
 //	FILE: test case prototypes
 void file_path_exists();
@@ -49,6 +50,7 @@ int main(int argc, string *argv)
 	{
 		remove(pfTemp);
 	}
+	Allocator.init();
 
 	BEGIN_SET(file, true)
 	{
@@ -96,6 +98,8 @@ int main(int argc, string *argv)
 	END_SET(stream)
 
 	TEST_STATS();
+
+	Allocator.terminate();
 }
 
 void __output_file_info(file pFile)
@@ -170,6 +174,7 @@ void create_file_obj()
 }
 void new_file_from_path()
 {
+	Allocator.flush();
 	/*
 		Duplicating conditions causing 'realloc(): invalid next size'
 	*/

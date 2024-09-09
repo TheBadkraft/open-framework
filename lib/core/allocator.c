@@ -1,203 +1,350 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "open/allocator.h"
 
-static size_t DEFAULT_STACK_SIZE = 64;
-static mem_allocator ALLOCATOR = NULL;
-static struct Mem_Pointer NULL_POINTER = {
-    .addr = 0,
-    .item = NULL};
+#if DEBUG
+#include "test/alloc_test.h"
+#endif
+
+//  for some reason, placing this inside the DEFINE preproc isn't working for testing
+static int ALLOC_COUNT = 0;
+static int DEALLOC_COUNT = 0;
+
+int counters[2];
+
+void _alloc_incr_alloc_count()
+{
+    ALLOC_COUNT = ++counters[0];
+}
+void _alloc_incr_dealloc_count()
+{
+    DEALLOC_COUNT = ++counters[1];
+}
+void _flush_counters()
+{
+    counters[0] = 0;
+    counters[1] = 0;
+}
+
+/*
+    The goal is to eventually have the allocator so that it is not required for external code to initialize.
+*/
+static const uintptr_t NULL_ADDR_PTR = 0;
+static const size_t DEFAULT_STACK_SIZE = 64;
+static struct Mem_Page MEMPAGE = {
+    .is_initialized = false,
+    .capacity = 0,
+    .count = 0,
+    .page = NULL};
+static struct Mem_Block EMPTY_BLOCK = {
+    .uptr = NULL_ADDR_PTR};
 
 //  PROTOTYPES
-void __init();
-void __stack_add_ptr(void *);
-bool __stack_rem_ptr(void *);
-mem_ptr __stack_get_pointer(uintptr_t, int *);
-void __stack_repl_pointer(mem_ptr, mem_ptr, int);
-void __mem_ptr_free(mem_ptr);
-bool __mem_ptr_equal(mem_ptr, mem_ptr);
+void page_fill();
+void page_add_ptr(void *);
+bool page_rem_ptr(void *);
+bool page_rem_at(int);
+uintptr_t page_repl_at(uintptr_t, int);
+mem_block page_get_block(uintptr_t);
 
-bool __alloc_init();
-size_t __alloc_count();
-void __alloc_clear();
-void __alloc_terminate();
-void *__alloc_allocate(size_t);
-bool __alloc_deallocate(void *);
-mem_ptr __alloc_get_pointer(uintptr_t);
+bool block_equ(mem_block, mem_block);
+int block_cmp(mem_block, mem_block);
 
-void __init()
+size_t alloc_count();
+size_t alloc_capacity();
+void alloc_flush();
+void alloc_terminate();
+void *alloc_allocate(size_t, allocMode);
+bool alloc_deallocate(void *);
+
+// #if DEBUG
+mem_block _alloc_get_pointer(uintptr_t uptr)
 {
-    ALLOCATOR = malloc(sizeof(struct Mem_Allocator));
-    ALLOCATOR->count = 0;
-    ALLOCATOR->capacity = DEFAULT_STACK_SIZE;
-    ALLOCATOR->stack = malloc(sizeof(struct Mem_Pointer) * ALLOCATOR->capacity);
+    return page_get_block(uptr);
 }
-void __stack_add_ptr(void *ptr)
+void _output_alloc_stats()
 {
-    //  we can check for eligible empty locations
-    int ndx;
-    mem_ptr memPtr = __stack_get_pointer(0, &ndx);
-    if (memPtr != NULL)
-    {
-        mem_ptr memPtr = malloc(sizeof(struct Mem_Pointer));
-        memPtr->item = ptr;
-        memPtr->addr = (uintptr_t)ptr;
+    printf("total allocations:    %d\n", ALLOC_COUNT);
+    printf("total deallocations:  %d\n", DEALLOC_COUNT);
+}
+// #endif
 
-        ALLOCATOR->stack[ndx] = *memPtr;
-        ALLOCATOR->count++;
+bool has_mem_page(void)
+{
+    if (!MEMPAGE.is_initialized)
+    {
+        MEMPAGE.count = 0;
+        MEMPAGE.capacity = DEFAULT_STACK_SIZE;
+        MEMPAGE.page = malloc(sizeof(struct Mem_Block) * MEMPAGE.capacity);
+        page_fill();
+
+        MEMPAGE.is_initialized = true;
+
+        // #if DEBUG
+        _flush_counters();
+        // #endif
+    }
+
+    return MEMPAGE.is_initialized;
+}
+
+//  block, mem_ptr functions are never called directly from the API so they will
+//  assume memBlock is valid
+void page_fill()
+{
+    //  this is naive in that it will not be reliable after (when) the memBlock is resized
+    //  TODO: improve function when memBlock is resized
+    mem_block ndx = MEMPAGE.page;
+    size_t pos = ndx - MEMPAGE.page;
+
+    // #if DEBUG
+    printf("Filling Page      %ld\n", EMPTY_BLOCK.uptr);
+    // #endif
+
+    while (pos < MEMPAGE.capacity)
+    {
+        uintptr_t uptr_cpy = (uintptr_t)memcpy(ndx, &EMPTY_BLOCK, sizeof(struct Mem_Block));
+        // #if DEBUG
+        // printf("[%2ld]    %ld\n", pos, uptr_cpy);
+        // #endif
+
+        pos = ++ndx - MEMPAGE.page;
+    }
+
+    // #if DEBUG
+    printf("---------------------------------------------------\n");
+    // #endif
+}
+void page_add_ptr(void *ptr)
+{
+    size_t pos = -1;
+    //  find the first empty block
+    mem_block memBlk = page_get_block(NULL_ADDR_PTR);
+    if (memBlk != NULL)
+    {
+        pos = memBlk - MEMPAGE.page;
+        // memBlk->uptr = (uintptr_t)ptr;
+        uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
+        // #if DEBUG
+        printf("Allocating        %ld\n", (uintptr_t)ptr);
+        // #endif
+
+        uaddr = page_repl_at((uintptr_t)ptr, pos);
+        MEMPAGE.count++;
+
+        // #if DEBUG
+        _alloc_incr_alloc_count();
+        printf("Allocated         %ld\n", memBlk->uptr);
+        // #endif
     }
     else
     {
-        if (ALLOCATOR->count == ALLOCATOR->capacity)
-        {
-            // resize
-            printf("ERROR: need to resize mem stack ...\n");
-            return;
-        }
-        else
-        {
-            mem_ptr memPtr = malloc(sizeof(struct Mem_Pointer));
-            memPtr->item = ptr;
-            memPtr->addr = (uintptr_t)ptr;
-
-            ALLOCATOR->stack[ALLOCATOR->count++] = *memPtr;
-        }
+        perror("Need to check allocation pool. It appears to be full.");
     }
 }
-bool __stack_rem_ptr(void *ptr)
+bool page_rem_ptr(void *ptr)
 {
-    int ndx;
-    mem_ptr memPtr = __stack_get_pointer((uintptr_t)ptr, &ndx);
+    mem_block memBlk = page_get_block((uintptr_t)ptr);
+    int pos = memBlk - MEMPAGE.page;
+    bool retOk = pos >= 0 && pos < MEMPAGE.capacity;
 
-    if (ndx != -1)
+    if (retOk)
     {
-        __stack_repl_pointer(ALLOCATOR->stack + ndx, &NULL_POINTER, ndx);
-        __mem_ptr_free(memPtr);
-        ALLOCATOR->count--;
+        uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
+        // #if DEBUG
+        printf("Deallocating     [%ld]    %ld\n", uaddr, memBlk->uptr);
+        // #endif
+
+        retOk = page_rem_at(pos);
+        // #if DEBUG
+        printf("Deallocated      [%ld]    %ld\n", uaddr, memBlk->uptr);
+        // #endif
+    }
+    if (retOk)
+    {
+        free(ptr);
+        _alloc_incr_dealloc_count();
     }
 
-    return ndx != -1;
+    return retOk;
 }
-mem_ptr __stack_get_pointer(uintptr_t addr, int *ndx)
+bool page_rem_at(int pos)
 {
-    *ndx = 0;
-    mem_ptr memPtr = NULL;
+    page_repl_at(NULL_ADDR_PTR, pos);
+    MEMPAGE.count--;
 
-    while (*ndx < ALLOCATOR->capacity)
+    //  TODO: determine how we can validate the function
+    return true;
+}
+uintptr_t page_repl_at(uintptr_t memPtr, int pos)
+{
+    uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
+    // #if DEBUG
+    printf("Replacing at %2d: [%ld] -> %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
+    // #endif
+
+    (MEMPAGE.page + pos)->uptr = memPtr;
+
+    // #if DEBUG
+    printf("Replaced  at %2d: [%ld] <- %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
+    // #endif
+
+    return uaddr;
+}
+mem_block page_get_block(uintptr_t uptr)
+{
+    mem_block ndx = MEMPAGE.page;
+    size_t pos = ndx - MEMPAGE.page;
+    mem_block memPtr = NULL;
+
+    while (pos < MEMPAGE.capacity)
     {
-        if (ALLOCATOR->stack[*ndx].addr == addr)
+        if (ndx->uptr == uptr)
         {
-            memPtr = ALLOCATOR->stack + *ndx;
+            memPtr = ndx;
+
             break;
         }
-        *++ndx;
-    }
-    if (!memPtr)
-    {
-        (*ndx) = -1;
+        ++ndx;
+        pos = ndx - MEMPAGE.page;
     }
 
     return memPtr;
 }
-void __stack_repl_pointer(mem_ptr targ, mem_ptr with, int ndx)
+
+int block_cmp(mem_block mp1, mem_block mp2)
 {
-    ALLOCATOR->stack[ndx] = NULL_POINTER;
+    int ret = mp1->uptr == mp2->uptr  ? 0
+              : mp1->uptr < mp2->uptr ? -1
+                                      : 1;
+
+    // if (mp1->addr < mp2->addr)
+    // {
+    //     ret = -1;
+    // }
+    // else if (mp1->addr > mp2->addr)
+    // {
+    //     ret = 1;
+    // }
+
+    return ret;
 }
-void __mem_ptr_free(mem_ptr memPtr)
+bool block_equ(mem_block mp1, mem_block mp2)
 {
-    if (memPtr != NULL)
+    int cmpRet = block_cmp(mp1, mp2);
+    return cmpRet == 0;
+}
+
+//  user-facing API: functions need ensure MEMPAGE is initialized
+size_t alloc_count()
+{
+    if (!has_mem_page())
     {
-        if (memPtr->item != NULL)
-        {
-            free(memPtr->item);
-            memPtr->item = NULL;
-        }
-
-        free(memPtr);
-        memPtr = NULL;
+        perror("Allocator MemPage Initialization failure");
     }
-}
-bool __mem_ptr_equal(mem_ptr mp1, mem_ptr mp2)
-{
-    return mp1->addr == mp2->addr &&
-           mp1->item == mp2->item;
-}
 
-bool __alloc_init()
+    return MEMPAGE.count;
+}
+size_t alloc_capacity()
 {
-    if (ALLOCATOR == NULL)
+    if (!has_mem_page())
     {
-        __init();
+        perror("Allocator MemPage Initialization failure");
     }
 
-    return ALLOCATOR != NULL;
+    return MEMPAGE.capacity;
 }
-size_t __alloc_count()
+void alloc_flush()
 {
-    return ALLOCATOR->count;
-}
-size_t __alloc_cap()
-{
-    return ALLOCATOR->capacity;
-}
-void __alloc_clear()
-{
+    if (!has_mem_page())
+    {
+        perror("Allocator MemPage Initialization failure");
+    }
+
+    // #if DEBUG
+    printf("Flushing Allocator MemPage\n");
+    // #endif
 
     //  for each memPtr: remove & free
-    int ndx = 0;
-    while (ndx < ALLOCATOR->capacity)
+    mem_block ndx = MEMPAGE.page;
+    size_t pos = ndx - MEMPAGE.page;
+
+    while (pos < MEMPAGE.capacity)
     {
-        if (!__mem_ptr_equal(&NULL_POINTER, ALLOCATOR->stack + ndx))
+        if (!block_equ(&EMPTY_BLOCK, ndx))
         {
-            __stack_repl_pointer(ALLOCATOR->stack + ndx, &NULL_POINTER, ndx);
-            ALLOCATOR->count--;
+            page_rem_at(pos);
+            void *ptr = (void *)(ndx->uptr);
+            free(ptr);
+            _alloc_incr_dealloc_count();
         }
         ++ndx;
+        pos = ndx - MEMPAGE.page;
+    }
+
+    // #if DEBUG
+    _output_alloc_stats();
+    _flush_counters();
+    // #endif
+}
+void alloc_terminate()
+{
+    if (!has_mem_page())
+    {
+        perror("Allocator MemPage Initialization failure");
+    }
+
+    if (MEMPAGE.page != NULL)
+    {
+        alloc_flush();
+        free(MEMPAGE.page);
+        MEMPAGE.page = NULL;
+        MEMPAGE.is_initialized = false;
     }
 }
-void __alloc_terminate()
+void *alloc_allocate(size_t size, allocMode mode)
 {
-    if (ALLOCATOR == NULL)
+    if (!has_mem_page())
     {
-        return;
+        perror("Allocator MemPage Initialization failure");
     }
-    if (ALLOCATOR->stack != NULL)
+
+    void *ptr;
+    switch (mode)
     {
-        __alloc_clear();
-        free(ALLOCATOR->stack);
-        ALLOCATOR->stack = NULL;
+    case UNITITIALIZED:
+        ptr = malloc(size);
+
+        break;
+    case INITIALIZED:
+        ptr = calloc(size + 1, 1);
+
+        break;
     }
-    free(ALLOCATOR);
-    ALLOCATOR = NULL;
-}
-void *__alloc_allocate(size_t size)
-{
-    void *ptr = malloc(size);
 
     if (ptr != NULL)
     {
-        __stack_add_ptr(ptr);
+        page_add_ptr(ptr);
     }
 
     return ptr;
 }
-bool __alloc_deallocate(void *ptr)
+bool alloc_deallocate(void *ptr)
 {
-    return __stack_rem_ptr(ptr);
-}
-mem_ptr __alloc_get_pointer(uintptr_t addr)
-{
-    int ndx;
-    return __stack_get_pointer(addr, &ndx);
+    if (!has_mem_page())
+    {
+        perror("Allocator MemPage Initialization failure");
+    }
+
+    return page_rem_ptr(ptr);
 }
 
 const struct Open_Allocator Allocator = {
-    .init = &__alloc_init,
-    .count = &__alloc_count,
-    .capacity = &__alloc_cap,
-    .clear = &__alloc_clear,
-    .terminate = &__alloc_terminate,
-    .alloc = &__alloc_allocate,
-    .dealloc = &__alloc_deallocate,
-    .pointer = &__alloc_get_pointer};
+    .count = &alloc_count,
+    .capacity = &alloc_capacity,
+    .flush = &alloc_flush,
+    .terminate = &alloc_terminate,
+    .alloc = &alloc_allocate,
+    .dealloc = &alloc_deallocate};

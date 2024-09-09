@@ -2,6 +2,7 @@
 
 #include "../open/test.h"
 #include "../open/core.h"
+#include "../open/allocator.h"
 
 //  test case prototypes
 void _not_freeable();
@@ -12,7 +13,7 @@ void _alloc();
 void _append();
 void _format();
 void _join_strings();
-void _append_array();
+void _alloc_join();
 
 //  utility prototypes
 void __output_string(string);
@@ -20,6 +21,7 @@ void __output_string(string);
 int main(int argc, char **argv)
 {
     write_header("OpenPlatform: Core Unit Testing");
+    Allocator.init();
 
     BEGIN_SET(String.API, true)
     {
@@ -31,12 +33,12 @@ int main(int argc, char **argv)
         TEST(_append);
         TEST(_format);
         TEST(_join_strings);
+        TEST(_alloc_join);
     }
     END_SET(String.API)
 
-    // TEST(_append_array);
-
     TEST_STATS();
+    Allocator.terminate();
 }
 
 void __output_string(string text)
@@ -155,22 +157,22 @@ void _join_strings()
 
     String.free(pBase);
 }
-void _append_array()
+void _alloc_join()
 {
-    writeln("This test is not functional");
+    static const string __DEF_PATH = ".data/sigmac.def";
+    string expPath = "c:/home/david/OpenPlatform/open_framework/lib/core/.data/sigmac.def";
+    //	get the current working directory
+    string cwdir;
+    String.alloc("c:/home/david/OpenPlatform/open_framework/lib/core", &cwdir);
 
-    string hello = "Hello ";
-    string subject[2] = {"Major", "Tom"};
-    string text;
+    string def_path;
+    String.new(0, &def_path);
 
-    string expStr = "Hello Major Tom";
-    size_t expLen = strlen(expStr);
+    String.join("/", &def_path, cwdir, __DEF_PATH, NULL);
 
-    String.alloc(hello, &text);
-    String.append(text, *subject);
-    // assert(strcmp(expStr, text) == 0);
-    // assert(String.length(text) == expLen);
+    assert(strcmp(expPath, def_path) == 0);
+    __output_string(def_path);
 
-    __output_string(text);
-    String.free(text);
+    String.free(cwdir);
+    String.free(def_path);
 }

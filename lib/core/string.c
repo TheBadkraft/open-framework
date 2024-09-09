@@ -3,12 +3,16 @@
 #include <stdarg.h>
 
 #include "open/core.h"
+#include "open/allocator.h"
 #include "open/internal/internal_string.h"
+
+//  String expects Allocator to be initialized.
 
 //  prototypes
 bool __str_empty(string);
 bool __str_null_or_empty(string);
 void __str_new(size_t, string *);
+void __str_alloc(string, string *);
 void __str_copy(string, const string);
 string __str_sub_copy(string, int, int);
 void __str_free(string);
@@ -49,11 +53,11 @@ bool __str_null_or_empty(string pStr)
     return false;
 }
 /*
-    Initializes a new '\0'-filled string to the specified length
+    Initializes a new '\0'-filled string to the specified length; adds 1 for string terminator
 */
 void __str_new(size_t capacity, string *out)
 {
-    (*out) = calloc(capacity, sizeof(char));
+    (*out) = Allocator.alloc(capacity + 1, INITIALIZED);
 }
 /*
     Allocates a new string from a copy of the given source
@@ -100,7 +104,7 @@ void __str_free(string text)
     // printf("free(str)\n");
     if (text != NULL)
     {
-        free(text);
+        Allocator.dealloc(text);
     }
 }
 /*
@@ -304,7 +308,6 @@ const struct Open_String String = {
     .free = &__str_free,
     .length = &__get_str_len,
     .append = &__str_append,
-    // .appendf = &__str_appendf,
     .format = &__str_format,
     .truncate = &__str_trunc,
     .join = &__str_join,

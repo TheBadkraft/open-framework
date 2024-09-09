@@ -76,15 +76,13 @@ file __file_new(string pFPath)
     // printf("File.new[%s] ", pFPath);
 
     //  function needs to go to Path but we need to know if it's a directory or file
-    String.alloc(basename(pFPath), &(pFile->name));
+    string baseName = basename(pFPath);
+    String.alloc(baseName, &(pFile->name));
     // printf("%s ", pFile->name->buffer);
 
-    //  this is a get_path function for Path
     size_t pathLen = strlen(pFPath) - String.length(pFile->name) - 1;
-    string path = calloc(pathLen, sizeof(char));
-    strncpy(path, pFPath, pathLen);
-
-    String.alloc(path, &(pFile->path));
+    String.new(pathLen, &(pFile->path));
+    strncpy(pFile->path, pFPath, pathLen);
     // printf("(\"%s\")\n", pFile=>path);
 
     __file_size(pFile);
@@ -260,7 +258,9 @@ void __path_combine(string *basePath, ...)
     else
     {
         //  check for trailing '/'
-        size_t slashPos = strrchr(*basePath, '/') - *basePath;
+        string slash = strrchr(*basePath, '/');
+        string start = *basePath;
+        size_t slashPos = slash - start;
         hasSlash = (baseLen - slashPos) > 0;
     }
 
