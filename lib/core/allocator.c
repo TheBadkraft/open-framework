@@ -100,7 +100,7 @@ void page_fill()
     size_t pos = ndx - MEMPAGE.page;
 
     // #if DEBUG
-    printf("Filling Page      %ld\n", EMPTY_BLOCK.uptr);
+    // printf("Filling Page      %ld\n", EMPTY_BLOCK.uptr);
     // #endif
 
     while (pos < MEMPAGE.capacity)
@@ -319,7 +319,7 @@ void *alloc_allocate(size_t size, allocMode mode)
 
         break;
     case INITIALIZED:
-        ptr = calloc(size + 1, 1);
+        ptr = calloc(1, size);
 
         break;
     }

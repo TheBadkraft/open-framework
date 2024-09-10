@@ -13,50 +13,50 @@
 #include "open/internal/internal_io.h"
 #include "open/internal/internal_string.h"
 
-bool __file_exists(file);
-void __file_size(file);
-file __file_new(string);
-void __get_file_path(file, string *);
-void __file_free(file);
-void __file_delete(file);
-bool __file_create(file);
-void __file_get_directory(file, directory *);
+bool file_exists(file);
+void file_size(file);
+file file_new(string);
+void get_file_path(file, string *);
+void file_free(file);
+void file_delete(file);
+bool file_create(file);
+void file_get_directory(file, directory *);
 
-directory __dir_new(string);
-bool __dir_exists(directory);
-void __dir_cwd(directory *);
-void __dir_free(directory);
+directory dir_new(string);
+bool dir_exists(directory);
+void dir_cwd(directory *);
+void dir_free(directory);
 
-bool __path_absolute(string, string *);
-void __path_combine(string *, ...);
-bool __path_exists(string);
-string __path_get_directory(string);
-IOType __path_io_type(string);
+bool path_absolute(string, string *);
+void path_combine(string *, ...);
+bool path_exists(string);
+string path_get_directory(string);
+IOType path_io_type(string);
 //      ===================== Utility Definitions ===========================
 
 //      ======================= File Definitions ============================
-bool __file_exists(file pFile)
+bool file_exists(file pFile)
 {
     bool retOk = false;
     if (pFile && pFile->path)
     {
         string pPath;
-        __get_file_path(pFile, &pPath);
+        get_file_path(pFile, &pPath);
 
-        retOk = __path_exists(pPath);
+        retOk = path_exists(pPath);
         String.free(pPath);
     }
 
     return retOk;
 }
-void __file_size(file pFile)
+void file_size(file pFile)
 {
     struct stat iostat;
     pFile->size = -1;
-    if (__file_exists(pFile))
+    if (file_exists(pFile))
     {
         string pPath;
-        __get_file_path(pFile, &pPath);
+        get_file_path(pFile, &pPath);
         if (stat(pPath, &iostat) == 0)
         {
             pFile->size = iostat.st_size;
@@ -65,9 +65,10 @@ void __file_size(file pFile)
         String.free(pPath);
     }
 }
-file __file_new(string pFPath)
+file file_new(string pFPath)
 {
-    file pFile = malloc(sizeof(struct io_file));
+    size_t size = sizeof(struct io_file);
+    file pFile = Allocator.alloc(sizeof(struct io_file), UNITITIALIZED);
     if (!pFile)
     {
         //  handle error
@@ -81,27 +82,27 @@ file __file_new(string pFPath)
     // printf("%s ", pFile->name->buffer);
 
     size_t pathLen = strlen(pFPath) - String.length(pFile->name) - 1;
-    String.new(pathLen, &(pFile->path));
+    String.new(pathLen + 1, &(pFile->path));
     strncpy(pFile->path, pFPath, pathLen);
     // printf("(\"%s\")\n", pFile=>path);
 
-    __file_size(pFile);
+    file_size(pFile);
 
     return pFile;
 }
-void __file_delete(file pFile)
+void file_delete(file pFile)
 {
     string pPath;
-    __get_file_path(pFile, &pPath);
+    get_file_path(pFile, &pPath);
 
     remove(pPath);
 
     String.free(pPath);
 }
-bool __file_create(file pFile)
+bool file_create(file pFile)
 {
     string pPath;
-    __get_file_path(pFile, &pPath);
+    get_file_path(pFile, &pPath);
 
     int fRet = EOF;
     FILE *pStream = fopen(pPath, "w");
@@ -110,23 +111,23 @@ bool __file_create(file pFile)
     {
         printf("[%d]ERROR closing file.\n", fRet);
     }
-    __file_size(pFile);
+    file_size(pFile);
 
-    bool retOk = __path_exists(pPath);
+    bool retOk = path_exists(pPath);
     String.free(pPath);
 
     return retOk;
 }
-bool __file_open(file pFile, stream *pStream, enum io_mode mode)
+bool file_open(file pFile, stream *pStream, enum io_mode mode)
 {
     bool retOk = true;
     string pFullPath;
 
-    __get_file_path(pFile, &pFullPath);
+    get_file_path(pFile, &pFullPath);
     (*pStream) = Stream.new(pFullPath);
     (*pStream)->length = pFile->size;
 
-    if (!__file_exists(pFile) && (CREATE & mode) != CREATE)
+    if (!file_exists(pFile) && (CREATE & mode) != CREATE)
     {
         (*pStream)->error = PATH_NOT_FOUND;
         retOk = false;
@@ -138,11 +139,11 @@ bool __file_open(file pFile, stream *pStream, enum io_mode mode)
 
     return retOk;
 }
-bool __file_truncate(file pFile)
+bool file_truncate(file pFile)
 {
     //  Not Implemented
 }
-void __file_free(file pFile)
+void file_free(file pFile)
 {
     if (pFile)
     {
@@ -154,23 +155,25 @@ void __file_free(file pFile)
         {
             String.free(pFile->path);
         }
-        free(pFile);
+        Allocator.dealloc(pFile);
     }
 }
-void __file_get_directory(file pFile, directory *pDir)
+void file_get_directory(file pFile, directory *pDir)
 {
-    (*pDir) = __dir_new(pFile->path);
+    (*pDir) = dir_new(pFile->path);
 }
-void __get_file_path(file pFile, string *pFullPath)
+void get_file_path(file pFile, string *pFullPath)
 {
-    String.new(0, pFullPath);
+    size_t pathLen = String.length(pFile->path) + String.length("/") + String.length(pFile->name) + 1;
+
+    String.new(pathLen, pFullPath);
     String.copy(*pFullPath, pFile->path);
     Path.combine(pFullPath, pFile->name, NULL);
 }
 //      ==================== Directory Definitions ==========================
-directory __dir_new(string pPath)
+directory dir_new(string pPath)
 {
-    directory pDir = malloc(sizeof(struct io_dir));
+    directory pDir = Allocator.alloc(sizeof(struct io_dir), UNITITIALIZED);
     string slash = strrchr(pPath, '/');
     if (!slash)
     {
@@ -183,11 +186,11 @@ directory __dir_new(string pPath)
 
     return pDir;
 }
-bool __dir_exists(directory pDir)
+bool dir_exists(directory pDir)
 {
-    return __path_exists(pDir->path);
+    return path_exists(pDir->path);
 }
-void __dir_cwd(directory *pDir)
+void dir_cwd(directory *pDir)
 {
     string pfDir;
 
@@ -198,7 +201,7 @@ void __dir_cwd(directory *pDir)
 
     (*pDir) = Directory.new(pfDir);
 }
-void __dir_free(directory pDir)
+void dir_free(directory pDir)
 {
     if (pDir)
     {
@@ -210,13 +213,13 @@ void __dir_free(directory pDir)
         {
             String.free(pDir->path);
         }
-        free(pDir);
+        Allocator.dealloc(pDir);
     }
 }
 //      ======================= Path Definitions ============================
-bool __path_absolute(string pRelPath, string *pAbsPath)
+bool path_absolute(string pRelPath, string *pAbsPath)
 {
-    bool retOk = __path_exists(pRelPath);
+    bool retOk = path_exists(pRelPath);
     //*pAbsPath = NULL;
 
     if (retOk)
@@ -228,7 +231,7 @@ bool __path_absolute(string pRelPath, string *pAbsPath)
     return retOk;
 }
 
-void __path_combine(string *basePath, ...)
+void path_combine(string *basePath, ...)
 {
     /*
         re-engineering this method to implement String.join and more gracefully handle several factors:
@@ -237,6 +240,8 @@ void __path_combine(string *basePath, ...)
         2. basePath may (or may not) have a trailing '/'
     */
     bool hasSlash = false;
+    va_list args;
+    int pathLen = 0;
 
     //  freshly initialized
     if (basePath == NULL)
@@ -248,10 +253,17 @@ void __path_combine(string *basePath, ...)
     //  if empty then there is no trailing '/'
     if (baseLen == 0)
     {
-        //  we are done here, just pass everything to __str_vjoin(...)
+        //  first get a required length
+        va_start(args, basePath);
+        pathLen = str_vsnjoin("/", basePath, args) + 1;
+        va_end(args);
+
+        (*basePath) = realloc(*basePath, pathLen);
+
+        //  we are done here, just pass everything to str_vjoin(...)
         va_list args;
         va_start(args, basePath);
-        __str_vjoin("/", basePath, args);
+        str_vjoin("/", basePath, args);
         va_end(args);
         return;
     }
@@ -261,36 +273,38 @@ void __path_combine(string *basePath, ...)
         string slash = strrchr(*basePath, '/');
         string start = *basePath;
         size_t slashPos = slash - start;
-        hasSlash = (baseLen - slashPos) > 0;
+        hasSlash = (baseLen - slashPos) == 0;
     }
 
     //  combine all arg members
     string dest;
-    String.new(0, &dest);
-    va_list args;
-
     //  first get a required length
     va_start(args, basePath);
-    int pathLen = __str_vsnjoin("/", &dest, args);
+    string arg = va_arg(args, string);
+    pathLen = str_vsnjoin("/", &arg, args);
     va_end(args);
 
-    dest = realloc(dest, pathLen);
+    String.new(pathLen, &dest);
     va_start(args, basePath);
-    __str_vjoin("/", &dest, args);
+    str_vjoin("/", &dest, args);
     va_end(args);
 
     if (hasSlash)
     {
+        String.resize(String.length(*basePath) + String.length(dest) + 1, basePath);
         String.append(*basePath, dest);
     }
     else
     {
-        String.join("/", basePath, dest);
+        String.resize(String.length(*basePath) + String.length(dest) + 2, basePath);
+        String.join("/", basePath, dest, NULL);
     }
+
+    String.free(dest);
 }
 
 /*
-void __path_combine(string *pBasePath, ...)
+void path_combine(string *pBasePath, ...)
 {
     int hasSlash = 0;
     size_t pos = (strrchr(*pBasePath, '/') - *pBasePath);
@@ -338,16 +352,16 @@ void __path_combine(string *pBasePath, ...)
 }
  */
 
-bool __path_exists(string pPath)
+bool path_exists(string pPath)
 {
     return access(pPath, F_OK) == 0 ? true : false;
 }
-string __path_get_directory(string pPath)
+string path_get_directory(string pPath)
 {
     //  TODO: check for '.' or '..' and get full path
     string pfDir = NULL;
     string pBasePath;
-    IOType type = __path_io_type(pPath);
+    IOType type = path_io_type(pPath);
 
     switch (type)
     {
@@ -363,7 +377,7 @@ string __path_get_directory(string pPath)
             perror("expected path delimeter not found.");
         }
 
-        pfDir = __path_get_directory(strndup(pPath, (++slash) - pPath));
+        pfDir = path_get_directory(strndup(pPath, (++slash) - pPath));
         break;
     default:
 
@@ -373,11 +387,11 @@ string __path_get_directory(string pPath)
 
     return pfDir;
 }
-string __path_get_file_name(string pPath)
+string path_get_file_name(string pPath)
 {
     return basename(pPath);
 }
-IOType __path_io_type(string pPath)
+IOType path_io_type(string pPath)
 {
     DIR *dir = opendir(pPath);
 
@@ -397,29 +411,29 @@ IOType __path_io_type(string pPath)
 //		=========================== File API ================================
 const struct Open_File File = {
     /*  members  */
-    .exists = &__file_exists,
-    .size = &__file_size,
-    .new = &__file_new,
-    .delete = &__file_delete,
-    .create = &__file_create,
-    .open = &__file_open,
-    .free = &__file_free,
-    .full_path = &__get_file_path,
-    .directory = &__file_get_directory};
+    .exists = &file_exists,
+    .size = &file_size,
+    .new = &file_new,
+    .delete = &file_delete,
+    .create = &file_create,
+    .open = &file_open,
+    .free = &file_free,
+    .full_path = &get_file_path,
+    .directory = &file_get_directory};
 
 //		======================== Directory API ==============================
 const struct Open_Directory Directory = {
     /*  members  */
-    .new = &__dir_new,
-    .exists = &__dir_exists,
-    .current = &__dir_cwd,
-    .free = &__dir_free};
+    .new = &dir_new,
+    .exists = &dir_exists,
+    .current = &dir_cwd,
+    .free = &dir_free};
 
 //		=========================== Path API ================================
 const struct Open_Path Path = {
     /*  members  */
-    .absolute = &__path_absolute,
-    .combine = &__path_combine,
-    .exists = &__path_exists,
-    .directory = &__path_get_directory,
-    .type = &__path_io_type};
+    .absolute = &path_absolute,
+    .combine = &path_combine,
+    .exists = &path_exists,
+    .directory = &path_get_directory,
+    .type = &path_io_type};

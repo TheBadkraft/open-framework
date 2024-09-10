@@ -5,7 +5,7 @@
 
 #include "../types.h"
 
-void __str_vjoin(string, string *, va_list);
-int __str_vsnjoin(string, string *, va_list);
+void str_vjoin(string, string *, va_list);
+size_t str_vsnjoin(string, string *, va_list);
 
 #endif //  _INTERNAL_IO_H
