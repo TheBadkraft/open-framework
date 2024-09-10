@@ -10,22 +10,22 @@ typedef enum io_error ioerr;
 string *ERR_MSGS = (string[]){
     "No error", "Path not found", "Incompatible mode"};
 
-void __get_friendly_mode(iomode, string *);
-stream __strm_new(string);
-void __get_err_info(ioerr, string *);
-void __strm_get_err_info(stream, string *);
-void __get_mode(iomode, string *);
-bool __strm_is_open(stream);
-void __strm_free(stream);
+void get_friendly_mode(iomode, string *);
+stream strm_new(string);
+void get_err_info(ioerr, string *);
+void strm_get_err_info(stream, string *);
+void get_mode(iomode, string *);
+bool strm_is_open(stream);
+void strm_free(stream);
 
-bool __open_stream(void *p, int m)
+bool open_stream(void *p, int m)
 {
     stream pStream = (stream)p;
     pStream->mode = (iomode)m;
     pStream->status = OK;
     string pMode;
 
-    __get_mode(pStream->mode, &pMode);
+    get_mode(pStream->mode, &pMode);
 
     pStream->fstream = fopen(pStream->source, pMode);
     if (pStream->fstream != NULL)
@@ -37,10 +37,10 @@ bool __open_stream(void *p, int m)
         pStream->status = ERR | CLOSED;
     }
 
-    return (OPEN & pStream->status) == OPEN;
+    return ((OPEN & pStream->status) == OPEN);
 }
 
-void __get_friendly_mode(iomode mode, string *outMode)
+void get_friendly_mode(iomode mode, string *outMode)
 {
     //  45 is a swag
     (*outMode) = calloc(45, sizeof(char));
@@ -94,9 +94,9 @@ void __get_friendly_mode(iomode mode, string *outMode)
         }
     }
 }
-stream __strm_new(string pPath)
+stream strm_new(string pPath)
 {
-    stream pStream = malloc(sizeof(struct io_stream));
+    stream pStream = Allocator.alloc(sizeof(struct io_stream), UNITITIALIZED);
     pStream->source = pPath;
     pStream->mode = NO_MODE;
     pStream->error = NONE;
@@ -107,16 +107,16 @@ stream __strm_new(string pPath)
 
     return pStream;
 }
-void __get_err_info(ioerr err, string *pErrMsg)
+void get_err_info(ioerr err, string *pErrMsg)
 {
     string errMsg = ERR_MSGS[err];
     String.alloc(errMsg, pErrMsg);
 }
-void __strm_get_err_info(stream pStream, string *pErrMsg)
+void strm_get_err_info(stream pStream, string *pErrMsg)
 {
-    __get_err_info(pStream->error, pErrMsg);
+    get_err_info(pStream->error, pErrMsg);
 }
-void __get_mode(iomode mode, string *pM)
+void get_mode(iomode mode, string *pM)
 {
     static char *_READ = "r";
     static char *_WRIT = "w";
@@ -170,14 +170,14 @@ void __get_mode(iomode mode, string *pM)
         strcat("b", *pM);
     }
 }
-bool __strm_is_open(stream pStream)
+bool strm_is_open(stream pStream)
 {
     bool retOk = (OPEN & pStream->status) == OPEN;
     retOk &= pStream->fstream != NULL;
 
     return retOk;
 }
-void __strm_free(stream pStream)
+void strm_free(stream pStream)
 {
     if (pStream->fstream != NULL)
     {
@@ -191,13 +191,13 @@ void __strm_free(stream pStream)
         }
     }
 
-    free(pStream);
+    Allocator.dealloc(pStream);
 }
 
 const struct Open_Stream Stream = {
-    .new = &__strm_new,
-    .get_error = &__strm_get_err_info,
-    .err_info = &__get_err_info,
-    .mode_info = &__get_mode,
-    .is_open = &__strm_is_open,
-    .free = &__strm_free};
+    .new = &strm_new,
+    .get_error = &strm_get_err_info,
+    .err_info = &get_err_info,
+    .mode_info = &get_mode,
+    .is_open = &strm_is_open,
+    .free = &strm_free};
