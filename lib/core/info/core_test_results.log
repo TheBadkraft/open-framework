@@ -759,18 +759,26 @@ Replaced  at  0: [93824992287744] <- 0
 Deallocated      [93824992287744]    0
 ==========================================   [PASS]
 *** TEST CASE [_new_stream]
+Allocating        93824992305344
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992305344
+Allocated         93824992305344
 file:    ./.data/bad.log
 created: false
 length:  0
 handle:  no
 status:  OK
 Allocating        93824992295024
-Replacing at  0: [93824992287744] -> 0
-Replaced  at  0: [93824992287744] <- 93824992295024
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992295024
 Allocated         93824992295024
 error:   No error
-Deallocating     [93824992287744]    93824992295024
-Replacing at  0: [93824992287744] -> 93824992295024
+Deallocating     [93824992287752]    93824992295024
+Replacing at  1: [93824992287752] -> 93824992295024
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287744]    93824992305344
+Replacing at  0: [93824992287744] -> 93824992305344
 Replaced  at  0: [93824992287744] <- 0
 Deallocated      [93824992287744]    0
 ==========================================   [PASS]
@@ -831,34 +839,42 @@ Deallocating     [93824992287776]    93824992305696
 Replacing at  4: [93824992287776] -> 93824992305696
 Replaced  at  4: [93824992287776] <- 0
 Deallocated      [93824992287776]    0
-Allocating        93824992305696
+Allocating        93824992305344
 Replacing at  4: [93824992287776] -> 0
-Replaced  at  4: [93824992287776] <- 93824992305696
+Replaced  at  4: [93824992287776] <- 93824992305344
+Allocated         93824992305344
+Allocating        93824992305696
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992305696
 Allocated         93824992305696
 Allocating        93824992305728
-Replacing at  5: [93824992287784] -> 0
-Replaced  at  5: [93824992287784] <- 93824992305728
+Replacing at  6: [93824992287792] -> 0
+Replaced  at  6: [93824992287792] <- 93824992305728
 Allocated         93824992305728
-Deallocating     [93824992287784]    93824992305728
-Replacing at  5: [93824992287784] -> 93824992305728
+Deallocating     [93824992287792]    93824992305728
+Replacing at  6: [93824992287792] -> 93824992305728
+Replaced  at  6: [93824992287792] <- 0
+Deallocated      [93824992287792]    0
+Deallocating     [93824992287784]    93824992305696
+Replacing at  5: [93824992287784] -> 93824992305696
 Replaced  at  5: [93824992287784] <- 0
 Deallocated      [93824992287784]    0
-Deallocating     [93824992287776]    93824992305696
-Replacing at  4: [93824992287776] -> 93824992305696
-Replaced  at  4: [93824992287776] <- 0
-Deallocated      [93824992287776]    0
 file:    ./.data/main.C
 created: true
 length:  50
 handle:  yes
 status:  OK
 Allocating        93824992305728
-Replacing at  4: [93824992287776] -> 0
-Replaced  at  4: [93824992287776] <- 93824992305728
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992305728
 Allocated         93824992305728
 error:   No error
-Deallocating     [93824992287776]    93824992305728
-Replacing at  4: [93824992287776] -> 93824992305728
+Deallocating     [93824992287784]    93824992305728
+Replacing at  5: [93824992287784] -> 93824992305728
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992305344
+Replacing at  4: [93824992287776] -> 93824992305344
 Replaced  at  4: [93824992287776] <- 0
 Deallocated      [93824992287776]    0
 ==========================================   [PASS]
@@ -871,12 +887,12 @@ Replacing at  2: [93824992287760] -> 93824992305568
 Replaced  at  2: [93824992287760] <- 0
 Replacing at  3: [93824992287768] -> 93824992305664
 Replaced  at  3: [93824992287768] <- 0
-total allocations:    14
-total deallocations:  14
+total allocations:    16
+total deallocations:  16
 END SET   [stream]              Tests:   3
 ===================================================
 Total Tests:                            16
 Tests PASS:                             16
 Flushing Allocator MemPage
-total allocations:    14
-total deallocations:  14
+total allocations:    16
+total deallocations:  16

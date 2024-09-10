@@ -134,7 +134,7 @@ bool file_open(file pFile, stream *pStream, enum io_mode mode)
     }
     if (retOk)
     {
-        __open_stream(*pStream, mode);
+        open_stream(*pStream, mode);
     }
 
     return retOk;
