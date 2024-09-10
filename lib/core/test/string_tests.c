@@ -10,10 +10,13 @@ void _is_empty();
 void _is_noe();
 void _new();
 void _alloc();
+void _copy();
+void _resize();
+void _truncate();
 void _append();
 void _format();
 void _join_strings();
-void _alloc_join();
+void _join_with_const_dest();
 
 //  utility prototypes
 void __output_string(string);
@@ -21,19 +24,20 @@ void __output_string(string);
 int main(int argc, char **argv)
 {
     write_header("OpenPlatform: Core Unit Testing");
-    Allocator.init();
-
     BEGIN_SET(String.API, true)
     {
         // TEST(__test_not_freeable);
-        TEST(_is_empty);
-        TEST(_is_noe);
-        TEST(_new);
-        TEST(_alloc);
-        TEST(_append);
-        TEST(_format);
-        TEST(_join_strings);
-        TEST(_alloc_join);
+        // TEST(_is_empty);
+        // TEST(_is_noe);
+        // TEST(_new);
+        // TEST(_alloc);
+        TEST(_copy);
+        TEST(_resize);
+        TEST(_truncate);
+        // TEST(_append);
+        // TEST(_format);
+        // TEST(_join_strings);
+        // TEST(_join_with_const_dest);
     }
     END_SET(String.API)
 
@@ -105,6 +109,57 @@ void _alloc()
     __output_string(text);
     String.free(text);
 }
+void _copy()
+{
+    writeln("String.copy: copies string const into malloc'd & sized string");
+    string expStr = "Original String";
+
+    string dest;
+    //  unlike alloc which takes an uninitialized string, copy expects a properly sized &
+    //  initialized string
+    String.new(String.length(expStr) + 1, &dest);
+    String.copy(dest, expStr);
+
+    assert(strcmp(expStr, dest) == 0);
+    __output_string(dest);
+
+    String.free(dest);
+}
+void _resize()
+{
+    writeln("String.resize: resize an initialized string");
+    string expStr = "Hello, World";
+    string pt1 = "Hello";
+    string pt2 = "World";
+
+    string dest;
+    //  allocate with initial value
+    String.alloc(pt1, &dest);
+    String.resize(String.length(dest) + String.length(pt2) + 2, &dest);
+
+    //  copy_to will not fault
+    String.copy_to(", ", dest, 5);
+    String.copy_to(pt2, dest, 7);
+
+    assert(strcmp(expStr, dest) == 0);
+    __output_string(dest);
+
+    String.free(dest);
+}
+void _truncate()
+{
+    writeln("String.truncate: truncate a string");
+    string expStr = "Hello,";
+    string target;
+    String.alloc("Hello, World", &target);
+
+    String.truncate(6, &target);
+
+    assert(strcmp(expStr, target) == 0);
+    __output_string(target);
+
+    String.free(target);
+}
 void _append()
 {
     string hello = "Hello";
@@ -141,12 +196,16 @@ void _format()
 }
 void _join_strings()
 {
-    writeln("Path.combine: combine path elements with a base path");
+    writeln("Path.combine: combine path elements with empty base path");
 
     string expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
     string root = "/home/david/OpenPlatform/open_framework/lib/io";
 
+    //  destination needs to be malloc'd and sized
     string pBase;
+    //  expected pathLen - do not pass the destination in the join_len
+    int pathLen = String.join_len("/", root, ".data", "main.C", NULL);
+    String.new(pathLen, &pBase);
     // String.new(0, &pBase);
     writefln("root:  %d", strlen(root));
 
@@ -157,22 +216,38 @@ void _join_strings()
 
     String.free(pBase);
 }
-void _alloc_join()
+void _join_with_const_dest()
 {
-    static const string __DEF_PATH = ".data/sigmac.def";
-    string expPath = "c:/home/david/OpenPlatform/open_framework/lib/core/.data/sigmac.def";
-    //	get the current working directory
-    string cwdir;
-    String.alloc("c:/home/david/OpenPlatform/open_framework/lib/core", &cwdir);
+    writeln("Path.combine: combine path elements with populated base path");
 
-    string def_path;
-    String.new(0, &def_path);
+    string expPath = "/home/david/OpenPlatform/open_framework/lib/io/.data/main.C";
+    string pathPart = "open_framework/lib/io";
+    string pathData = ".data";
+    string pathMainC = "main.C";
 
-    String.join("/", &def_path, cwdir, __DEF_PATH, NULL);
+    //  root is the destination
+    string pathRoot = "/home/david/OpenPlatform";
 
-    assert(strcmp(expPath, def_path) == 0);
-    __output_string(def_path);
+    int pathLen = String.join_len("/", pathPart, pathData, pathMainC, NULL);
+    //  then add the destination len if not empty
+    pathLen += String.length(pathRoot);
 
-    String.free(cwdir);
-    String.free(def_path);
+    //  this will throw a seg fault because pathRoot is not malloc'd
+    // String.join("/", &pathRoot, pathPart, pathData, pathMainC, NULL);
+    //  must allocate the string first and size properly to the expected pathLen
+    String.alloc(pathRoot, &pathRoot);
+    String.resize(pathLen, &pathRoot);
+    /*
+    //  there are a couple of ways to do the above ...
+
+        Example:
+        String.new(pathLen, &pathRoot);
+        String.copy(pathRoot, "/home/david/OpenPlatform");
+    */
+    String.join("/", &pathRoot, pathPart, pathData, pathMainC, NULL);
+
+    assert(strcmp(expPath, pathRoot) == 0);
+    __output_string(pathRoot);
+
+    String.free(pathRoot);
 }

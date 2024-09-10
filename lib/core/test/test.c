@@ -15,14 +15,14 @@ void _format();
 //  IO: test case prototypes
 void file_path_exists();
 void dir_new();
-void combine_paths();
-void open_file_stream();
+void _combine_paths();
+void _open_file_stream();
 
 //	utility prototypes
 void __output_string(string);
-void __output_file_info(file);
-void __output_directory_info(directory);
-void __output_stream_info(stream);
+void _output_file_info(file);
+void _output_directory_info(directory);
+void _output_stream_info(stream);
 
 //	test values
 string pfDir = "./.data";
@@ -48,8 +48,8 @@ int main(int argc, char **argv)
     {
         TEST(file_path_exists);
         TEST(dir_new);
-        TEST(combine_paths);
-        TEST(open_file_stream);
+        TEST(_combine_paths);
+        TEST(_open_file_stream);
     }
     END_SET(IO.API)
 
@@ -71,7 +71,7 @@ void __output_string(string text)
     writefln("text len:  %ld", String.length(text));
     writefln("freeable: %s", YN(String.freeable(text)));
 }
-void __output_file_info(file pFile)
+void _output_file_info(file pFile)
 {
     directory pDir;
     File.directory(pFile, &pDir);
@@ -84,12 +84,12 @@ void __output_file_info(file pFile)
 
     Directory.free(pDir);
 }
-void __output_directory_info(directory pDir)
+void _output_directory_info(directory pDir)
 {
     writefln("name: %s", pDir->name);
     writefln("path: %s", pDir->path);
 }
-void __output_stream_info(stream pStream)
+void _output_stream_info(stream pStream)
 {
     writefln("file:    %s", pStream->source);
     writefln("created: %s", B(Path.exists(pStream->source)));
@@ -175,10 +175,10 @@ void dir_new()
     assert(strcmp(".data", pDir->name) == 0);
     assert(strcmp("./.data", pDir->path) == 0);
 
-    __output_directory_info(pDir);
+    _output_directory_info(pDir);
     Directory.free(pDir);
 }
-void combine_paths()
+void _combine_paths()
 {
     writeln("Path.combine: combine path elements with a base path");
 
@@ -195,7 +195,7 @@ void combine_paths()
     assert(strcmp(expPath, pBase) == 0);
     String.free(pBase);
 }
-void open_file_stream()
+void _open_file_stream()
 {
     //	gain access to a stream by opening a file
     file pFile = File.new(pfSource);
@@ -206,6 +206,6 @@ void open_file_stream()
     assert(pStream->fstream != NULL);
     assert(Stream.is_open(pStream));
 
-    __output_stream_info(pStream);
+    _output_stream_info(pStream);
     Stream.free(pStream);
 }

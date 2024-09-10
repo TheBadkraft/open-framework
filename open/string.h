@@ -19,8 +19,12 @@ extern const struct Open_String
     void (*new)(size_t, string *);
     //  Allocates a new string from a copy of the given source
     void (*alloc)(string, string *);
+    //  Resize the current string to the new size
+    void (*resize)(size_t, string *);
     //  Copy string text to destination
     void (*copy)(string, const string);
+    //  Begin copy source to destination at position
+    void (*copy_to)(string, string, int loc);
     //  Copy substring to new string
     string (*subcopy)(string, int, int);
     //  [NOT WORKING] Determines whether the current string is freeable
@@ -40,9 +44,11 @@ extern const struct Open_String
     //  Formats the given parameters returning a new string
     void (*format)(const string, string *, ...);
     //  Truncate the current string
-    void (*truncate)(string, size_t);
+    void (*truncate)(size_t, string *);
     //  Join multiple strings separated with the given delimeter.
     void (*join)(string, string *, ...);
+    //  determines the size of the joined string with delimeter
+    size_t (*join_len)(string, ...);
     //  Split a string on a given delimter.
     string *(*split)(char, string);
 } String;

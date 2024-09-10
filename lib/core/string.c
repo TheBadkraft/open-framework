@@ -9,27 +9,28 @@
 //  String expects Allocator to be initialized.
 
 //  prototypes
-bool __str_empty(string);
-bool __str_null_or_empty(string);
-void __str_new(size_t, string *);
-void __str_alloc(string, string *);
-void __str_copy(string, const string);
-string __str_sub_copy(string, int, int);
-void __str_free(string);
-size_t __get_str_len(string);
-size_t __get_str_cap(string);
-void __str_append(string, const string);
-void __str_format(const string, string *, ...);
-void __str_trunc(string, size_t);
-void __str_join(string, string *, ...);
-string *__str_split(char, string);
-int __fmt_count(const string);
+bool str_empty(string);
+bool str_null_or_empty(string);
+void str_new(size_t, string *);
+void str_alloc(string, string *);
+void str_copy(string, const string);
+void str_copy_to(string, string, int);
+string str_sub_copy(string, int, int);
+void str_free(string);
+size_t get_str_len(string);
+size_t get_str_cap(string);
+void str_append(string, const string);
+void str_format(const string, string *, ...);
+void str_trunc(size_t, string *);
+void str_join(string, string *, ...);
+string *str_split(char, string);
+int fmt_count(const string);
 //  -------------------
 
 /*
     Determine if a string is empty; returns FALSE for NULL
 */
-bool __str_empty(string pStr)
+bool str_empty(string pStr)
 {
     if (pStr == NULL)
     {
@@ -43,7 +44,7 @@ bool __str_empty(string pStr)
 /*
     Determine if a string is null or empty
 */
-bool __str_null_or_empty(string pStr)
+bool str_null_or_empty(string pStr)
 {
     if (!pStr || strcmp(String.empty, pStr) == 0)
     {
@@ -55,33 +56,57 @@ bool __str_null_or_empty(string pStr)
 /*
     Initializes a new '\0'-filled string to the specified length; adds 1 for string terminator
 */
-void __str_new(size_t capacity, string *out)
+void str_new(size_t capacity, string *out)
 {
     (*out) = Allocator.alloc(capacity + 1, INITIALIZED);
 }
 /*
     Allocates a new string from a copy of the given source
 */
-void __str_alloc(string source, string *out)
+void str_alloc(string source, string *out)
 {
-    __str_new(strlen(source), out);
+    str_new(strlen(source), out);
     strcpy((*out), source);
+}
+
+void str_resize(size_t size, string *out)
+{
+    size_t len = get_str_len(*out);
+    if (len == size)
+    {
+        return;
+    }
+    if (len > size)
+    {
+        str_trunc(size, out);
+    }
+    else
+    {
+        (*out) = realloc(*out, size);
+    }
 }
 /*
     Copy string text to destination
 */
-void __str_copy(string dest, const string text)
+void str_copy(string dest, const string text)
 {
     // __set_str_cap(dest, strlen(text) + 1);
     strcpy(dest, text);
 }
 /*
+    Begin copy source to destination at position
+*/
+void str_copy_to(string text, string dest, int loc)
+{
+    strcpy((dest + loc), text);
+}
+/*
     Copy substring to new string
 */
-string __str_sub_copy(string text, int pos, int len)
+string str_sub_copy(string text, int pos, int len)
 {
     string pNew;
-    __str_new(len, &pNew);
+    str_new(len, &pNew);
 
     strncpy(pNew, text + pos, len);
 
@@ -90,7 +115,7 @@ string __str_sub_copy(string text, int pos, int len)
 /*
     Determines whether the current string is freeable
 */
-bool __str_freeable(string text)
+bool str_freeable(string text)
 {
     // bool retOk = Core.is_allocated(text);
 
@@ -99,7 +124,7 @@ bool __str_freeable(string text)
 /*
     Free the current string
 */
-void __str_free(string text)
+void str_free(string text)
 {
     // printf("free(str)\n");
     if (text != NULL)
@@ -110,14 +135,14 @@ void __str_free(string text)
 /*
     Returns the string length
 */
-size_t __get_str_len(string pStr)
+size_t get_str_len(string pStr)
 {
-    return __str_null_or_empty(pStr) ? 0 : strlen(pStr);
+    return str_null_or_empty(pStr) ? 0 : strlen(pStr);
 }
 /*
     Appends the supplied string at the end of the current string.
 */
-void __str_append(string base, const string text)
+void str_append(string base, const string text)
 {
     size_t baselen = strlen(base), txtlen = strlen(text);
     size_t len = baselen + txtlen + 1;
@@ -125,34 +150,10 @@ void __str_append(string base, const string text)
 
     strcat(base, text);
 }
-
-/*
-   // Appends a formatted string to the current string
-
-void __str_appendf(string dest, const string format, ...)
-{
-  va_list args;
-
-  va_start(args, format);
-  int len = vsnprintf(NULL, 0, format, args);
-  va_end(args);
-
-  string pfStr;
-  __str_new(len, &pfStr);
-
-  va_start(args, format);
-  vsprintf(pfStr, format, args);
-  va_end(args);
-
-  String.append(dest, pfStr);
-  free(pfStr);
-}
-*/
-
 /*
     Formats the given parameters returning a new string
 */
-void __str_format(const string format, string *out, ...)
+void str_format(const string format, string *out, ...)
 {
     va_list args;
 
@@ -160,7 +161,7 @@ void __str_format(const string format, string *out, ...)
     int len = vsnprintf(NULL, 0, format, args);
     va_end(args);
 
-    __str_new(len, out);
+    str_new(len, out);
 
     va_start(args, out);
     vsprintf((*out), format, args);
@@ -169,66 +170,44 @@ void __str_format(const string format, string *out, ...)
 /*
     Truncate the current string
 */
-void __str_trunc(string pStr, size_t len)
+void str_trunc(size_t size, string *out)
 {
-    if (__get_str_len(pStr) > len)
+    // we allocate for the null terminator here
+    if (get_str_len(*out) > size)
     {
-        memset(pStr + len, 0, 1);
+        (*out) = realloc(*out, size + 1);
+        memset((*out) + size, 0, 1);
     }
 }
 /*
-    Join multiple strings separated with the given delimeter.
+    Join multiple strings separated with the given delimeter. Expect dest to be malloc'd and
+    properly sized.
 */
-void __str_join(string delim, string *dest, ...)
+void str_join(string delim, string *dest, ...)
 {
     va_list args;
 
-    //  first calculate how large the destination string needs to be
     va_start(args, dest);
-    //  we play naive and only expect string (char*) args
-    string arg = va_arg(args, string);
-    size_t len = 1; //  set to 1 to account for null terminator
-    while (arg)
-    {
-        len += strlen(arg);
-        arg = va_arg(args, string);
-
-        if (arg)
-        {
-            // __str_append(*dest, delim);
-            len += strlen(delim);
-        }
-    }
+    str_vjoin(delim, dest, args);
+    va_end(args);
+}
+size_t str_join_len(string delim, ...)
+{
+    va_list args;
+    va_start(args, delim);
+    string dest = String.empty;
+    size_t size = str_vsnjoin(delim, &dest, args);
     va_end(args);
 
-    //  allocate the size one time
-    __str_new(len, dest);
-    va_start(args, dest);
-    __str_vjoin(delim, dest, args);
-    va_end(args);
-
-    // //  iterate the args and join
-    // va_start(args, dest);
-    // arg = va_arg(args, string);
-    // while (arg)
-    // {
-    //     strcat(*dest, arg);
-    //     //  get the next arg
-    //     arg = va_arg(args, string);
-    //     if (arg)
-    //     {
-    //         strcat(*dest, delim);
-    //     }
-    // }
-    // va_end(args);
+    return size;
 }
 /*
     Split a string on a given delimter.
 */
-string *__str_split(char delim, string pStr)
+string *str_split(char delim, string pStr)
 {
     //  not yet implemented
-    return (char *[]){NULL};
+    return NULL;
 }
 
 //  INTERNAL FUNCTIONS
@@ -237,8 +216,18 @@ string *__str_split(char delim, string pStr)
     In this internal implementation, we expect that 'dest' is malloc'd, and of the proper
     length.
 */
-void __str_vjoin(string delim, string *dest, va_list args)
+void str_vjoin(string delim, string *dest, va_list args)
 {
+    if (*dest == NULL)
+    {
+        perror("destination for join cannot be NULL; must be allocated & sized");
+        return;
+    }
+
+    if (!str_empty(*dest))
+    {
+        strcat(*dest, delim);
+    }
     //  iterate the args and join
     string arg = va_arg(args, string);
     while (arg)
@@ -255,7 +244,7 @@ void __str_vjoin(string delim, string *dest, va_list args)
 /*
     Expect 'dest' to NOT be NULL. Count the final string length of a join with delimeter
 */
-int __str_vsnjoin(string delim, string *dest, va_list args)
+size_t str_vsnjoin(string delim, string *dest, va_list args)
 {
     size_t delimLen = String.length(delim);
     size_t outLen = String.length(*dest);
@@ -267,7 +256,7 @@ int __str_vsnjoin(string delim, string *dest, va_list args)
         arg = va_arg(args, string);
     }
 
-    return delimLen;
+    return outLen;
 }
 
 //  MISCELLANEOUS
@@ -276,7 +265,7 @@ int __str_vsnjoin(string delim, string *dest, va_list args)
 
     NAIVE
 */
-int __fmt_count(const string format)
+int fmt_count(const string format)
 {
     /*
         NOT USED in any functions.
@@ -299,16 +288,19 @@ int __fmt_count(const string format)
 
 const struct Open_String String = {
     .empty = "",
-    .is_empty = &__str_empty,
-    .is_null_or_empty = &__str_null_or_empty,
-    .new = &__str_new,
-    .alloc = &__str_alloc,
-    .copy = &__str_copy,
-    .freeable = &__str_freeable,
-    .free = &__str_free,
-    .length = &__get_str_len,
-    .append = &__str_append,
-    .format = &__str_format,
-    .truncate = &__str_trunc,
-    .join = &__str_join,
-    .split = &__str_split};
+    .is_empty = &str_empty,
+    .is_null_or_empty = &str_null_or_empty,
+    .new = &str_new,
+    .alloc = &str_alloc,
+    .resize = &str_resize,
+    .copy = &str_copy,
+    .copy_to = &str_copy_to,
+    .freeable = &str_freeable,
+    .free = &str_free,
+    .length = &get_str_len,
+    .append = &str_append,
+    .format = &str_format,
+    .truncate = &str_trunc,
+    .join = &str_join,
+    .join_len = &str_join_len,
+    .split = &str_split};

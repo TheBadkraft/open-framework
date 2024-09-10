@@ -1,0 +1,882 @@
+BEGIN SET [file]
+---------------------------------------------------
+OP Tests: IO.File
+===================================================
+*** TEST CASE [_file_path_exists]
+path_exists: determine if path exists
+==========================================   [PASS]
+*** TEST CASE [_file_size]
+File.size: get file size
+---------------------------------------------------
+Allocating        93824992288272
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288272
+Allocated         93824992288272
+Allocating        93824992288304
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992288304
+Allocated         93824992288304
+Allocating        93824992288336
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992288336
+Allocated         93824992288336
+Allocating        93824992288368
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992288368
+Allocated         93824992288368
+Allocating        93824992288400
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992288400
+Allocated         93824992288400
+Deallocating     [93824992287776]    93824992288400
+Replacing at  4: [93824992287776] -> 93824992288400
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992288368
+Replacing at  3: [93824992287768] -> 93824992288368
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992288432
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992288432
+Allocated         93824992288432
+Allocating        93824992288464
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992288464
+Allocated         93824992288464
+Deallocating     [93824992287776]    93824992288464
+Replacing at  4: [93824992287776] -> 93824992288464
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992288432
+Replacing at  3: [93824992287768] -> 93824992288432
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Deallocating     [93824992287752]    93824992288304
+Replacing at  1: [93824992287752] -> 93824992288304
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287760]    93824992288336
+Replacing at  2: [93824992287760] -> 93824992288336
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287744]    93824992288272
+Replacing at  0: [93824992287744] -> 93824992288272
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+Flushing Allocator MemPage
+total allocations:    7
+total deallocations:  7
+==========================================   [PASS]
+*** TEST CASE [_create_file_obj]
+File.new: new file object
+Allocating        93824992288336
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288336
+Allocated         93824992288336
+Allocating        93824992286416
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992286416
+Allocated         93824992286416
+Allocating        93824992289008
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992289008
+Allocated         93824992289008
+Allocating        93824992289040
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289072
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289072
+Allocated         93824992289072
+Deallocating     [93824992287776]    93824992289072
+Replacing at  4: [93824992287776] -> 93824992289072
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289040
+Replacing at  3: [93824992287768] -> 93824992289040
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289104
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289104
+Allocated         93824992289104
+Allocating        93824992289136
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289136
+Allocated         93824992289136
+Deallocating     [93824992287776]    93824992289136
+Replacing at  4: [93824992287776] -> 93824992289136
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289104
+Replacing at  3: [93824992287768] -> 93824992289104
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289040
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Allocating        93824992289168
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992289168
+Allocated         93824992289168
+file: test.log
+object:    true
+Allocating        93824992289200
+Replacing at  6: [93824992287792] -> 0
+Replaced  at  6: [93824992287792] <- 93824992289200
+Allocated         93824992289200
+Allocating        93824992289232
+Replacing at  7: [93824992287800] -> 0
+Replaced  at  7: [93824992287800] <- 93824992289232
+Allocated         93824992289232
+Deallocating     [93824992287800]    93824992289232
+Replacing at  7: [93824992287800] -> 93824992289232
+Replaced  at  7: [93824992287800] <- 0
+Deallocated      [93824992287800]    0
+Deallocating     [93824992287792]    93824992289200
+Replacing at  6: [93824992287792] -> 93824992289200
+Replaced  at  6: [93824992287792] <- 0
+Deallocated      [93824992287792]    0
+created:   false
+directory: .data
+size:      -1
+Deallocating     [93824992287784]    93824992289168
+Replacing at  5: [93824992287784] -> 93824992289168
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289040
+Replacing at  3: [93824992287768] -> 93824992289040
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289040
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289040
+Replacing at  3: [93824992287768] -> 93824992289040
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Deallocating     [93824992287752]    93824992286416
+Replacing at  1: [93824992287752] -> 93824992286416
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287760]    93824992289008
+Replacing at  2: [93824992287760] -> 93824992289008
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287744]    93824992288336
+Replacing at  0: [93824992287744] -> 93824992288336
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+Flushing Allocator MemPage
+total allocations:    14
+total deallocations:  14
+==========================================   [PASS]
+*** TEST CASE [_create_file]
+File.create: create new file
+Allocating        93824992289072
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992289072
+Allocated         93824992289072
+Allocating        93824992288272
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992288272
+Allocated         93824992288272
+Allocating        93824992286416
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992286416
+Allocated         93824992286416
+Allocating        93824992289040
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289040
+Replacing at  3: [93824992287768] -> 93824992289040
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289040
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Allocating        93824992289168
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992289168
+Allocated         93824992289168
+Deallocating     [93824992287784]    93824992289168
+Replacing at  5: [93824992287784] -> 93824992289168
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Allocating        93824992289104
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289104
+Allocated         93824992289104
+Allocating        93824992289168
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992289168
+Allocated         93824992289168
+Deallocating     [93824992287784]    93824992289168
+Replacing at  5: [93824992287784] -> 93824992289168
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992289104
+Replacing at  4: [93824992287776] -> 93824992289104
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289040
+Replacing at  3: [93824992287768] -> 93824992289040
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289008
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289008
+Allocated         93824992289008
+Allocating        93824992289040
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289040
+Allocated         93824992289040
+Allocating        93824992289168
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992289168
+Allocated         93824992289168
+file: test.log
+object:    true
+Allocating        93824992289200
+Replacing at  6: [93824992287792] -> 0
+Replaced  at  6: [93824992287792] <- 93824992289200
+Allocated         93824992289200
+Allocating        93824992289232
+Replacing at  7: [93824992287800] -> 0
+Replaced  at  7: [93824992287800] <- 93824992289232
+Allocated         93824992289232
+Deallocating     [93824992287800]    93824992289232
+Replacing at  7: [93824992287800] -> 93824992289232
+Replaced  at  7: [93824992287800] <- 0
+Deallocated      [93824992287800]    0
+Deallocating     [93824992287792]    93824992289200
+Replacing at  6: [93824992287792] -> 93824992289200
+Replaced  at  6: [93824992287792] <- 0
+Deallocated      [93824992287792]    0
+created:   true
+directory: .data
+size:      0
+Deallocating     [93824992287784]    93824992289168
+Replacing at  5: [93824992287784] -> 93824992289168
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992289040
+Replacing at  4: [93824992287776] -> 93824992289040
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289008
+Replacing at  3: [93824992287768] -> 93824992289008
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992289008
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289008
+Allocated         93824992289008
+Allocating        93824992289040
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289040
+Allocated         93824992289040
+Deallocating     [93824992287776]    93824992289040
+Replacing at  4: [93824992287776] -> 93824992289040
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289008
+Replacing at  3: [93824992287768] -> 93824992289008
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+deleting test.log
+Allocating        93824992289008
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289008
+Allocated         93824992289008
+Allocating        93824992289040
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289040
+Allocated         93824992289040
+Deallocating     [93824992287776]    93824992289040
+Replacing at  4: [93824992287776] -> 93824992289040
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992289008
+Replacing at  3: [93824992287768] -> 93824992289008
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Deallocating     [93824992287752]    93824992288272
+Replacing at  1: [93824992287752] -> 93824992288272
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287760]    93824992286416
+Replacing at  2: [93824992287760] -> 93824992286416
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287744]    93824992289072
+Replacing at  0: [93824992287744] -> 93824992289072
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+*** TEST CASE [_new_file_from_path]
+Allocating        93824992288336
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288336
+Allocated         93824992288336
+Allocating        93824992289008
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992289008
+Allocated         93824992289008
+Allocating        93824992286416
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992286416
+Allocated         93824992286416
+Allocating        93824992289072
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992289072
+Allocated         93824992289072
+Allocating        93824992289072
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992289072
+Allocated         93824992289072
+Allocating        93824992289216
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992289216
+Allocated         93824992289216
+Allocating        93824992294880
+Replacing at  6: [93824992287792] -> 0
+Replaced  at  6: [93824992287792] <- 93824992294880
+Allocated         93824992294880
+Allocating        93824992294944
+Replacing at  7: [93824992287800] -> 0
+Replaced  at  7: [93824992287800] <- 93824992294944
+Allocated         93824992294944
+Allocating        93824992295024
+Replacing at  8: [93824992287808] -> 0
+Replaced  at  8: [93824992287808] <- 93824992295024
+Allocated         93824992295024
+Deallocating     [93824992287808]    93824992295024
+Replacing at  8: [93824992287808] -> 93824992295024
+Replaced  at  8: [93824992287808] <- 0
+Deallocated      [93824992287808]    0
+Deallocating     [93824992287800]    93824992294944
+Replacing at  7: [93824992287800] -> 93824992294944
+Replaced  at  7: [93824992287800] <- 0
+Deallocated      [93824992287800]    0
+Allocating        93824992295056
+Replacing at  7: [93824992287800] -> 0
+Replaced  at  7: [93824992287800] <- 93824992295056
+Allocated         93824992295056
+Allocating        93824992295136
+Replacing at  8: [93824992287808] -> 0
+Replaced  at  8: [93824992287808] <- 93824992295136
+Allocated         93824992295136
+Deallocating     [93824992287808]    93824992295136
+Replacing at  8: [93824992287808] -> 93824992295136
+Replaced  at  8: [93824992287808] <- 0
+Deallocated      [93824992287808]    0
+Deallocating     [93824992287800]    93824992295056
+Replacing at  7: [93824992287800] -> 93824992295056
+Replaced  at  7: [93824992287800] <- 0
+Deallocated      [93824992287800]    0
+Allocating        93824992295024
+Replacing at  7: [93824992287800] -> 0
+Replaced  at  7: [93824992287800] <- 93824992295024
+Allocated         93824992295024
+Allocating        93824992295168
+Replacing at  8: [93824992287808] -> 0
+Replaced  at  8: [93824992287808] <- 93824992295168
+Allocated         93824992295168
+Allocating        93824992295136
+Replacing at  9: [93824992287816] -> 0
+Replaced  at  9: [93824992287816] <- 93824992295136
+Allocated         93824992295136
+file: sigmac.def
+object:    true
+Allocating        93824992295232
+Replacing at 10: [93824992287824] -> 0
+Replaced  at 10: [93824992287824] <- 93824992295232
+Allocated         93824992295232
+Allocating        93824992295312
+Replacing at 11: [93824992287832] -> 0
+Replaced  at 11: [93824992287832] <- 93824992295312
+Allocated         93824992295312
+Deallocating     [93824992287832]    93824992295312
+Replacing at 11: [93824992287832] -> 93824992295312
+Replaced  at 11: [93824992287832] <- 0
+Deallocated      [93824992287832]    0
+Deallocating     [93824992287824]    93824992295232
+Replacing at 10: [93824992287824] -> 93824992295232
+Replaced  at 10: [93824992287824] <- 0
+Deallocated      [93824992287824]    0
+created:   true
+directory: .data
+size:      144
+Deallocating     [93824992287816]    93824992295136
+Replacing at  9: [93824992287816] -> 93824992295136
+Replaced  at  9: [93824992287816] <- 0
+Deallocated      [93824992287816]    0
+Deallocating     [93824992287808]    93824992295168
+Replacing at  8: [93824992287808] -> 93824992295168
+Replaced  at  8: [93824992287808] <- 0
+Deallocated      [93824992287808]    0
+Deallocating     [93824992287800]    93824992295024
+Replacing at  7: [93824992287800] -> 93824992295024
+Replaced  at  7: [93824992287800] <- 0
+Deallocated      [93824992287800]    0
+Deallocating     [93824992287784]    93824992289216
+Replacing at  5: [93824992287784] -> 93824992289216
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287792]    93824992294880
+Replacing at  6: [93824992287792] -> 93824992294880
+Replaced  at  6: [93824992287792] <- 0
+Deallocated      [93824992287792]    0
+Deallocating     [93824992287768]    93824992289072
+Replacing at  3: [93824992287768] -> 93824992289072
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Flushing Allocator MemPage
+Replacing at  0: [93824992287744] -> 93824992288336
+Replaced  at  0: [93824992287744] <- 0
+Replacing at  1: [93824992287752] -> 93824992289008
+Replaced  at  1: [93824992287752] <- 0
+Replacing at  2: [93824992287760] -> 93824992286416
+Replaced  at  2: [93824992287760] <- 0
+Replacing at  4: [93824992287776] -> 93824992289072
+Replaced  at  4: [93824992287776] <- 0
+total allocations:    36
+total deallocations:  36
+==========================================   [PASS]
+*** TEST CASE [_file_directory]
+File.directory: get file directory
+Allocating        93824992288272
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288272
+Allocated         93824992288272
+Allocating        93824992289104
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992289104
+Allocated         93824992289104
+Allocating        93824992295136
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992295136
+Allocated         93824992295136
+Allocating        93824992295856
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992295856
+Allocated         93824992295856
+Allocating        93824992295888
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992295888
+Allocated         93824992295888
+Deallocating     [93824992287776]    93824992295888
+Replacing at  4: [93824992287776] -> 93824992295888
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992295856
+Replacing at  3: [93824992287768] -> 93824992295856
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992295856
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992295856
+Allocated         93824992295856
+Allocating        93824992295888
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992295888
+Allocated         93824992295888
+Deallocating     [93824992287776]    93824992295888
+Replacing at  4: [93824992287776] -> 93824992295888
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992295856
+Replacing at  3: [93824992287768] -> 93824992295856
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992295024
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992295024
+Allocated         93824992295024
+Allocating        93824992295856
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992295856
+Allocated         93824992295856
+Allocating        93824992295920
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992295920
+Allocated         93824992295920
+name: .data
+path: ./.data
+Deallocating     [93824992287752]    93824992289104
+Replacing at  1: [93824992287752] -> 93824992289104
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287760]    93824992295136
+Replacing at  2: [93824992287760] -> 93824992295136
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287744]    93824992288272
+Replacing at  0: [93824992287744] -> 93824992288272
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+Deallocating     [93824992287784]    93824992295920
+Replacing at  5: [93824992287784] -> 93824992295920
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992295856
+Replacing at  4: [93824992287776] -> 93824992295856
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992295024
+Replacing at  3: [93824992287768] -> 93824992295024
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+==========================================   [PASS]
+END SET   [file]                Tests:   6
+===================================================
+BEGIN SET [directory]
+---------------------------------------------------
+OP Tests: IO.Directory
+===================================================
+*** TEST CASE [_dir_current]
+Allocating        93824992288304
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288304
+Allocated         93824992288304
+Allocating        93824992300576
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992300576
+Allocated         93824992300576
+Allocating        93824992295312
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992295312
+Allocated         93824992295312
+name: core
+path: /home/david/OpenPlatform/open_framework/lib/core
+Deallocating     [93824992287760]    93824992295312
+Replacing at  2: [93824992287760] -> 93824992295312
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287752]    93824992300576
+Replacing at  1: [93824992287752] -> 93824992300576
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287744]    93824992288304
+Replacing at  0: [93824992287744] -> 93824992288304
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+*** TEST CASE [_dir_new]
+Allocating        93824992295856
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992295856
+Allocated         93824992295856
+Allocating        93824992289072
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992289072
+Allocated         93824992289072
+Allocating        93824992288272
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992288272
+Allocated         93824992288272
+name: .data
+path: ./.data
+Deallocating     [93824992287760]    93824992288272
+Replacing at  2: [93824992287760] -> 93824992288272
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287752]    93824992289072
+Replacing at  1: [93824992287752] -> 93824992289072
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287744]    93824992295856
+Replacing at  0: [93824992287744] -> 93824992295856
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+*** TEST CASE [_dir_exists]
+Allocating        93824992288304
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288304
+Allocated         93824992288304
+Allocating        93824992295920
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992295920
+Allocated         93824992295920
+Allocating        93824992295136
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992295136
+Allocated         93824992295136
+name: .data
+path: ./.data
+Deallocating     [93824992287760]    93824992295136
+Replacing at  2: [93824992287760] -> 93824992295136
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287752]    93824992295920
+Replacing at  1: [93824992287752] -> 93824992295920
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+Deallocating     [93824992287744]    93824992288304
+Replacing at  0: [93824992287744] -> 93824992288304
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+Flushing Allocator MemPage
+total allocations:    19
+total deallocations:  19
+END SET   [directory]           Tests:   3
+===================================================
+BEGIN SET [Path]
+---------------------------------------------------
+OP Tests: IO.Path
+===================================================
+*** TEST CASE [_combine_paths]
+Path.combine: combine path elements with a base path
+Allocating        93824992289072
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992289072
+Allocated         93824992289072
+pBase len: 46
+Allocating        93824992295312
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992295312
+Allocated         93824992295312
+Deallocating     [93824992287752]    93824992295312
+Replacing at  1: [93824992287752] -> 93824992295312
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+==========================================   [PASS]
+*** TEST CASE [_combine_with_empty_base]
+Path.combine: combine path elements from an empty base path
+Allocating        93824992295312
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992295312
+Allocated         93824992295312
+Allocating        93824992305344
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992305344
+Allocated         93824992305344
+Allocating        93824992288304
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992288304
+Allocated         93824992288304
+Allocating        93824992305408
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305408
+Allocated         93824992305408
+expected: /home/david/OpenPlatform/open_framework/lib/core/.data/main.C
+Allocating        93824992305488
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992305488
+Allocated         93824992305488
+combined: /home/david/OpenPlatform/open_framework/lib/core/.data/main.C
+Deallocating     [93824992287768]    93824992288304
+Replacing at  3: [93824992287768] -> 93824992288304
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Deallocating     [93824992287760]    93824992305344
+Replacing at  2: [93824992287760] -> 93824992305344
+Replaced  at  2: [93824992287760] <- 0
+Deallocated      [93824992287760]    0
+Deallocating     [93824992287752]    93824992295312
+Replacing at  1: [93824992287752] -> 93824992295312
+Replaced  at  1: [93824992287752] <- 0
+Deallocated      [93824992287752]    0
+==========================================   [PASS]
+*** TEST CASE [_path_directory]
+Path.directory: return char* directory from path
+==========================================   [PASS]
+*** TEST CASE [_path_file_directory]
+Path.directory: return char* directory from file path
+==========================================   [PASS]
+Flushing Allocator MemPage
+Replacing at  0: [93824992287744] -> 93824992289072
+Replaced  at  0: [93824992287744] <- 0
+Replacing at  4: [93824992287776] -> 93824992305408
+Replaced  at  4: [93824992287776] <- 0
+Replacing at  5: [93824992287784] -> 93824992305488
+Replaced  at  5: [93824992287784] <- 0
+total allocations:    7
+total deallocations:  7
+END SET   [Path]                Tests:   4
+===================================================
+BEGIN SET [stream]
+---------------------------------------------------
+OP Tests: IO.Stream
+===================================================
+*** TEST CASE [_get_stream_error]
+Allocating        93824992295856
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992295856
+Allocated         93824992295856
+Deallocating     [93824992287744]    93824992295856
+Replacing at  0: [93824992287744] -> 93824992295856
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+*** TEST CASE [_new_stream]
+file:    ./.data/bad.log
+created: false
+length:  0
+handle:  no
+status:  OK
+Allocating        93824992295024
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992295024
+Allocated         93824992295024
+error:   No error
+Deallocating     [93824992287744]    93824992295024
+Replacing at  0: [93824992287744] -> 93824992295024
+Replaced  at  0: [93824992287744] <- 0
+Deallocated      [93824992287744]    0
+==========================================   [PASS]
+*** TEST CASE [_open_file_stream]
+Allocating        93824992288304
+Replacing at  0: [93824992287744] -> 0
+Replaced  at  0: [93824992287744] <- 93824992288304
+Allocated         93824992288304
+Allocating        93824992295856
+Replacing at  1: [93824992287752] -> 0
+Replaced  at  1: [93824992287752] <- 93824992295856
+Allocated         93824992295856
+Allocating        93824992305568
+Replacing at  2: [93824992287760] -> 0
+Replaced  at  2: [93824992287760] <- 93824992305568
+Allocated         93824992305568
+Allocating        93824992305600
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992305600
+Allocated         93824992305600
+Allocating        93824992305632
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305632
+Allocated         93824992305632
+Deallocating     [93824992287776]    93824992305632
+Replacing at  4: [93824992287776] -> 93824992305632
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992305600
+Replacing at  3: [93824992287768] -> 93824992305600
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992305664
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992305664
+Allocated         93824992305664
+Allocating        93824992305696
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305696
+Allocated         93824992305696
+Deallocating     [93824992287776]    93824992305696
+Replacing at  4: [93824992287776] -> 93824992305696
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Deallocating     [93824992287768]    93824992305664
+Replacing at  3: [93824992287768] -> 93824992305664
+Replaced  at  3: [93824992287768] <- 0
+Deallocated      [93824992287768]    0
+Allocating        93824992305664
+Replacing at  3: [93824992287768] -> 0
+Replaced  at  3: [93824992287768] <- 93824992305664
+Allocated         93824992305664
+Allocating        93824992305696
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305696
+Allocated         93824992305696
+Deallocating     [93824992287776]    93824992305696
+Replacing at  4: [93824992287776] -> 93824992305696
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+Allocating        93824992305696
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305696
+Allocated         93824992305696
+Allocating        93824992305728
+Replacing at  5: [93824992287784] -> 0
+Replaced  at  5: [93824992287784] <- 93824992305728
+Allocated         93824992305728
+Deallocating     [93824992287784]    93824992305728
+Replacing at  5: [93824992287784] -> 93824992305728
+Replaced  at  5: [93824992287784] <- 0
+Deallocated      [93824992287784]    0
+Deallocating     [93824992287776]    93824992305696
+Replacing at  4: [93824992287776] -> 93824992305696
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+file:    ./.data/main.C
+created: true
+length:  50
+handle:  yes
+status:  OK
+Allocating        93824992305728
+Replacing at  4: [93824992287776] -> 0
+Replaced  at  4: [93824992287776] <- 93824992305728
+Allocated         93824992305728
+error:   No error
+Deallocating     [93824992287776]    93824992305728
+Replacing at  4: [93824992287776] -> 93824992305728
+Replaced  at  4: [93824992287776] <- 0
+Deallocated      [93824992287776]    0
+==========================================   [PASS]
+Flushing Allocator MemPage
+Replacing at  0: [93824992287744] -> 93824992288304
+Replaced  at  0: [93824992287744] <- 0
+Replacing at  1: [93824992287752] -> 93824992295856
+Replaced  at  1: [93824992287752] <- 0
+Replacing at  2: [93824992287760] -> 93824992305568
+Replaced  at  2: [93824992287760] <- 0
+Replacing at  3: [93824992287768] -> 93824992305664
+Replaced  at  3: [93824992287768] <- 0
+total allocations:    14
+total deallocations:  14
+END SET   [stream]              Tests:   3
+===================================================
+Total Tests:                            16
+Tests PASS:                             16
+Flushing Allocator MemPage
+total allocations:    14
+total deallocations:  14

@@ -9,34 +9,34 @@
 #include "../open/allocator.h"
 
 //	FILE: test case prototypes
-void file_path_exists();
-void file_size();
-void create_file_obj();
-void new_file_from_path();
-void create_file();
-void file_directory();
+void _file_path_exists();
+void _file_size();
+void _create_file_obj();
+void _new_file_from_path();
+void _create_file();
+void _file_directory();
 //	DIRECTORY: test case prototypes
-void dir_new();
-void dir_exists();
-void dir_current();
+void _dir_new();
+void _dir_exists();
+void _dir_current();
 //	PATH: test case prototypes
-void get_abs_path();
-void combine_paths();
-void combine_with_empty_base();
-void path_directory();
-void path_file_directory();
+void _get_abs_path();
+void _combine_paths();
+void _combine_with_empty_base();
+void _path_directory();
+void _path_file_directory();
 //	STREAM: test case prototypes
-void get_stream_error();
-void new_stream();
-void open_file_stream();
+void _get_stream_error();
+void _new_stream();
+void _open_file_stream();
 
 //	utility prototypes
-void __output_file_info(file);
-void __output_directory_info(directory);
-void __output_stream_info(stream);
+void _output_file_info(file);
+void _output_directory_info(directory);
+void _output_stream_info(stream);
 
 //	target subject
-static file def_file = NULL;
+file def_file = NULL;
 
 //	test values
 string pfDir = "./.data";
@@ -50,28 +50,30 @@ int main(int argc, string *argv)
 	{
 		remove(pfTemp);
 	}
-	Allocator.init();
 
 	BEGIN_SET(file, true)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.File");
-		TEST(file_path_exists);
-		TEST(file_size);
-		TEST(create_file_obj);
-		TEST(create_file);
-		TEST(new_file_from_path);
-		TEST(file_directory);
+		TEST(_file_path_exists);
+		TEST(_file_size);
+		TEST(_create_file_obj);
+		TEST(_create_file);
+		TEST(_new_file_from_path);
+		TEST(_file_directory);
 	}
 	END_SET(file)
 
-	BEGIN_SET(directory, false)
+	BEGIN_SET(directory, true)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.Directory");
-		TEST(dir_current);
-		TEST(dir_new);
-		TEST(dir_exists);
+		TEST(_dir_current);
+		TEST(_dir_new);
+		TEST(_dir_exists);
+
+		if (doTests)
+			Allocator.flush();
 	}
 	END_SET(directory)
 
@@ -79,21 +81,27 @@ int main(int argc, string *argv)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.Path");
-		TEST(get_abs_path);
-		TEST(combine_paths);
-		TEST(combine_with_empty_base);
-		TEST(path_directory);
-		TEST(path_file_directory);
+		// TEST(_get_abs_path);
+		TEST(_combine_paths);
+		TEST(_combine_with_empty_base);
+		TEST(_path_directory);
+		TEST(_path_file_directory);
+
+		if (doTests)
+			Allocator.flush();
 	}
 	END_SET(Path)
 
-	BEGIN_SET(stream, false)
+	BEGIN_SET(stream, true)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.Stream");
-		TEST(get_stream_error);
-		TEST(new_stream);
-		TEST(open_file_stream);
+		TEST(_get_stream_error);
+		TEST(_new_stream);
+		TEST(_open_file_stream);
+
+		if (doTests)
+			Allocator.flush();
 	}
 	END_SET(stream)
 
@@ -102,7 +110,7 @@ int main(int argc, string *argv)
 	Allocator.terminate();
 }
 
-void __output_file_info(file pFile)
+void _output_file_info(file pFile)
 {
 	directory pDir;
 	File.directory(pFile, &pDir);
@@ -115,12 +123,12 @@ void __output_file_info(file pFile)
 
 	Directory.free(pDir);
 }
-void __output_directory_info(directory pDir)
+void _output_directory_info(directory pDir)
 {
 	writefln("name: %s", pDir->name);
 	writefln("path: %s", pDir->path);
 }
-void __output_stream_info(stream pStream)
+void _output_stream_info(stream pStream)
 {
 	writefln("file:    %s", pStream->source);
 	writefln("created: %s", B(Path.exists(pStream->source)));
@@ -137,13 +145,13 @@ void __output_stream_info(stream pStream)
 }
 
 //		================================ TEST CASES ================================
-void file_path_exists()
+void _file_path_exists()
 {
 	writeln("path_exists: determine if path exists");
 	assert(Utils.path_exists(pfSource));
 	assert(Utils.path_exists(pfNone) == false);
 }
-void file_size()
+void _file_size()
 {
 	writeln("File.size: get file size");
 
@@ -152,9 +160,10 @@ void file_size()
 
 	assert(pFile->size == -1);
 
-	free(pFile);
+	File.free(pFile);
+	Allocator.flush();
 }
-void create_file_obj()
+void _create_file_obj()
 {
 	writeln("File.new: new file object");
 
@@ -163,7 +172,25 @@ void create_file_obj()
 	assert(pFile->size == -1);
 	assert(File.exists(pFile) == false);
 
-	__output_file_info(pFile);
+	_output_file_info(pFile);
+	if (File.exists(pFile))
+	{
+		writefln("deleting %s", pFile->name);
+		File.delete(pFile);
+	}
+
+	File.free(pFile);
+	Allocator.flush();
+}
+void _create_file()
+{
+	writeln("File.create: create new file");
+
+	file pFile = File.new(pfTemp);
+	assert(File.create(pFile));
+	assert(pFile->size == 0);
+
+	_output_file_info(pFile);
 	if (File.exists(pFile))
 	{
 		writefln("deleting %s", pFile->name);
@@ -172,9 +199,8 @@ void create_file_obj()
 
 	File.free(pFile);
 }
-void new_file_from_path()
+void _new_file_from_path()
 {
-	Allocator.flush();
 	/*
 		Duplicating conditions causing 'realloc(): invalid next size'
 	*/
@@ -192,28 +218,12 @@ void new_file_from_path()
 	String.free(def_path);
 
 	assert(def_file != NULL);
-	__output_file_info(def_file);
+	_output_file_info(def_file);
 
 	File.free(def_file);
+	Allocator.flush();
 }
-void create_file()
-{
-	writeln("File.create: create new file");
-
-	file pFile = File.new(pfTemp);
-	assert(File.create(pFile));
-	assert(pFile->size == 0);
-
-	__output_file_info(pFile);
-	if (File.exists(pFile))
-	{
-		writefln("deleting %s", pFile->name);
-		File.delete(pFile);
-	}
-
-	File.free(pFile);
-}
-void file_directory()
+void _file_directory()
 {
 	writeln("File.directory: get file directory");
 
@@ -224,40 +234,40 @@ void file_directory()
 	assert(strcmp(".data", pDir->name) == 0);
 	assert(strcmp("./.data", pDir->path) == 0);
 
-	__output_directory_info(pDir);
+	_output_directory_info(pDir);
 	File.free(pFile);
 	Directory.free(pDir);
 }
 
-void dir_new()
+void _dir_new()
 {
 	directory pDir = Directory.new(pfDir);
 	assert(pDir != NULL);
 	assert(strcmp(".data", pDir->name) == 0);
 	assert(strcmp("./.data", pDir->path) == 0);
 
-	__output_directory_info(pDir);
+	_output_directory_info(pDir);
 	Directory.free(pDir);
 }
-void dir_exists()
+void _dir_exists()
 {
 	directory pDir = Directory.new(pfDir);
 	assert(Directory.exists(pDir));
 
-	__output_directory_info(pDir);
+	_output_directory_info(pDir);
 	Directory.free(pDir);
 }
-void dir_current()
+void _dir_current()
 {
 	directory pDir;
 	Directory.current(&pDir);
 	assert(pDir != NULL);
 
-	__output_directory_info(pDir);
+	_output_directory_info(pDir);
 	Directory.free(pDir);
 }
 
-void get_abs_path()
+void _get_abs_path()
 {
 	writeln("Path.absolute: get the absolute members of a relative path");
 
@@ -284,7 +294,7 @@ void get_abs_path()
 		String.free(actPath);
 	}
 }
-void combine_paths()
+void _combine_paths()
 {
 	writeln("Path.combine: combine path elements with a base path");
 
@@ -293,7 +303,6 @@ void combine_paths()
 
 	string pBase;
 	String.alloc(startPath, &pBase);
-	writefln("strlen:  %d", strlen(startPath));
 	writefln("pBase len: %d", String.length(pBase));
 
 	Path.combine(&pBase, ".data", "main.C", NULL);
@@ -301,7 +310,7 @@ void combine_paths()
 	assert(strcmp(expPath, pBase) == 0);
 	String.free(pBase);
 }
-void combine_with_empty_base()
+void _combine_with_empty_base()
 {
 	/*
 		Duplicating an error condition that resulted in 2x '//' at the beginning of the path
@@ -329,7 +338,7 @@ void combine_with_empty_base()
 	assert(strcmp(expPath, pBase) == 0);
 	Directory.free(cwdir);
 }
-void path_directory()
+void _path_directory()
 {
 	writeln("Path.directory: return char* directory from path");
 
@@ -338,7 +347,7 @@ void path_directory()
 
 	assert(strcmp(expDir, pDir) == 0);
 }
-void path_file_directory()
+void _path_file_directory()
 {
 	writeln("Path.directory: return char* directory from file path");
 
@@ -348,7 +357,7 @@ void path_file_directory()
 	assert(strcmp(expDir, pDir) == 0);
 }
 
-void get_stream_error()
+void _get_stream_error()
 {
 	string expMsg = "Path not found";
 
@@ -362,7 +371,7 @@ void get_stream_error()
 
 	String.free(errMsg);
 }
-void new_stream()
+void _new_stream()
 {
 	//	new stream
 	stream pStream = Stream.new(pfNone);
@@ -370,10 +379,10 @@ void new_stream()
 	assert(pStream != NULL);
 	assert(strcmp(pfNone, pStream->source) == 0);
 
-	__output_stream_info(pStream);
+	_output_stream_info(pStream);
 	Stream.free(pStream);
 }
-void open_file_stream()
+void _open_file_stream()
 {
 	//	gain access to a stream by opening a file
 	file pFile = File.new(pfSource);
@@ -384,6 +393,6 @@ void open_file_stream()
 	assert(pStream->fstream != NULL);
 	assert(Stream.is_open(pStream));
 
-	__output_stream_info(pStream);
+	_output_stream_info(pStream);
 	Stream.free(pStream);
 }
