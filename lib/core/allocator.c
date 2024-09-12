@@ -97,8 +97,8 @@ void page_fill()
 {
     //  this is naive in that it will not be reliable after (when) the memBlock is resized
     //  TODO: improve function when memBlock is resized
-    mem_block ndx = MEMPAGE.page;
-    size_t pos = ndx - MEMPAGE.page;
+    mem_block blockNdx = MEMPAGE.page;
+    size_t pos = blockNdx - MEMPAGE.page;
 
     // #if DEBUG
     // printf("Filling Page      %ld\n", EMPTY_BLOCK.objPtr);
@@ -106,38 +106,40 @@ void page_fill()
 
     while (pos < MEMPAGE.capacity)
     {
-        obj_p objPtr_cpy = (obj_p)memcpy(ndx, &EMPTY_BLOCK, sizeof(struct Mem_Block));
+        obj_p objPtr_cpy = (obj_p)memcpy(blockNdx, &EMPTY_BLOCK, sizeof(struct Mem_Block));
         // #if DEBUG
         // printf("[%2ld]    %ld\n", pos, objPtr_cpy);
         // #endif
 
-        pos = ++ndx - MEMPAGE.page;
+        pos = ++blockNdx - MEMPAGE.page;
     }
 
     // #if DEBUG
     // printf("---------------------------------------------------\n");
     // #endif
 }
-void page_add_ptr(object ptr)
+void page_add_ptr(object obj)
 {
     size_t pos = -1;
     //  find the first empty block
-    mem_block memBlk = page_get_block(NULL_ADDR_PTR);
-    if (memBlk != NULL)
+    mem_block memBlock = page_get_block(NULL_ADDR_PTR);
+    if (memBlock != NULL)
     {
-        pos = memBlk - MEMPAGE.page;
-        // memBlk->objPtr = (obj_ptr)ptr;
-        obj_p uaddr = (obj_p)(MEMPAGE.page + pos);
+        pos = memBlock - MEMPAGE.page;
+        // memBlock->objPtr = (obj_ptr)ptr;
+        /*  //  I don't recall if I did this for logging purposes but seems useless...
+            obj_p objPtr = (obj_p)(MEMPAGE.page + pos);
+        */
         // #if DEBUG
         // printf("Allocating        %ld\n", (obj_ptr)ptr);
         // #endif
 
-        uaddr = page_repl_at((obj_p)ptr, pos);
+        obj_p objPtr = page_repl_at((obj_p)obj, pos);
         MEMPAGE.count++;
 
         _alloc_incr_alloc_count();
         // #if DEBUG
-        // printf("Allocated         %ld\n", memBlk->objPtr);
+        // printf("Allocated         %ld\n", memBlock->objPtr);
         // #endif
     }
     else
@@ -145,27 +147,27 @@ void page_add_ptr(object ptr)
         perror("Need to check allocation pool. It appears to be full.");
     }
 }
-bool page_rem_ptr(object ptr)
+bool page_rem_ptr(object obj)
 {
-    mem_block memBlk = page_get_block((obj_p)ptr);
-    int pos = memBlk - MEMPAGE.page;
+    mem_block memBlock = page_get_block((obj_p)obj);
+    int pos = memBlock - MEMPAGE.page;
     bool retOk = pos >= 0 && pos < MEMPAGE.capacity;
 
     if (retOk)
     {
-        obj_p uaddr = (obj_p)(MEMPAGE.page + pos);
         // #if DEBUG
-        // printf("Deallocating     [%ld]    %ld\n", uaddr, memBlk->objPtr);
+        // obj_p objPtr = (obj_p)(MEMPAGE.page + pos);
+        // printf("Deallocating     [%ld]    %ld\n", uaddr, memBlock->objPtr);
         // #endif
 
         retOk = page_rem_at(pos);
         // #if DEBUG
-        // printf("Deallocated      [%ld]    %ld\n", uaddr, memBlk->objPtr);
+        // printf("Deallocated      [%ld]    %ld\n", uaddr, memBlock->objPtr);
         // #endif
     }
     if (retOk)
     {
-        free(ptr);
+        free(obj);
         _alloc_incr_dealloc_count();
     }
 
@@ -181,7 +183,7 @@ bool page_rem_at(int pos)
 }
 obj_p page_repl_at(obj_p objPtr, int pos)
 {
-    obj_p uaddr = (obj_p)(MEMPAGE.page + pos);
+    obj_p blockPtr = (obj_p)(MEMPAGE.page + pos);
     // #if DEBUG
     // printf("Replacing at %2d: [%ld] -> %ld\n", pos, uaddr, (MEMPAGE.page + pos)->objPtr);
     // #endif
@@ -192,33 +194,33 @@ obj_p page_repl_at(obj_p objPtr, int pos)
     // printf("Replaced  at %2d: [%ld] <- %ld\n", pos, uaddr, (MEMPAGE.page + pos)->objPtr);
     // #endif
 
-    return uaddr;
+    return blockPtr;
 }
 mem_block page_get_block(obj_p objPtr)
 {
-    mem_block ndx = MEMPAGE.page;
-    size_t pos = ndx - MEMPAGE.page;
-    mem_block objPtr = NULL;
+    mem_block blockNdx = MEMPAGE.page;
+    size_t pos = blockNdx - MEMPAGE.page;
+    mem_block memBlock = NULL;
 
     while (pos < MEMPAGE.capacity)
     {
-        if (ndx->obj_ptr == objPtr)
+        if (blockNdx->obj_ptr == objPtr)
         {
-            objPtr = ndx;
+            memBlock = blockNdx;
 
             break;
         }
-        ++ndx;
-        pos = ndx - MEMPAGE.page;
+        ++blockNdx;
+        pos = blockNdx - MEMPAGE.page;
     }
 
-    return objPtr;
+    return memBlock;
 }
 
-int block_cmp(mem_block mp1, mem_block mp2)
+int block_cmp(mem_block mb1, mem_block mb2)
 {
-    int ret = mp1->obj_ptr == mp2->obj_ptr  ? 0
-              : mp1->obj_ptr < mp2->obj_ptr ? -1
+    int ret = mb1->obj_ptr == mb2->obj_ptr  ? 0
+              : mb1->obj_ptr < mb2->obj_ptr ? -1
                                             : 1;
 
     // if (mp1->addr < mp2->addr)
@@ -232,9 +234,9 @@ int block_cmp(mem_block mp1, mem_block mp2)
 
     return ret;
 }
-bool block_equ(mem_block mp1, mem_block mp2)
+bool block_equ(mem_block mb1, mem_block mb2)
 {
-    int cmpRet = block_cmp(mp1, mp2);
+    int cmpRet = block_cmp(mb1, mb2);
     return cmpRet == 0;
 }
 
@@ -269,20 +271,21 @@ void alloc_flush()
     // #endif
 
     //  for each objPtr: remove & free
-    mem_block ndx = MEMPAGE.page;
-    size_t pos = ndx - MEMPAGE.page;
+    mem_block blockNdx = MEMPAGE.page;
+    size_t pos = blockNdx - MEMPAGE.page;
 
     while (pos < MEMPAGE.capacity)
     {
-        if (!block_equ(&EMPTY_BLOCK, ndx))
+        if (!block_equ(&EMPTY_BLOCK, blockNdx))
         {
             page_rem_at(pos);
-            object ptr = (object)(ndx->obj_ptr);
-            free(ptr);
+            object obj = (object)(blockNdx->obj_ptr);
+            free(obj);
+
             _alloc_incr_dealloc_count();
         }
-        ++ndx;
-        pos = ndx - MEMPAGE.page;
+        ++blockNdx;
+        pos = blockNdx - MEMPAGE.page;
     }
 
     // #if DEBUG
@@ -315,25 +318,25 @@ object alloc_allocate(size_t size, allocMode mode)
         perror("Allocator MemPage Initialization failure");
     }
 
-    object ptr;
+    object obj;
     switch (mode)
     {
     case UNINITIALIZED:
-        ptr = malloc(size);
+        obj = malloc(size);
 
         break;
     case INITIALIZED:
-        ptr = calloc(1, size);
+        obj = calloc(1, size);
 
         break;
     }
 
-    if (ptr != NULL)
+    if (obj != NULL)
     {
-        page_add_ptr(ptr);
+        page_add_ptr(obj);
     }
 
-    return ptr;
+    return obj;
 }
 bool alloc_deallocate(object obj)
 {
