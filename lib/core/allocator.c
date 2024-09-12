@@ -317,7 +317,7 @@ void *alloc_allocate(size_t size, allocMode mode)
     void *ptr;
     switch (mode)
     {
-    case UNITITIALIZED:
+    case UNINITIALIZED:
         ptr = malloc(size);
 
         break;

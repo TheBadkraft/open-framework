@@ -13,5 +13,6 @@ typedef unsigned short ushort;
 typedef char sbyte;
 
 typedef char *string;
+typedef void *object;
 
 #endif // _OPEN_TYPES_H

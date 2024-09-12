@@ -12,7 +12,7 @@
 enum Alloc_Mode
 {
     INITIALIZED,
-    UNITITIALIZED
+    UNINITIALIZED
 };
 
 struct Mem_Block

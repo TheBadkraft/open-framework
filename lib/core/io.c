@@ -68,7 +68,7 @@ void file_size(file pFile)
 file file_new(string pFPath)
 {
     size_t size = sizeof(struct io_file);
-    file pFile = Allocator.alloc(sizeof(struct io_file), UNITITIALIZED);
+    file pFile = Allocator.alloc(sizeof(struct io_file), UNINITIALIZED);
     if (!pFile)
     {
         //  handle error
@@ -173,7 +173,7 @@ void get_file_path(file pFile, string *pFullPath)
 //      ==================== Directory Definitions ==========================
 directory dir_new(string pPath)
 {
-    directory pDir = Allocator.alloc(sizeof(struct io_dir), UNITITIALIZED);
+    directory pDir = Allocator.alloc(sizeof(struct io_dir), UNINITIALIZED);
     string slash = strrchr(pPath, '/');
     if (!slash)
     {

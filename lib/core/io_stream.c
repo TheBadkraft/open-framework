@@ -96,7 +96,7 @@ void get_friendly_mode(iomode mode, string *outMode)
 }
 stream strm_new(string pPath)
 {
-    stream pStream = Allocator.alloc(sizeof(struct io_stream), UNITITIALIZED);
+    stream pStream = Allocator.alloc(sizeof(struct io_stream), UNINITIALIZED);
     pStream->source = pPath;
     pStream->mode = NO_MODE;
     pStream->error = NONE;
