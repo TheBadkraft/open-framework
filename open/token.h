@@ -2,6 +2,7 @@
 #define _TOKEN_H
 
 #include "types.h"
+#include "allocator.h"
 
 struct io_token
 {
