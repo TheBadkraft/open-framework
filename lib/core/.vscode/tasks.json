@@ -22,7 +22,7 @@
 			"detail": "compiler: gcc"
 		},
 		{   "label": "build so",
-			"type": "shell",
+			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
 				"-shared",

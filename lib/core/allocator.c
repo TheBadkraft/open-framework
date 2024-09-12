@@ -66,8 +66,8 @@ mem_block _alloc_get_pointer(uintptr_t uptr)
 }
 void _output_alloc_stats()
 {
-    printf("total allocations:    %d\n", ALLOC_COUNT);
-    printf("total deallocations:  %d\n", DEALLOC_COUNT);
+    // printf("total allocations:    %d\n", ALLOC_COUNT);
+    // printf("total deallocations:  %d\n", DEALLOC_COUNT);
 }
 // #endif
 
@@ -114,7 +114,7 @@ void page_fill()
     }
 
     // #if DEBUG
-    printf("---------------------------------------------------\n");
+    // printf("---------------------------------------------------\n");
     // #endif
 }
 void page_add_ptr(void *ptr)
@@ -128,15 +128,15 @@ void page_add_ptr(void *ptr)
         // memBlk->uptr = (uintptr_t)ptr;
         uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
         // #if DEBUG
-        printf("Allocating        %ld\n", (uintptr_t)ptr);
+        // printf("Allocating        %ld\n", (uintptr_t)ptr);
         // #endif
 
         uaddr = page_repl_at((uintptr_t)ptr, pos);
         MEMPAGE.count++;
 
-        // #if DEBUG
         _alloc_incr_alloc_count();
-        printf("Allocated         %ld\n", memBlk->uptr);
+        // #if DEBUG
+        // printf("Allocated         %ld\n", memBlk->uptr);
         // #endif
     }
     else
@@ -154,12 +154,12 @@ bool page_rem_ptr(void *ptr)
     {
         uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
         // #if DEBUG
-        printf("Deallocating     [%ld]    %ld\n", uaddr, memBlk->uptr);
+        // printf("Deallocating     [%ld]    %ld\n", uaddr, memBlk->uptr);
         // #endif
 
         retOk = page_rem_at(pos);
         // #if DEBUG
-        printf("Deallocated      [%ld]    %ld\n", uaddr, memBlk->uptr);
+        // printf("Deallocated      [%ld]    %ld\n", uaddr, memBlk->uptr);
         // #endif
     }
     if (retOk)
@@ -182,13 +182,13 @@ uintptr_t page_repl_at(uintptr_t memPtr, int pos)
 {
     uintptr_t uaddr = (uintptr_t)(MEMPAGE.page + pos);
     // #if DEBUG
-    printf("Replacing at %2d: [%ld] -> %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
+    // printf("Replacing at %2d: [%ld] -> %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
     // #endif
 
     (MEMPAGE.page + pos)->uptr = memPtr;
 
     // #if DEBUG
-    printf("Replaced  at %2d: [%ld] <- %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
+    // printf("Replaced  at %2d: [%ld] <- %ld\n", pos, uaddr, (MEMPAGE.page + pos)->uptr);
     // #endif
 
     return uaddr;
@@ -264,7 +264,7 @@ void alloc_flush()
     }
 
     // #if DEBUG
-    printf("Flushing Allocator MemPage\n");
+    // printf("Flushing Allocator MemPage\n");
     // #endif
 
     //  for each memPtr: remove & free
@@ -286,8 +286,11 @@ void alloc_flush()
 
     // #if DEBUG
     _output_alloc_stats();
-    _flush_counters();
     // #endif
+
+    //  may not necessarily want to automatically flush counters; at this point, if there is
+    //  an imbalance of allocations/deallocations we may want to throw or ... ???
+    _flush_counters();
 }
 void alloc_terminate()
 {
