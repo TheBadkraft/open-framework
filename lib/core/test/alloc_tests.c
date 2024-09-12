@@ -83,7 +83,7 @@ void allocate_item()
 {
     writeln("Allocate mem for item");
 
-    target2 t2 = Allocator.alloc(sizeof(struct test2), UNITITIALIZED);
+    target2 t2 = Allocator.alloc(sizeof(struct test2), UNINITIALIZED);
     assert(t2 != NULL);
     assert(Allocator.count() == 1);
 
@@ -134,7 +134,7 @@ void multiple_allocs()
 
     target2 t2A = Allocator.alloc(sizeof(struct test2), INITIALIZED);
     target1 t1A = Allocator.alloc(sizeof(struct test1), INITIALIZED);
-    target2 t2B = Allocator.alloc(sizeof(struct test2), UNITITIALIZED);
+    target2 t2B = Allocator.alloc(sizeof(struct test2), UNINITIALIZED);
     __output_allocator_info();
 
     t1A->id = expId;
