@@ -28,6 +28,7 @@ bool doTests = true;
         char *pChar = malloc(flen);                                          \
         sprintf(pChar, format, doTests ? "BEGIN" : "SKIP");                  \
         printf("%-10s", pChar);                                              \
+        free(pChar);                                                         \
         writefln("[%s]", #__test_set);                                       \
         if (doTests)                                                         \
         {                                                                    \

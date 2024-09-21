@@ -69,8 +69,8 @@ void __output_pointer_info(mem_block memBlock)
     {
         puts("");
         writefln("  addr:   %ld", (uintptr_t)memBlock);
-        writefln("  uptr:   %ld", memBlock->uptr);
-        writefln("  size:   %ld", sizeof((void *)(memBlock->uptr)));
+        writefln("  uptr:   %ld", memBlock->obj_ptr);
+        writefln("  size:   %ld", sizeof((void *)(memBlock->obj_ptr)));
     }
     else
     {
@@ -104,7 +104,7 @@ void get_mem_pointer()
     mem_block memPtr = _alloc_get_pointer(uptr);
     assert(memPtr != NULL);
 
-    target2 tx = (target2)memPtr->uptr;
+    target2 tx = (target2)memPtr->obj_ptr;
     assert(t2->status == tx->status);
     assert(strcmp(t2->name, tx->name) == 0);
 
@@ -144,7 +144,7 @@ void multiple_allocs()
     __output_allocator_info();
     __output_pointer_info(_alloc_get_pointer(uptr));
 
-    target1 actT1 = (target1)(_alloc_get_pointer(uptr)->uptr);
+    target1 actT1 = (target1)(_alloc_get_pointer(uptr)->obj_ptr);
     assert(actT1 != NULL);
     assert(actT1->id == t1A->id);
     assert(strcmp(actT1->name, t1A->name) == 0);
