@@ -11,7 +11,7 @@ typedef unsigned long ulong;
 typedef unsigned char byte;
 typedef unsigned short ushort;
 
-typedef uintptr_t obj_p;
+typedef uintptr_t objptr;
 
 typedef char sbyte;
 

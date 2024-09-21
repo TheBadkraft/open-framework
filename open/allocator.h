@@ -18,7 +18,7 @@ enum Alloc_Mode
 
 struct Mem_Block
 {
-    obj_p obj_ptr;
+    objptr obj_ptr;
 };
 
 struct Mem_Page
