@@ -14,8 +14,9 @@
 #include "open/internal/internal_string.h"
 
 bool file_exists(file);
-void file_size(file);
+int64_t file_size(file);
 file file_new(string);
+file file_get(string, int64_t *);
 void get_file_path(file, string *);
 void file_free(file);
 void file_delete(file);
@@ -49,25 +50,26 @@ bool file_exists(file pFile)
 
     return retOk;
 }
-void file_size(file pFile)
+int64_t file_size(file pFile)
 {
     struct stat iostat;
-    pFile->size = -1;
+    int64_t size = -1;
     if (file_exists(pFile))
     {
         string pPath;
         get_file_path(pFile, &pPath);
         if (stat(pPath, &iostat) == 0)
         {
-            pFile->size = iostat.st_size;
+            size = iostat.st_size;
         }
 
         String.free(pPath);
     }
+
+    return size;
 }
 file file_new(string pFPath)
 {
-    size_t size = sizeof(struct io_file);
     file pFile = Allocator.alloc(sizeof(struct io_file), UNINITIALIZED);
     if (!pFile)
     {
@@ -86,7 +88,17 @@ file file_new(string pFPath)
     strncpy(pFile->path, pFPath, pathLen);
     // printf("(\"%s\")\n", pFile=>path);
 
-    file_size(pFile);
+    return pFile;
+}
+file file_get(string pFPath, int64_t *size)
+{
+    file pFile = file_new(pFPath);
+
+    if (pFile)
+    {
+
+        *size = file_size(pFile);
+    }
 
     return pFile;
 }
@@ -125,7 +137,6 @@ bool file_open(file pFile, stream *pStream, enum io_mode mode)
 
     get_file_path(pFile, &pFullPath);
     (*pStream) = Stream.new(pFullPath);
-    (*pStream)->length = pFile->size;
 
     if (!file_exists(pFile) && (CREATE & mode) != CREATE)
     {
@@ -414,6 +425,7 @@ const struct Open_File File = {
     .exists = &file_exists,
     .size = &file_size,
     .new = &file_new,
+    .get = &file_get,
     .delete = &file_delete,
     .create = &file_create,
     .open = &file_open,

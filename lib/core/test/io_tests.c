@@ -11,7 +11,7 @@
 //	FILE: test case prototypes
 void _file_path_exists();
 void _file_size();
-void _create_file_obj();
+void _get_file_obj();
 void _new_file_from_path();
 void _create_file();
 void _file_directory();
@@ -57,14 +57,14 @@ int main(int argc, string *argv)
 			write_header("OP Tests: IO.File");
 		TEST(_file_path_exists);
 		TEST(_file_size);
-		TEST(_create_file_obj);
+		TEST(_get_file_obj);
 		TEST(_create_file);
 		TEST(_new_file_from_path);
 		TEST(_file_directory);
 	}
 	END_SET(file)
 
-	BEGIN_SET(directory, true)
+	BEGIN_SET(directory, false)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.Directory");
@@ -77,7 +77,7 @@ int main(int argc, string *argv)
 	}
 	END_SET(directory)
 
-	BEGIN_SET(Path, true)
+	BEGIN_SET(Path, false)
 	{
 		if (doTests)
 			write_header("OP Tests: IO.Path");
@@ -119,7 +119,7 @@ void _output_file_info(file pFile)
 	writefln("object:    %s", B(pFile != NULL));
 	writefln("created:   %s", B(File.exists(pFile)));
 	writefln("directory: %s", pDir->name);
-	writefln("size:      %ld", pFile->size);
+	writefln("size:      %ld", File.size(pFile));
 
 	Directory.free(pDir);
 }
@@ -156,20 +156,19 @@ void _file_size()
 	writeln("File.size: get file size");
 
 	file pFile = File.new(pfNone);
-	File.size(pFile);
 
-	assert(pFile->size == -1);
+	assert(File.size(pFile) == -1);
 
 	File.free(pFile);
 	Allocator.flush();
 }
-void _create_file_obj()
+void _get_file_obj()
 {
-	writeln("File.new: new file object");
-
-	file pFile = File.new(pfTemp);
+	writeln("File.get: get file object");
+	int64_t size;
+	file pFile = File.get(pfTemp, &size);
 	assert(pFile != NULL);
-	assert(pFile->size == -1);
+	assert(size == -1);
 	assert(File.exists(pFile) == false);
 
 	_output_file_info(pFile);
@@ -188,7 +187,7 @@ void _create_file()
 
 	file pFile = File.new(pfTemp);
 	assert(File.create(pFile));
-	assert(pFile->size == 0);
+	assert(File.size(pFile) == 0);
 
 	_output_file_info(pFile);
 	if (File.exists(pFile))
