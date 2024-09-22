@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 #include "open/io_stream.h"
 #include "open/internal/internal_io.h"
@@ -31,6 +32,12 @@ bool open_stream(void *p, int m)
     if (pStream->fstream != NULL)
     {
         pStream->status |= OPEN;
+
+        struct stat iostat;
+        if (stat(pStream->source, &iostat) == 0)
+        {
+            pStream->length = iostat.st_size;
+        }
     }
     else
     {

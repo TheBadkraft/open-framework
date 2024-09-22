@@ -21,7 +21,6 @@ struct io_file
 {
     string path;
     string name;
-    int64_t size;
 };
 
 typedef enum io_type IOType;
@@ -33,8 +32,9 @@ extern const struct Open_File
 {
     /*  members  */
     bool (*exists)(file);
-    void (*size)(file);
+    int64_t (*size)(file);
     file (*new)(string);
+    file (*get)(string, int64_t *);
     void (*delete)(file);
     bool (*create)(file);
     bool (*open)(file, stream *, enum io_mode);
