@@ -260,26 +260,26 @@ digit  := "1234567890":|
 
 I expect the indexer to tokenize like so:
 
->! tokens list:
->! -------------
->! letter
->! :=
->! "
->! abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
->! "
->! :
->! |
->! \n
+> tokens list:
+> -------------
+> letter
+> :=
+> "
+> abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+> "
+> :
+> |
+> \n
 
 You'll see I'm using the '|' since it is as good as saying ':1' which means *just one*. The '"' mean an atomic list. There is no *delimeter* so it is assumed that each of the smallest elements enclosed in the **"** is a separate element of the list. I have something in mind that might expand on this concept, but we'll see how this develops.  
 
 Okay, so, let's assume for now that I have internally defined a default EBN format (*above*). We've designated the parser **_op_**eration as an **or** function with the *pipe* (**|**). That's our first *micro-parser*. Return true as soon as the *input* finds a single match. But, before we can get to the parser, we need to lex ...  
 
 First lex pass results in the following:
->! tokens:  
->! :> letter  
->! :> :=  
->! :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
->! :>  
->!  
->! --------------------------------  
+> tokens:  
+> :> letter  
+> :> :=  
+> :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
+> :>  
+>  
+> --------------------------------  
