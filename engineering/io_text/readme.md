@@ -276,10 +276,10 @@ You'll see I'm using the '|' since it is as good as saying ':1' which means *jus
 Okay, so, let's assume for now that I have internally defined a default EBN format (*above*). We've designated the parser **_op_**eration as an **or** function with the *pipe* (**|**). That's our first *micro-parser*. Return true as soon as the *input* finds a single match. But, before we can get to the parser, we need to lex ...  
 
 First lex pass results in the following:
->! tokens:
->! :> letter
->! :> :=
->! :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|
->! :> 
->! 
->! --------------------------------
+>! tokens:  
+>! :> letter  
+>! :> :=  
+>! :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
+>! :>  
+>!  
+>! --------------------------------  
