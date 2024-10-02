@@ -260,16 +260,16 @@ digit  := "1234567890":|
 
 I expect the indexer to tokenize like so:
 
-> tokens list:
-> -------------
-> letter
-> :=
-> "
-> abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
-> "
-> :
-> |
-> \n
+> tokens list:  
+> -------------  
+> letter  
+> :=  
+> "  
+> abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  
+> "  
+> :  
+> |  
+> \n  
 
 You'll see I'm using the '|' since it is as good as saying ':1' which means *just one*. The '"' mean an atomic list. There is no *delimeter* so it is assumed that each of the smallest elements enclosed in the **"** is a separate element of the list. I have something in mind that might expand on this concept, but we'll see how this develops.  
 
@@ -281,5 +281,3 @@ First lex pass results in the following:
 > :> :=  
 > :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
 > :>  
->  
-> --------------------------------  
