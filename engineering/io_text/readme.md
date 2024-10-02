@@ -280,4 +280,62 @@ First lex pass results in the following:
 > :> letter  
 > :> :=  
 > :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
-> :>  
+> :> \n  
+
+The indexer doesn't know anything about the mark-up in the EBN format - **:=**, **"**, **:**, or **|**. That is up to the parser to determine, what it is and what to do with it. By lexing the initial source in tokens, we can now handle large chunks and peek ahead very quickly. The parser will begin generating **`term`** objects. These are going to be a slightly more advanced form of token. It would be nice to be able to inherit `token` and have a *super-*token. We will simply encapsulate the `token` instead. But, we have to make sure we're careful not to lose context of the terms. If you start navigating tokens (`token->next`), you lose the `term` encapsulating it.  
+
+So, the parser will take the first token - > letter . It can make an assumption that since this is the first token, it is LHS of the expansion operator (`:=`). We could also peek ahead *expecting* the expansion operator. If it isn't there, then we have a problem. *Non-*terminals are without spaces, a single word and have no enclosures. So, this **_should_** be a non-terminal but then, if so, where is the expansion operator? Well, we don't really care where it is because it isn't where we expect it to be. So our first logical function is going to be an *`expects`* function.  
+
+``` c
+bool expects_next(token tkn, const string exp) {
+  return Token.equals(tkn->next, exp;
+}
+```
+
+Now that we are certain of what we have, the parser can create our first two terms and identify them. Let's assume a term looks something like this ...
+
+``` c
+struct io_term {
+  token source;
+  enum TERM_TYPE {
+    NONTERM;		// non-terminal
+    OP_EXPAND;		// :=
+    EXPANSION;		// what the non-terminal can be replaced with or what it expands to
+  } type;
+}
+```
+**NOTE:** `EXPANSION` is really just a placeholder for now. *EXPANSION* can be 1 or more terms. I am using the simple type now just to distinguish from `NONTERM` and `OP_EXPAND`. As this grows, there will be many more types that begin to take the place of `EXPANSION`.  
+
+Okay ...
+ ... for the parser, we know that each production rule ends with `'\n'` (*at least for now ... or until I get tired of escaping stuff*). The parser can then iterate tokens in chunks, making short work of consuming entire lines of tokens.  
+
+``` c
+void parser_run(token tkn) {
+  token current = tkn;
+  
+  while(current) {
+    current = parser_build_rule(current);
+  }
+}
+
+//	 here, the parser expects that it has the first token in the EBN format which should be a NONTERM. the only way to know for sure is to peek ahead
+token parser_build_rule(token tkn, term *termTkn) {
+  token current = tkn;
+  while(!Token.equals(current, "\n")) {
+    if(expects_next(current, ":=")) {
+      // this token is a NONTERM
+      
+      // next token is an OP_EXPAND
+      current = tkn->next;
+    }
+    else {
+      // figure out the expansion
+    }
+    
+    current = current->next;
+  }
+  
+  return current->next;
+}
+```
+```
