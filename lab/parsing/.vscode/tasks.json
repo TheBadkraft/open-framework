@@ -1,0 +1,65 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{   "label": "build debug",
+			"type": "shell",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/bin/${workspaceFolderBasename}",
+				"${workspaceFolder}/src/*.c",
+				"${workspaceFolder}/src/mpc/*.c",
+				"-l_core",
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: gcc"
+		},
+		{   "label": "build test",
+			"type": "shell",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g3",
+				"-o",
+				"${workspaceFolder}/bin/${workspaceFolderBasename}",
+				"${workspaceFolder}/src/*.c",
+				"-l_core",
+				"-l_mpc",
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: gcc"
+		},
+		{   "label": "dependencies",
+			"type": "process",
+			"command": "/usr/bin/ldd",
+			"args": [
+				"${workspaceFolder}/bin/${workspaceFolderBasename}"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "test",
+			"detail": "linker info: ldd"
+		}
+	]
+}

@@ -1,8 +1,8 @@
 #ifndef _TOKEN_H
 #define _TOKEN_H
 
-#include "types.h"
-#include "allocator.h"
+#include "../core/types.h"
+#include "../core/allocator.h"
 
 struct io_token
 {

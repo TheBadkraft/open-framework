@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 
-#include "types.h"
-#include "string.h"
-#include "allocator.h"
+#include "../core/types.h"
+#include "../core/string.h"
+#include "../core/allocator.h"
 
 enum io_mode
 {

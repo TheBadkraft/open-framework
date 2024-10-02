@@ -39,7 +39,7 @@ void __output_pointer_info(mem_block);
 
 int main(int argc, string *argv)
 {
-    BEGIN_SET(Allocatgor.API, true)
+    BEGIN_SET(Allocator.API, true)
     {
         TEST(allocate_item);
         TEST(get_mem_pointer);

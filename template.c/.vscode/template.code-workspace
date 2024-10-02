@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"name": "core",
+			"path": ".."
+		},
+		{
+			"name": "bin",
+			"path": "../../bin"
+		},
+		{
+			"name": "shared",
+			"path": "../../shared"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"core.h": "c",
+			"test.h": "c",
+			"setjmp.h": "c",
+			"main.C": "cpp",
+			"internal_io.h": "c",
+			"internal_string.h": "c",
+			"allocator.h": "c",
+			"io_stream.h": "c",
+			"vector": "c"
+		}
+	},
+}

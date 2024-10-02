@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <assert.h>
 
-#include "core.h"
-#include "except/Except.h"
-#include "except/Assert.h"
+#include "../core/core.h"
+#include "../except/Except.h"
+#include "../except/Assert.h"
 
 int test_count = 0;
 int pass_count = 0;

@@ -1,7 +1,8 @@
 #ifndef _OPEN_IO_H
 #define _OPEN_IO_H
 
-#include "core.h"
+#include "../core/core.h"
+
 #include "io_stream.h"
 
 enum io_type
