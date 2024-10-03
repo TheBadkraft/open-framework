@@ -6,7 +6,7 @@
 #include "../core/string.h"
 
 #include "io.h"
-#include "token.h"
+#include "cursor.h"
 
 struct io_indexer;
 struct io_document
@@ -16,12 +16,12 @@ struct io_document
 };
 
 typedef struct io_document *document;
-typedef bool (*index_delegate)(document, token *);
+typedef bool (*index_delegate)(document, cursor *);
 
 struct io_indexer
 {
     string name;
-    index_delegate tokenize;
+    index_delegate index;
 };
 
 typedef struct io_indexer *indexer;
@@ -91,7 +91,7 @@ extern const struct Document_T
 extern const struct IO_Indexer
 {
     bool (*init)(string, index_delegate, indexer *);
-    bool (*tokenize)(document, token *);
+    bool (*index)(document, cursor *);
     //  TODO: !!!
     void (*dispose)(indexer);
 } Indexer;

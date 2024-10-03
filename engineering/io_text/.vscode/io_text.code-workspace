@@ -6,7 +6,9 @@
 	],
 	"settings": {
 		"files.associations": {
-			"internal_io.h": "c"
+			"internal_io.h": "c",
+			"string": "cpp",
+			"test.h": "c"
 		}
 	},
 }

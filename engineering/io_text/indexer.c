@@ -6,18 +6,18 @@
 
 #include "open/internal/internal_io.h"
 
-bool default_tokenizer(document, token *);
+bool default_tokenizer(document, cursor *);
 
 static bool doc_load(stream, document *);
 static bool doc_dispose(document);
 
 static index_delegate handler = default_tokenizer;
 
-bool default_tokenizer(document pDoc, token *pToken)
+bool default_tokenizer(document pDoc, cursor *pToken)
 {
     printf("[default indexer]\n");
 
-    (*pToken) = Allocator.alloc(sizeof(token), INITIALIZED);
+    (*pToken) = Allocator.alloc(sizeof(cursor), INITIALIZED);
     if ((*pToken))
     {
         (*pToken)->pPos = pDoc->content;
@@ -48,11 +48,11 @@ bool indexer_init(string name, index_delegate delegate, indexer *pIndexer)
         (*pIndexer)->name = name;
         if (delegate)
         {
-            (*pIndexer)->tokenize = delegate;
+            (*pIndexer)->index = delegate;
         }
         else
         {
-            (*pIndexer)->tokenize = handler;
+            (*pIndexer)->index = handler;
         }
 
         printf("... ");
@@ -60,17 +60,17 @@ bool indexer_init(string name, index_delegate delegate, indexer *pIndexer)
 
     return (*pIndexer) != NULL;
 }
-/// @brief generates a token from the default lexer delegate
+/// @brief generates a cursor from the default lexer delegate
 /// @param pDoc the source document
-/// @param pToken the resulting token
+/// @param pToken the resulting cursor
 /// @return true if successful; otherwise false
-bool indexer_index(document pDoc, token *pToken)
+bool indexer_index(document pDoc, cursor *pToken)
 {
     return handler(pDoc, pToken);
 }
 void indexer_dispose(indexer pIndexer)
 {
-    pIndexer->tokenize = NULL;
+    pIndexer->index = NULL;
     Allocator.dealloc(pIndexer);
 }
 //	======================================
@@ -132,5 +132,5 @@ const struct Document_T Document = {
 
 const struct IO_Indexer Indexer = {
     .init = &indexer_init,
-    .tokenize = &indexer_index,
+    .index = &indexer_index,
     .dispose = &indexer_dispose};

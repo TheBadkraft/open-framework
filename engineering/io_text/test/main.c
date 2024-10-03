@@ -2,30 +2,34 @@
 
 #include "../open/core/core.h"
 #include "../open/io/indexer.h"
-#include "../open/io/nonspace_tokenizer.h"
+#include "../open/io/nonspace_indexer.h"
 
 #include "../open/testing/test.h"
 
 void _init_document(void);
 void _init_indexer(void);
-void _indexer_tokenize_default(void);
-void _indexer_tokenize_nonspace(void);
+void _indexer_index_default(void);
+void _indexer_index_nonspace(void);
+void _cursor_equals(void);
+void _cursor_not_equals(void);
 
 void __output_doc_info(document);
-void __output_token_info(token);
+void __output_token_info(cursor);
 
 int main(int argc, string *argv)
 {
 	writeln("OpenPlatform: IO.Text namespace\n");
 
-	BEGIN_SET(IO.Text.Token, true)
+	BEGIN_SET(IO.Text.Cursor, true)
 	{
 		TEST(_init_document);
 		TEST(_init_indexer);
-		TEST(_indexer_tokenize_default);
-		TEST(_indexer_tokenize_nonspace);
+		TEST(_indexer_index_default);
+		TEST(_indexer_index_nonspace);
+		TEST(_cursor_equals);
+		TEST(_cursor_not_equals);
 	}
-	END_SET(IO.Text.Token);
+	END_SET(IO.Text.Cursor);
 
 	TEST_STATS();
 
@@ -36,16 +40,16 @@ void __output_doc_info(document doc)
 	writefln("doc: source  -> %s", doc->source == NULL ? "NULL" : doc->source);
 	writefln("     content -> %s", doc->content);
 }
-void __output_token_info(token tkn)
+void __output_cursor_info(cursor tkn)
 {
-	writeln("tokens:");
-	token current = tkn;
+	writeln("cursors:");
+	cursor current = tkn;
 	string word = NULL;
 
 	while (current)
 	{
-		Token.word(current, &word);
-		writefln(":> %s", word);
+		Cursor.word(current, &word);
+		writefln(":> %s", word[0] == '\n' ? "\\n" : word);
 
 		current = current->next;
 	}
@@ -73,7 +77,7 @@ void _init_indexer(void)
 
 	Indexer.dispose(ndxr);
 }
-void _indexer_tokenize_default(void)
+void _indexer_index_default(void)
 {
 	write_header("Indexer: using the default index tokenizer");
 
@@ -81,37 +85,51 @@ void _indexer_tokenize_default(void)
 	doc->content = "this is a test";
 
 	indexer ndxr;
-	token tkn;
+	cursor tkn;
 
 	writefln("%s", Indexer.init("test", NULL, &ndxr) ? "SUCCESS" : "FAILURE");
-	ndxr->tokenize(doc, &tkn);
+	ndxr->index(doc, &tkn);
 	assert(tkn != NULL);
 
 	string word = NULL;
-	Token.word(tkn, &word);
+	Cursor.word(tkn, &word);
 	assert(strcmp(doc->content, word) == 0);
 
-	__output_token_info(tkn);
+	__output_cursor_info(tkn);
 	Document.dispose(doc);
 	Indexer.dispose(ndxr);
-	Token.free(tkn);
+	Cursor.dispose(tkn);
 }
-void _indexer_tokenize_nonspace(void)
+void _indexer_index_nonspace(void)
 {
 	write_header("Indexer: using the nonspace index tokenizer");
 
 	document doc = Document.new();
-	doc->content = "letter := \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\":|\n";
+	doc->content = "letter := \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n";
 
 	indexer ndxr;
-	token tkn;
+	cursor tkn;
 
 	writefln("%s", Indexer.init("test", index_nonspace, &ndxr) ? "SUCCESS" : "FAILURE");
-	ndxr->tokenize(doc, &tkn);
+	ndxr->index(doc, &tkn);
 	assert(tkn != NULL);
 
-	__output_token_info(tkn);
+	__output_cursor_info(tkn);
 	Document.dispose(doc);
 	Indexer.dispose(ndxr);
-	Token.free(tkn);
+	Cursor.dispose(tkn);
+}
+void _cursor_equals(void)
+{
+	string val = "hello";
+	cursor curs = Cursor.new(val, 5);
+
+	assert(Cursor.equals(curs, val));
+}
+void _cursor_not_equals(void)
+{
+	string val = "helLo";
+	cursor curs = Cursor.new("hello", 5);
+
+	assert(!Cursor.equals(curs, val));
 }

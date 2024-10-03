@@ -181,9 +181,9 @@ In all this effort, I have discovered the lack of a few things that would elevat
 
 *"So why is all this in the `io_text` namespace?"*  
 
-I'm getting to that ... now. Fast forward to this point and I had already decided that I will write a new, high-level iteration of C ... **_Sigma.C_**. In this project, I've already begun assembling some core components, a few I've already mentioned - `file` `directory`, `stream`. There are more coming along, especially in the *Sigma.C Compiler* source. Now, I am about to be diving into the *parser* side of the compiler and I'm learning about **_parser combinators_**. That is what is going to go on in here. Plus this namespace, `io_text`, gives me a place to put the `struct io_token` object and it's interface. There is an `Indexer` interface that will be in this namespace as well.  
+I'm getting to that ... now. Fast forward to this point and I had already decided that I will write a new, high-level iteration of C ... **_Sigma.C_**. In this project, I've already begun assembling some core components, a few I've already mentioned - `file` `directory`, `stream`. There are more coming along, especially in the *Sigma.C Compiler* source. Now, I am about to be diving into the *parser* side of the compiler and I'm learning about **_parser combinators_**. That is what is going to go on in here. Plus this namespace, `io_text`, gives me a place to put the `struct io_cursor` object and it's interface. There is an `Indexer` interface that will be in this namespace as well.  
 
-We will have the standard tests for unit testing Tokens and the Indexer. The Parser, rather than working directly on a string source, will consume tokens. I'll be using MPC to learn what I'm doing with parser combinators. I feel like calling them *micro parsers*. We should be able to read up an EBNF like so:  
+We will have the standard tests for unit testing indices and the Indexer. The Parser, rather than working directly on a string source, will consume cursors. I'll be using MPC to learn what I'm doing with parser combinators. I feel like calling them *micro parsers*. We should be able to read up an EBNF like so:  
 
 ``` html
 #  candidate: Sigma.C language definition
@@ -251,52 +251,48 @@ letter ::= ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":1)
 
 I much prefer this and it's meaning can be understood pretty quick. First, I have a grouping notated with **(** and **)**. It's really just window dressing to aid in readability. So it's not necessary. Next, you'll see that I used the double " instead of the single ' used on otherwise *compulsory* symbols. Since I am creating a *list* of similar, atomic (*single character*) symbols and not a **compulsory** literal, I am using " to enclose the items. At the end of the list I use ':' to provide a parameter to the parser. Since we are creating a list of atomic symbols, we need to tell the parser *how many* or *how to* satisfy the condition. `letter` definitely implies a single selection, so we postfix the *list* with `:1`. It's brief and unambiguous. Consistency is the key and it's not often you will need this particular notation. In fact you won't really need this notation with my parser because, well, you won't see these in any EBN formats. They're built in. You can supply your own rule for `letter` and `digit` ... or just use `<letter>` or `<digit>` at your leisure in your own EBN format.
 
-Taking all this into consideration, maybe '::=' could be more *brief* as well. **'::='** says *'expands into'* or *'can be replaced with'*. I'll be mixing and matching a bit until I find something I like. I may just drop one of the ':'. For now, this is what I'm starting with internally:
+Taking all this into consideration, maybe '::=' could be more *brief* as well. **'::='** says *'expands into'* or *'can be replaced with'*. I'll be mixing and matching a bit until I find something I like. I may just drop one of the ':'. And, maybe the postfixed ':1' is unnecessary. For now, this is what I'm starting with internally:
 
 ``` html
-letter := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|
-digit  := "1234567890":|
+letter := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+digit  := "1234567890"
 ```
 
-I expect the indexer to tokenize like so:
+I expect the indexer to *cursor* like so:
 
-> tokens list:  
+> indices list:  
 > -------------  
 > letter  
 > :=  
-> "  
-> abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  
-> "  
-> :  
-> |  
+> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"  
 > \n  
 
-You'll see I'm using the '|' since it is as good as saying ':1' which means *just one*. The '"' mean an atomic list. There is no *delimeter* so it is assumed that each of the smallest elements enclosed in the **"** is a separate element of the list. I have something in mind that might expand on this concept, but we'll see how this develops.  
+~~You'll see I'm using the '|' since it is as good as saying ':1' which means *just one*.~~ The '"' mean an atomic list. There is no *delimeter* so it is assumed that each of the smallest elements enclosed in the **"** is a separate element of the list. I have something in mind that might expand on this concept, but we'll see how this develops.  
 
 Okay, so, let's assume for now that I have internally defined a default EBN format (*above*). We've designated the parser **_op_**eration as an **or** function with the *pipe* (**|**). That's our first *micro-parser*. Return true as soon as the *input* finds a single match. But, before we can get to the parser, we need to lex ...  
 
 First lex pass results in the following:
-> tokens:  
+> indices:  
 > :> letter  
 > :> :=  
 > :> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":|  
 > :> \n  
 
-The indexer doesn't know anything about the mark-up in the EBN format - **:=**, **"**, **:**, or **|**. That is up to the parser to determine, what it is and what to do with it. By lexing the initial source in tokens, we can now handle large chunks and peek ahead very quickly. The parser will begin generating **`term`** objects. These are going to be a slightly more advanced form of token. It would be nice to be able to inherit `token` and have a *super-*token. We will simply encapsulate the `token` instead. But, we have to make sure we're careful not to lose context of the terms. If you start navigating tokens (`token->next`), you lose the `term` encapsulating it.  
+The indexer doesn't know anything about the mark-up in the EBN format - **:=**, **"**, **:**, or **|**. That is up to the parser to determine, what it is and what to do with it. By lexing the initial source in indexs, we can now handle large chunks and peek ahead very quickly. The parser will begin generating **`term`** objects. These are going to be a slightly more advanced form of cursor. It would be nice to be able to inherit `cursor` and have a *super-*cursor. We will simply encapsulate the `cursor` instead. But, we have to make sure we're careful not to lose context of the terms. If you start navigating indexs (`cursor->next`), you lose the `term` encapsulating it.  
 
-So, the parser will take the first token - > letter . It can make an assumption that since this is the first token, it is LHS of the expansion operator (`:=`). We could also peek ahead *expecting* the expansion operator. If it isn't there, then we have a problem. *Non-*terminals are without spaces, a single word and have no enclosures. So, this **_should_** be a non-terminal but then, if so, where is the expansion operator? Well, we don't really care where it is because it isn't where we expect it to be. So our first logical function is going to be an *`expects`* function.  
+So, the parser will take the first cursor - > letter . It can make an assumption that since this is the first cursor, it is LHS of the expansion operator (`:=`). We could also peek ahead *expecting* the expansion operator. If it isn't there, then we have a problem. *Non-*terminals are without spaces, a single word and have no enclosures. So, this **_should_** be a non-terminal but then, if so, where is the expansion operator? Well, we don't really care where it is because it isn't where we expect it to be. So our first logical function is going to be an *`expects`* function.  
 
 ``` c
-bool expects_next(token tkn, const string exp) {
-  return Token.equals(tkn->next, exp;
+bool expects_next(cursor curs, const string exp) {
+  return Cursor.equals(curs->next, exp;
 }
 ```
 
 Now that we are certain of what we have, the parser can create our first two terms and identify them. Let's assume a term looks something like this ...
 
 ``` c
-struct io_term {
-  token source;
+struct io_token {
+  cursor source;
   enum TERM_TYPE {
     NONTERM;		// non-terminal
     OP_EXPAND;		// :=
@@ -307,26 +303,26 @@ struct io_term {
 **NOTE:** `EXPANSION` is really just a placeholder for now. *EXPANSION* can be 1 or more terms. I am using the simple type now just to distinguish from `NONTERM` and `OP_EXPAND`. As this grows, there will be many more types that begin to take the place of `EXPANSION`.  
 
 Okay ...
- ... for the parser, we know that each production rule ends with `'\n'` (*at least for now ... or until I get tired of escaping stuff*). The parser can then iterate tokens in chunks, making short work of consuming entire lines of tokens.  
+ ... for the parser, we know that each production rule ends with `'\n'` (*at least for now ... or until I get tired of escaping stuff*). The parser can then iterate indexs in chunks, making short work of consuming entire lines of indexs.  
 
 ``` c
-void parser_run(token tkn) {
-  token current = tkn;
+void parser_run(cursor curs) {
+  cursor current = curs;
   
   while(current) {
     current = parser_build_rule(current);
   }
 }
 
-//	 here, the parser expects that it has the first token in the EBN format which should be a NONTERM. the only way to know for sure is to peek ahead
-token parser_build_rule(token tkn, term *termTkn) {
-  token current = tkn;
-  while(!Token.equals(current, "\n")) {
+//	 here, the parser expects that it has the first cursor in the EBN format which should be a NONTERM. the only way to know for sure is to peek ahead
+cursor parser_build_rule(cursor curs, term *termTkn) {
+  cursor current = curs;
+  while(!cursor.equals(current, "\n")) {
     if(expects_next(current, ":=")) {
-      // this token is a NONTERM
+      // this cursor is a NONTERM
       
-      // next token is an OP_EXPAND
-      current = tkn->next;
+      // next cursor is an OP_EXPAND
+      current = curs->next;
     }
     else {
       // figure out the expansion

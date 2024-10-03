@@ -6,7 +6,7 @@
 
 const string EXPANDS_TO = ":=";
 
-bool index_nonspace(document pDoc, token *pTknHead)
+bool index_nonspace(document pDoc, cursor *pTknHead)
 {
     string pSrc;
     char *ndx = pSrc = pDoc->content;
@@ -16,7 +16,7 @@ bool index_nonspace(document pDoc, token *pTknHead)
     int line = 1;
     char *wrdEnd;
     (*pTknHead) = NULL;
-    token pCurrent = NULL;
+    cursor pCurrent = NULL;
 
     while (pos < srcLen)
     {
@@ -42,11 +42,11 @@ bool index_nonspace(document pDoc, token *pTknHead)
 
         if (!(*pTknHead))
         {
-            pCurrent = (*pTknHead) = Token.new(ndx, length);
+            pCurrent = (*pTknHead) = Cursor.new(ndx, length);
         }
         else if (!pCurrent->next)
         {
-            pCurrent = pCurrent->next = Token.new(ndx, length);
+            pCurrent = pCurrent->next = Cursor.new(ndx, length);
         }
 
         pos += length;
