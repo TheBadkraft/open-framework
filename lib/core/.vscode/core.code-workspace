@@ -23,7 +23,12 @@
 			"internal_string.h": "c",
 			"allocator.h": "c",
 			"io_stream.h": "c",
-			"vector": "c"
+			"vector": "c",
+			"types.h": "c",
+			"alloc_test.h": "c",
+			"array": "c",
+			"string_view": "c",
+			"stdlib.h": "c"
 		}
 	},
 }

@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <linux/limits.h>
 
-#include "open/io.h"
+#include "open/io/io.h"
 #include "open/internal/internal_io.h"
 #include "open/internal/internal_string.h"
 
@@ -45,7 +45,7 @@ bool file_exists(file pFile)
         get_file_path(pFile, &pPath);
 
         retOk = path_exists(pPath);
-        String.free(pPath);
+        String.dispose(pPath);
     }
 
     return retOk;
@@ -63,7 +63,7 @@ int64_t file_size(file pFile)
             size = iostat.st_size;
         }
 
-        String.free(pPath);
+        String.dispose(pPath);
     }
 
     return size;
@@ -109,7 +109,7 @@ void file_delete(file pFile)
 
     remove(pPath);
 
-    String.free(pPath);
+    String.dispose(pPath);
 }
 bool file_create(file pFile)
 {
@@ -126,7 +126,7 @@ bool file_create(file pFile)
     file_size(pFile);
 
     bool retOk = path_exists(pPath);
-    String.free(pPath);
+    String.dispose(pPath);
 
     return retOk;
 }
@@ -160,11 +160,11 @@ void file_free(file pFile)
     {
         if (pFile->name)
         {
-            String.free(pFile->name);
+            String.dispose(pFile->name);
         }
         if (pFile->path)
         {
-            String.free(pFile->path);
+            String.dispose(pFile->path);
         }
         Allocator.dealloc(pFile);
     }
@@ -218,11 +218,11 @@ void dir_free(directory pDir)
     {
         if (pDir->name)
         {
-            String.free(pDir->name);
+            String.dispose(pDir->name);
         }
         if (pDir->path)
         {
-            String.free(pDir->path);
+            String.dispose(pDir->path);
         }
         Allocator.dealloc(pDir);
     }
@@ -311,7 +311,7 @@ void path_combine(string *basePath, ...)
         String.join("/", basePath, dest, NULL);
     }
 
-    String.free(dest);
+    String.dispose(dest);
 }
 
 /*
@@ -420,7 +420,7 @@ IOType path_io_type(string pPath)
     return IO_UNKNOWN;
 }
 //		=========================== File API ================================
-const struct Open_File File = {
+const struct IFile File = {
     /*  members  */
     .exists = &file_exists,
     .size = &file_size,
@@ -429,23 +429,26 @@ const struct Open_File File = {
     .delete = &file_delete,
     .create = &file_create,
     .open = &file_open,
-    .free = &file_free,
+    .dispose = &file_free,
     .full_path = &get_file_path,
-    .directory = &file_get_directory};
+    .directory = &file_get_directory,
+};
 
 //		======================== Directory API ==============================
-const struct Open_Directory Directory = {
+const struct IDirectory Directory = {
     /*  members  */
     .new = &dir_new,
     .exists = &dir_exists,
     .current = &dir_cwd,
-    .free = &dir_free};
+    .dispose = &dir_free,
+};
 
 //		=========================== Path API ================================
-const struct Open_Path Path = {
+const struct IPath Path = {
     /*  members  */
     .absolute = &path_absolute,
     .combine = &path_combine,
     .exists = &path_exists,
     .directory = &path_get_directory,
-    .type = &path_io_type};
+    .type = &path_io_type,
+};

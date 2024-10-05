@@ -1,4 +1,4 @@
-#include "../open/core.h"
+#include "../../open/core/core.h"
 
 jmp_buf jump;
 

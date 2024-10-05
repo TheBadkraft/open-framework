@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "open/core.h"
-#include "open/allocator.h"
+#include "open/core/core.h"
+#include "open/core/allocator.h"
 #include "open/internal/internal_string.h"
 
 //  String expects Allocator to be initialized.
@@ -126,7 +126,7 @@ bool str_freeable(string text)
 */
 void str_free(string text)
 {
-    // printf("free(str)\n");
+    // printf("dispose(str)\n");
     if (text != NULL)
     {
         Allocator.dealloc(text);
@@ -286,7 +286,7 @@ int fmt_count(const string format)
     return count;
 }
 
-const struct Open_String String = {
+const struct IString String = {
     .empty = "",
     .is_empty = &str_empty,
     .is_null_or_empty = &str_null_or_empty,
@@ -296,7 +296,7 @@ const struct Open_String String = {
     .copy = &str_copy,
     .copy_to = &str_copy_to,
     .freeable = &str_freeable,
-    .free = &str_free,
+    .dispose = &str_free,
     .length = &get_str_len,
     .append = &str_append,
     .format = &str_format,

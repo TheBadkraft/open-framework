@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "../open/test.h"
-#include "../open/core.h"
-#include "../open/allocator.h"
+#include "../open/testing/test.h"
+#include "../open/core/core.h"
+#include "../open/core/allocator.h"
 
 //  test case prototypes
 void _not_freeable();
@@ -27,17 +27,17 @@ int main(int argc, char **argv)
     BEGIN_SET(String.API, true)
     {
         // TEST(__test_not_freeable);
-        // TEST(_is_empty);
-        // TEST(_is_noe);
-        // TEST(_new);
-        // TEST(_alloc);
+        TEST(_is_empty);
+        TEST(_is_noe);
+        TEST(_new);
+        TEST(_alloc);
         TEST(_copy);
         TEST(_resize);
         TEST(_truncate);
-        // TEST(_append);
-        // TEST(_format);
-        // TEST(_join_strings);
-        // TEST(_join_with_const_dest);
+        TEST(_append);
+        TEST(_format);
+        TEST(_join_strings);
+        TEST(_join_with_const_dest);
     }
     END_SET(String.API)
 
@@ -78,7 +78,7 @@ void _is_empty()
     __output_string(text);
 
     //  was not malloc'd
-    // String.free(text);
+    // String.dispose(text);
 }
 void _is_noe()
 {
@@ -86,7 +86,7 @@ void _is_noe()
     assert(String.is_null_or_empty(text));
 
     __output_string(text);
-    String.free(text);
+    String.dispose(text);
 }
 void _new()
 {
@@ -95,7 +95,7 @@ void _new()
     assert(text != NULL);
 
     __output_string(text);
-    String.free(text);
+    String.dispose(text);
 }
 void _alloc()
 {
@@ -107,7 +107,7 @@ void _alloc()
     assert(strcmp(hello, text) == 0);
 
     __output_string(text);
-    String.free(text);
+    String.dispose(text);
 }
 void _copy()
 {
@@ -123,7 +123,7 @@ void _copy()
     assert(strcmp(expStr, dest) == 0);
     __output_string(dest);
 
-    String.free(dest);
+    String.dispose(dest);
 }
 void _resize()
 {
@@ -144,7 +144,7 @@ void _resize()
     assert(strcmp(expStr, dest) == 0);
     __output_string(dest);
 
-    String.free(dest);
+    String.dispose(dest);
 }
 void _truncate()
 {
@@ -158,7 +158,7 @@ void _truncate()
     assert(strcmp(expStr, target) == 0);
     __output_string(target);
 
-    String.free(target);
+    String.dispose(target);
 }
 void _append()
 {
@@ -175,7 +175,7 @@ void _append()
     assert(String.length(text) == expLen);
 
     __output_string(text);
-    String.free(text);
+    String.dispose(text);
 }
 void _format()
 {
@@ -192,7 +192,7 @@ void _format()
     assert(String.length(text) == expLen);
 
     __output_string(text);
-    String.free(text);
+    String.dispose(text);
 }
 void _join_strings()
 {
@@ -214,7 +214,7 @@ void _join_strings()
     assert(strcmp(expPath, pBase) == 0);
     __output_string(pBase);
 
-    String.free(pBase);
+    String.dispose(pBase);
 }
 void _join_with_const_dest()
 {
@@ -249,5 +249,5 @@ void _join_with_const_dest()
     assert(strcmp(expPath, pathRoot) == 0);
     __output_string(pathRoot);
 
-    String.free(pathRoot);
+    String.dispose(pathRoot);
 }

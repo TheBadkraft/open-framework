@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "open/version.h"
+#include "open/core/version.h"
 
 /*
     This needs re-writing to fit OpenPlatform specifications

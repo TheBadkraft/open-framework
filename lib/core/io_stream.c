@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "open/io_stream.h"
+#include "open/io/io_stream.h"
 #include "open/internal/internal_io.h"
 
 typedef enum io_mode iomode;
@@ -201,10 +201,11 @@ void strm_free(stream pStream)
     Allocator.dealloc(pStream);
 }
 
-const struct Open_Stream Stream = {
+const struct IStream Stream = {
     .new = &strm_new,
     .get_error = &strm_get_err_info,
     .err_info = &get_err_info,
     .mode_info = &get_mode,
     .is_open = &strm_is_open,
-    .free = &strm_free};
+    .dispose = &strm_free,
+};

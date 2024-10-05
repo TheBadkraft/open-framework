@@ -29,7 +29,7 @@ typedef enum io_type IOType;
 typedef struct io_dir *directory;
 typedef struct io_file *file;
 
-extern const struct Open_File
+extern const struct IFile
 {
     /*  members  */
     bool (*exists)(file);
@@ -39,21 +39,21 @@ extern const struct Open_File
     void (*delete)(file);
     bool (*create)(file);
     bool (*open)(file, stream *, enum io_mode);
-    void (*free)(file);
+    void (*dispose)(file);
     void (*directory)(file, directory *);
     void (*full_path)(file, string *);
 } File;
 
-extern const struct Open_Directory
+extern const struct IDirectory
 {
     /*  members  */
     directory (*new)(string);
     bool (*exists)(directory);
     void (*current)(directory *);
-    void (*free)(directory);
+    void (*dispose)(directory);
 } Directory;
 
-extern const struct Open_Path
+extern const struct IPath
 {
     /*  members  */
     //
