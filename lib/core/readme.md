@@ -42,6 +42,33 @@ One thing I learned while writing the Allocator is what's best for storing point
 
 In the Allocator, I use `handle` as the alias for `uintptr_t`. See `types.h` for more flavor ... like `typedef void *object`. If you are familiar with C#, this may make more sense. I'm not trying to make something C is *not*. I'm working within what C allows to emulate as closely as possible something it isn't. I draw the line, however, at writing huge production macros. I use very few and only where I'm implementing a truly useful macro, not writing reems of source so I can have syntactic sugar. They say, "Sugar rots the teeth." Well, syntactic sugar rots the brain. It's like buying the muscle car already muscled out and not knowing a thing about what's going on under the hood. But, I digress ... again.
 
-Obviously, the issue with such a collection is that it is not a homogenous collection ... that is, neither the `collection` nor its interface enforce *type safety*. You can place any *`handle`* (`uintptr_t`) in the array and it doesn't care. Well, I don't either. But, as I was pondering the best path forward I decided that I am providing the building blocks. It is up to the developer to put them together in a way that is suitable for his/her requirements. I will have a very tight approach to developing 3 very basic types of *collections*: array, set, key/value. I will demonstrate how to create a type-safe interface when we get to that point. At some point someone may coerce me to write a macro that generates source for a type-safe collection. But, as of now, I am not inclined to venture into those weeds. There be snakes ...
+Obviously, the issue with such a collection is that it is not a homogenous collection ... that is, neither the `collection` nor its interface enforce *type safety*. You can place any *`handle`* (`uintptr_t`) in the array and it doesn't care. Well, I don't either. But, as I was pondering the best path forward I decided that I am providing the building blocks. It is up to the developer to put them together in a way that is suitable for his/her requirements. I will have a very tight approach to developing 3 very basic types of *collections*: array, set, key/value. I will demonstrate how to create a type-safe interface when we get to that point. At some point someone may coerce me to write a macro that generates source for a type-safe collection. But, as of now, I am not inclined to venture into those weeds. There be snakes ...  
+
+Beginning the collection object, here is my initial test output after a day of work:
+> *** TEST CASE [_collection_add_multiple]
+> Collection.add: add multiple elements to collection
+> (0x55555555fc20 ... 0x55555555fc20 ... 0x55555555fc28) <- 0x55555555fe70
+> (0x55555555fc20 ... 0x55555555fc28 ... 0x55555555fc30) <- 0x555555560090
+> (0x55555555fc20 ... 0x55555555fc30 ... 0x55555555fc38) <- 0x5555555600b0
+> (0x55555555fc20 ... 0x55555555fc38 ... 0x55555555fc40) <- 0x5555555600d0
+> (0x55555555fc20 ... 0x55555555fc40 ... 0x55555555fc48) <- 0x5555555600f0
+> (0x55555555fc20 ... 0x55555555fc48)
+> mem Diff: 40
+> count: 5
+> collection data:
+> ---------------------------------------
+> [0] (0x55555555fc20 : 0x55555555fc48) person: [0] Sam
+> [1] (0x55555555fc28 : 0x55555555fc48) person: [1] Harold
+> [2] (0x55555555fc30 : 0x55555555fc48) person: [2] Betty
+> [3] (0x55555555fc38 : 0x55555555fc48) person: [3] James
+> [4] (0x55555555fc40 : 0x55555555fc48) person: [4] Jill
+> =======================================
+
+What you're looking at is analysis of the memory locations and what is going into them. The top 5 entries are demonstrating the beginning memory location of the list `0x55555555fc20` followed by the *current* element location, again `0x55555555fc20`, and the terminal element location after adding the element, `0x55555555fc28`. You can trace the advancement of the terminal element with the advancement of the current element. The middle memory location - or, *current* element - is where the object is being stored. The stored object is the last memory location. Each object being stored should be `malloc`'d or else ... well, behavior will be undefined.  
+
+The *collection data* section is simply outputing the collection's stored data. The memory locations enclosed in `(...)` correlate to what we see in the top section. In this case, the left location is the middle *current* element location. The numbers in brackets are indices (on the left) and data (on the right) -- `p->id`.
+
+It's worth noting that one should not use this collection to store primitives. You should `malloc` your memory to ensure persistence.  
+
 
 
