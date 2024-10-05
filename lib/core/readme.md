@@ -72,5 +72,18 @@ The *collection data* section is simply outputing the collection's stored data. 
 
 It's worth noting that one should not use this collection to store primitives. You should `malloc` your memory to ensure persistence.  
 
+This is how simple iteration of the collection is:
+
+``` c
+handle *hPtr = coll->list;
+while (hPtr != (handle *)(coll->last))
+{
+    person *pData = (person *)(*hPtr);
+    printf("person: [%d] %s\n", pData->id, pData->name);
+
+    ++hPtr;
+}
+```
+
 
 
