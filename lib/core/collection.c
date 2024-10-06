@@ -30,6 +30,9 @@ collection coll_new(int);
 void coll_dispose(collection);
 size_t coll_count(collection);
 bool coll_add_item(collection, object);
+enumerator coll_get_enumerator(collection);
+bool enumer_move_next(enumerator);
+void enumer_reset(enumerator);
 
 iterator coll_get_iterator(collection, comparator);
 
@@ -116,34 +119,61 @@ bool coll_add_item(collection coll, object item)
         _array_resize(&(coll->list), &(coll->capacity));
     }
     retAdd = (coll->last + sizeof(handle)) < (handle)(coll->list + coll->capacity);
-    // handle *pElement = coll->list;
-    // if (count == 0)
-    // {
-    //     // coll->list[0] = (handle)item;
-    //     // coll->last = (handle)(&(coll->list[1]));
-    //     (*pElement) = (handle)item;
-    //     coll->last = (handle)++pElement;
-
-    //     printf("(%p ... %p)\n", coll->list, (object)(coll->last));
-
-    //     // could be more robust but this works for now
-    //     retAdd = coll_count(coll) - count == 1;
-    // }
 
     if (retAdd)
     {
         (*(coll->list + count)) = (handle)item;
         coll->last += sizeof(handle);
 
-        printf("(%p ... %p ... %p) <- %p\n", coll->list, (coll->list + count), (object)(coll->last), item);
+        // printf("(%p ... %p ... %p) <- %p\n", coll->list, (coll->list + count), (object)(coll->last), item);
 
         retAdd = coll_count(coll) - count == 1;
     }
 
     return retAdd;
 }
-iterator coll_get_iterator(collection coll, comparator comparer)
+enumerator coll_get_enumerator(collection coll)
 {
+    enumerator pEnumerator = Allocator.alloc(sizeof(struct coll_enumerator), UNINITIALIZED);
+    pEnumerator->coll = coll;
+    pEnumerator->element = NULL;
+    pEnumerator->current = NULL;
+}
+
+bool enumer_move_next(enumerator pEnumerator)
+{
+    handle *last = (handle *)pEnumerator->coll->last;
+    handle *current = pEnumerator->element;
+
+    if (current == NULL)
+    {
+        //  ASSUMPTION: we're at the beginning of the enumeration
+        current = pEnumerator->coll->list;
+    }
+    else if (current != last)
+    {
+        ++current;
+    }
+    else
+    {
+        //  we're not sure what went wrong to end up here but stop the presses!!!
+        return false;
+    }
+    // printf("move next --> %p\n", current);
+
+    pEnumerator->element = current;
+    pEnumerator->current = (object)*current;
+
+    return current != last;
+}
+void enumer_reset(enumerator pEnumerator)
+{
+    pEnumerator->element = NULL;
+    pEnumerator->current = NULL;
+}
+void enumer_dispose(enumerator pEnumerator)
+{
+    Allocator.dealloc(pEnumerator);
 }
 
 const struct ICollection Collection = {
@@ -151,5 +181,10 @@ const struct ICollection Collection = {
     .dispose = &coll_dispose,
     .count = &coll_count,
     .add = &coll_add_item,
-    .get_iterator = &coll_get_iterator,
+    .get_enumerator = &coll_get_enumerator,
+};
+const struct IEnumerator Enumerator = {
+    .next = &enumer_move_next,
+    .reset = &enumer_reset,
+    .dispose = &enumer_dispose,
 };

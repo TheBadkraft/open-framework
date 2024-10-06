@@ -21,11 +21,17 @@ typedef struct tst_person
 void _collection_new(void);
 void _collection_add(void);
 void _collection_add_multiple(void);
+void _collection_get_enumerator(void);
 void _collection_get_iterator(void);
+
+void _enumerator_move_next(void);
+void _enumerator_reset(void);
 
 //  utility prototypes
 void __output_collection_info(collection);
 void __output_collection_data(collection);
+void __output_enumerator_data(enumerator);
+void __dispose_enumerator_data(enumerator);
 collection __generate_collection(int);
 
 int main(int argc, string *argv)
@@ -40,11 +46,25 @@ int main(int argc, string *argv)
     }
     END_SET(collection);
 
+    BEGIN_SET(enumerator, true)
+    {
+        write_header("Test Core Enumerator interface");
+
+        TEST(_collection_get_enumerator);
+        TEST(_enumerator_move_next);
+        TEST(_enumerator_reset);
+    }
+    END_SET(enumerator);
+
     BEGIN_SET(iterator, false)
     {
+        write_header("Test Core Iterator interface");
+
         TEST(_collection_get_iterator);
     }
     END_SET(iterator);
+
+    TEST_STATS();
 }
 void __output_collection_info(collection coll)
 {
@@ -71,6 +91,24 @@ void __output_collection_data(collection coll)
     }
 
     writeln("=======================================");
+}
+void __output_enumerator_data(enumerator enumer)
+{
+    int i = 0;
+    while (Enumerator.next(enumer))
+    {
+        person *pData = enumer->current;
+        writefln("[%d] (%p) person: [%d] %s", i, enumer->current, pData->id, pData->name);
+
+        ++i;
+    }
+}
+void __dispose_enumerator_data(enumerator enumer)
+{
+    while (Enumerator.next(enumer))
+    {
+        free(enumer->current);
+    }
 }
 collection __generate_collection(int count)
 {
@@ -146,10 +184,75 @@ void _collection_add_multiple(void)
     }
     Collection.dispose(coll);
 }
+void _collection_get_enumerator(void)
+{
+    writeln("Collection.get_enumerator: add multiple elements to collection");
 
+    int expCount = 5;
+    collection coll = __generate_collection(expCount);
+
+    enumerator enumer = Collection.get_enumerator(coll);
+    assert(enumer != NULL);
+    assert(enumer->current == NULL);
+    assert(Collection.count(enumer->coll) == expCount);
+
+    for (int i = 0; i < expCount; i++)
+    {
+        object d = (object)coll->list[i];
+        free(d);
+    }
+    Collection.dispose(coll);
+    Enumerator.dispose(enumer);
+}
 void _collection_get_iterator(void)
 {
     collection coll = __generate_collection(25);
 
     assert(Collection.count(coll) == 25);
+}
+
+void _enumerator_move_next(void)
+{
+    writeln("Enumerator.next: enumerate collection accessing current object");
+
+    int expCount = 5;
+    collection coll = __generate_collection(expCount);
+
+    enumerator enumer = Collection.get_enumerator(coll);
+    int actCount = 0;
+    while (Enumerator.next(enumer))
+    {
+        person *pData = enumer->current;
+        writefln("(%p -> %p) person: [%d] %s", enumer->element, enumer->current, pData->id, pData->name);
+        free(pData);
+
+        ++actCount;
+    }
+    assert(actCount == expCount);
+    Collection.dispose(coll);
+    Enumerator.dispose(enumer);
+}
+void _enumerator_reset(void)
+{
+    writeln("Enumerator.reset: reset enumerator for re-use");
+
+    int expCount = 5;
+    collection coll = __generate_collection(expCount);
+
+    enumerator enumer = Collection.get_enumerator(coll);
+    int actCount = 0;
+    while (Enumerator.next(enumer))
+    {
+        ++actCount;
+    }
+    writefln("enumerated records: %d", actCount);
+    Enumerator.reset(enumer);
+    assert(enumer->current == NULL);
+    assert(enumer->element == NULL);
+
+    __output_enumerator_data(enumer);
+    Enumerator.reset(enumer);
+    __dispose_enumerator_data(enumer);
+    Collection.dispose(coll);
+    Enumerator.dispose(enumer);
 }

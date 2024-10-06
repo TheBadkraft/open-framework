@@ -14,23 +14,28 @@ typedef handle *array;
 static const handle EMPTY_ELEMENT = 0;
 
 typedef bool (*comparator)(object, object);
-typedef object (*enumerator)(void);
 
 struct coll
 {
     array list;
     size_t capacity;
     handle last;
-    const enumerator get_enumerator;
 };
-struct iter
+struct coll_enumerator
+{
+    struct coll *coll;
+    handle *element;
+    object current;
+};
+struct coll_iterator
 {
     handle current;
     comparator compare;
 };
 
 typedef struct coll *collection;
-typedef struct iter *iterator;
+typedef struct coll_enumerator *enumerator;
+typedef struct coll_iterator *iterator;
 
 extern const struct ICollection
 {
@@ -38,6 +43,12 @@ extern const struct ICollection
     void (*dispose)(collection);
     size_t (*count)(collection);
     bool (*add)(collection, object);
-    iterator (*get_iterator)(collection, comparator);
+    enumerator (*get_enumerator)(collection);
 } Collection;
+extern const struct IEnumerator
+{
+    bool (*next)(enumerator);
+    void (*reset)(enumerator);
+    void (*dispose)(enumerator);
+} Enumerator;
 #endif //  _COLLECTION_H
