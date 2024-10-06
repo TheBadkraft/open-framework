@@ -5,28 +5,45 @@
 
 const float RESIZE_THRESHOLD = .75F;
 
-//  internal prototypes
+/*
+    NEXT:   short-term features
+        - remove
+        - arrange
+        - resize
+        - clear
+        - iterator
+        - copy-to
+        - copy-from
+        - add-range
+        - insert-at
+        - remove-at
+        - get-at
+        - alloc
 
-/// @brief allocate memory for the current array list
-/// @param list     the target list
-/// @param current  the current list capacity; both in and out
-/// @param count    the list count
+
+    TODO:   long-term enhancements
+        - ~~replace collection->capacity with `cap` pointer~~
+        - replace enumerator->list with ref id
+        - internally manage enumerator ref properties
+        - interrupt enumerators/iterators if collection modified
+        - implement a yield pattern
+*/
+
+//  === internal prototypes
+
 void _array_allocate(array *, size_t *, size_t);
-/// @brief resize memory allocation for the current array list
-/// @param list     the target list
-/// @param current  current list capacity; both in and out
 void _array_resize(array *, size_t *);
 
 bool _coll_at_threshold(collection);
 
-//  interface prototypes
+//  === interface prototypes
 
 /// @brief create a new collection
 /// @param cap      initial collection capacity; if lower than default, will resolve to initial default
 /// @return TRUE if object was added; otherwise FALSE
 collection coll_new(int);
 /// @brief dispose of the current collection
-/// @param coll     the object to dispose (free)
+/// @param list     the object to dispose (free)
 void coll_dispose(collection);
 size_t coll_count(collection);
 bool coll_add_item(collection, object);
@@ -36,7 +53,12 @@ void enumer_reset(enumerator);
 
 iterator coll_get_iterator(collection, comparator);
 
-//  internal functions
+//  === internal functions
+
+/// @brief allocate memory for the current array list
+/// @param list     the target list
+/// @param current  the current list capacity; both in and out
+/// @param count    the list count
 void _array_allocate(array *list, size_t *current, size_t count)
 {
     /*
@@ -44,7 +66,7 @@ void _array_allocate(array *list, size_t *current, size_t count)
         We will pass the list, current capacity, and count ... I don't see the
         point in blindly doubling the current capacity. The larger the capacity, the more will
         be increased by some factor. We will always increase capacity by +1 to accomodate the
-        empty element. Neither count nor capacity will (should) never include the last empty
+        empty element. Neither count nor capacity will (should) never include the last (end)
         element.
 
         current   factor
@@ -62,95 +84,107 @@ void _array_allocate(array *list, size_t *current, size_t count)
         _array_resize(list, current);
     }
 }
+/// @brief resize memory allocation for the current array list
+/// @param list     the target list
+/// @param current  current list capacity; both in and out
 void _array_resize(array *list, size_t *current)
 {
     //  TODO ...
 }
-bool _coll_at_threshold(collection coll)
+/// @brief determines if the collection is at threshold for resizing
+/// @param list the collection
+/// @return TRUE if resize; otherwise FALSE
+bool _coll_at_threshold(collection list)
 {
-    size_t ratio = coll_count(coll) / coll->capacity;
+    /*
+        This is not necessarily a binary option. We could determine that we want the collection
+        capacity to shrink. And then ... by how much???
+    */
+    size_t ratio = coll_count(list) / list->capacity;
     return ratio > RESIZE_THRESHOLD;
 }
 
-//  interface functions
+//  === interface functions
+
+/// @brief
+/// @param cap
+/// @return
 collection coll_new(int cap)
 {
     cap = cap < DEFAULT_ARRAY_SIZE ? DEFAULT_ARRAY_SIZE : cap;
 
-    collection coll = Allocator.alloc(sizeof(struct coll), UNINITIALIZED);
-    coll->capacity = 0;
-    coll->list = NULL;
+    collection list = Allocator.alloc(sizeof(struct set_collection), UNINITIALIZED);
+    list->capacity = 0;
+    list->bucket = NULL;
 
-    _array_allocate(&(coll->list), &(coll->capacity), coll_count(coll));
-    //  hold reference to the last item so we can calculate count
-    coll->last = (handle)(coll->list);
+    _array_allocate(&(list->bucket), &(list->capacity), coll_count(list));
+    //  hold reference to the last (end) item so we can calculate count
+    list->end = (handle)(list->bucket);
 
-    // printf("list -> %p\n", coll->list);
-    // printf("last -> %p\n", (object)(coll->last));
+    // printf("(%p ... %p ... %p) <- %p\n", list->list, (list->list + count), (object)(list->end), item);
 
-    return coll;
+    return list;
 }
-void coll_dispose(collection coll)
+void coll_dispose(collection list)
 {
-    Allocator.dealloc(coll->list);
-    coll->capacity = 0;
-    coll->last = (handle)coll->list;
+    Allocator.dealloc(list->bucket);
+    list->capacity = 0;
+    list->end = (handle)list->bucket;
 
-    // printf("list -> %p\n", coll->list);
-    // printf("last -> %p\n", (object)(coll->last));
+    // printf("(%p ... %p ... %p) <- %p\n", list->list, (list->list + count), (object)(list->end), item);
 
-    Allocator.dealloc(coll);
+    Allocator.dealloc(list);
 
-    coll = NULL;
+    list = NULL;
 }
-size_t coll_count(collection coll)
+size_t coll_count(collection list)
 {
-    handle memDiff = coll->last - (handle)coll->list;
+    handle memDiff = list->end - (handle)list->bucket;
 
     return memDiff / sizeof(handle);
 }
-bool coll_add_item(collection coll, object item)
+bool coll_add_item(collection list, object item)
 {
     bool retAdd = false;
-    size_t count = coll_count(coll);
+    size_t count = coll_count(list);
 
-    if (_coll_at_threshold(coll))
+    if (_coll_at_threshold(list))
     {
-        _array_resize(&(coll->list), &(coll->capacity));
+        _array_resize(&(list->bucket), &(list->capacity));
     }
-    retAdd = (coll->last + sizeof(handle)) < (handle)(coll->list + coll->capacity);
+    retAdd = (list->end + sizeof(handle)) < (handle)(list->bucket + list->capacity);
 
     if (retAdd)
     {
-        (*(coll->list + count)) = (handle)item;
-        coll->last += sizeof(handle);
+        (*(list->bucket + count)) = (handle)item;
+        list->end += sizeof(handle);
 
-        // printf("(%p ... %p ... %p) <- %p\n", coll->list, (coll->list + count), (object)(coll->last), item);
+        // printf("(%p ... %p ... %p) <- %p\n", list->list, (list->list + count), (object)(list->end), item);
 
-        retAdd = coll_count(coll) - count == 1;
+        retAdd = coll_count(list) - count == 1;
     }
 
     return retAdd;
 }
-enumerator coll_get_enumerator(collection coll)
+enumerator coll_get_enumerator(collection list)
 {
-    enumerator pEnumerator = Allocator.alloc(sizeof(struct coll_enumerator), UNINITIALIZED);
-    pEnumerator->coll = coll;
+    enumerator pEnumerator = Allocator.alloc(sizeof(struct set_enumerator), UNINITIALIZED);
+    pEnumerator->list = list;
     pEnumerator->element = NULL;
     pEnumerator->current = NULL;
 }
 
 bool enumer_move_next(enumerator pEnumerator)
 {
-    handle *last = (handle *)pEnumerator->coll->last;
+    handle *end = (handle *)pEnumerator->list->end;
     handle *current = pEnumerator->element;
 
     if (current == NULL)
     {
         //  ASSUMPTION: we're at the beginning of the enumeration
-        current = pEnumerator->coll->list;
+        current = pEnumerator->list->bucket;
     }
-    else if (current != last)
+    else if (current != end)
     {
         ++current;
     }
@@ -164,7 +198,7 @@ bool enumer_move_next(enumerator pEnumerator)
     pEnumerator->element = current;
     pEnumerator->current = (object)*current;
 
-    return current != last;
+    return current != end;
 }
 void enumer_reset(enumerator pEnumerator)
 {

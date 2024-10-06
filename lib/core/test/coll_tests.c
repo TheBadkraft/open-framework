@@ -68,9 +68,9 @@ int main(int argc, string *argv)
 }
 void __output_collection_info(collection coll)
 {
-    writefln("(%p ... %p)", coll->list, coll->last);
+    writefln("(%p ... %p)", coll->bucket, coll->end);
 
-    handle memDiff = coll->last - (handle)coll->list;
+    handle memDiff = coll->end - (handle)coll->bucket;
     writefln("mem Diff: %ld", memDiff);
     writefln("count: %d", memDiff / sizeof(handle));
 }
@@ -80,12 +80,12 @@ void __output_collection_data(collection coll)
     writeln("collection data:");
     writeln("---------------------------------------");
     //  grab copy of list pointer casting to the expected type
-    handle *hPtr = coll->list;
-    while (hPtr != (handle *)(coll->last))
+    handle *hPtr = coll->bucket;
+    while (hPtr != (handle *)(coll->end))
     {
-        int i = hPtr - coll->list;
+        int i = hPtr - coll->bucket;
         person *pData = (person *)(*hPtr);
-        writefln("[%d] (%p : %p) person: [%d] %s", i, hPtr, (object)coll->last, pData->id, pData->name);
+        writefln("[%d] (%p : %p) person: [%d] %s", i, hPtr, (object)coll->end, pData->id, pData->name);
 
         ++hPtr;
     }
@@ -136,7 +136,7 @@ void _collection_new(void)
     collection coll = Collection.new(0);
     assert(coll->capacity == DEFAULT_ARRAY_SIZE);
     assert(Collection.count(coll) == 0);
-    assert(coll->list != NULL);
+    assert(coll->bucket != NULL);
 
     __output_collection_info(coll);
     Collection.dispose(coll);
@@ -151,12 +151,12 @@ void _collection_add(void)
     pExp->name = "Harold";
 
     assert(Collection.add(coll, pExp));
-    person *pAct = (object)coll->list[0];
+    person *pAct = (object)coll->bucket[0];
     assert(Collection.count(coll) == 1);
 
-    writefln("(%p : %p) person: [%d] %s", coll->list, pAct, pAct->id, pAct->name);
+    writefln("(%p : %p) person: [%d] %s", coll->bucket, pAct, pAct->id, pAct->name);
 
-    handle memDiff = coll->last - (handle)coll->list;
+    handle memDiff = coll->end - (handle)coll->bucket;
     assert(memDiff == sizeof(handle));
 
     __output_collection_info(coll);
@@ -179,7 +179,7 @@ void _collection_add_multiple(void)
     //  release all generated data
     for (int i = 0; i < expCount; i++)
     {
-        object d = (object)coll->list[i];
+        object d = (object)coll->bucket[i];
         free(d);
     }
     Collection.dispose(coll);
@@ -194,11 +194,11 @@ void _collection_get_enumerator(void)
     enumerator enumer = Collection.get_enumerator(coll);
     assert(enumer != NULL);
     assert(enumer->current == NULL);
-    assert(Collection.count(enumer->coll) == expCount);
+    assert(Collection.count(enumer->list) == expCount);
 
     for (int i = 0; i < expCount; i++)
     {
-        object d = (object)coll->list[i];
+        object d = (object)coll->bucket[i];
         free(d);
     }
     Collection.dispose(coll);

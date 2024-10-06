@@ -15,27 +15,30 @@ static const handle EMPTY_ELEMENT = 0;
 
 typedef bool (*comparator)(object, object);
 
-struct coll
+struct set_collection
 {
-    array list;
+    array bucket;
     size_t capacity;
-    handle last;
+    handle end;
 };
-struct coll_enumerator
+struct set_enumerator
 {
-    struct coll *coll;
+    struct set_collection *list;
     handle *element;
     object current;
 };
 struct coll_iterator
 {
-    handle current;
-    comparator compare;
+    struct set_enumerator *enumer;
+    comparator comparer;
 };
 
-typedef struct coll *collection;
-typedef struct coll_enumerator *enumerator;
-typedef struct coll_iterator *iterator;
+//  basic element bucket
+typedef struct set_collection *collection;
+//  basic element enumerator
+typedef struct set_enumerator *enumerator;
+//  element comparer enumeration
+typedef struct set_iterator *iterator;
 
 extern const struct ICollection
 {
