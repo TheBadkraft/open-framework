@@ -38,7 +38,7 @@ int main(int argc, string *argv)
 {
     BEGIN_SET(collection, true)
     {
-        write_header("Test Core Collection interface");
+        write_header("Collection interface");
 
         TEST(_collection_new);
         TEST(_collection_add);
@@ -48,7 +48,7 @@ int main(int argc, string *argv)
 
     BEGIN_SET(enumerator, true)
     {
-        write_header("Test Core Enumerator interface");
+        write_header("Enumerator interface");
 
         TEST(_collection_get_enumerator);
         TEST(_enumerator_move_next);
@@ -58,7 +58,7 @@ int main(int argc, string *argv)
 
     BEGIN_SET(iterator, false)
     {
-        write_header("Test Core Iterator interface");
+        write_header("Iterator interface");
 
         TEST(_collection_get_iterator);
     }
@@ -66,26 +66,26 @@ int main(int argc, string *argv)
 
     TEST_STATS();
 }
-void __output_collection_info(collection coll)
+void __output_collection_info(collection list)
 {
-    writefln("(%p ... %p)", coll->bucket, coll->end);
+    writefln("(%p ... %p)", list->bucket, list->end);
 
-    handle memDiff = coll->end - (handle)coll->bucket;
+    handle memDiff = list->end - (handle)list->bucket;
     writefln("mem Diff: %ld", memDiff);
     writefln("count: %d", memDiff / sizeof(handle));
 }
-void __output_collection_data(collection coll)
+void __output_collection_data(collection list)
 {
     //  first glimpse into the ease of enumerating this collection
     writeln("collection data:");
     writeln("---------------------------------------");
     //  grab copy of list pointer casting to the expected type
-    handle *hPtr = coll->bucket;
-    while (hPtr != (handle *)(coll->end))
+    handle *hPtr = list->bucket;
+    while (hPtr != (handle *)(list->end))
     {
-        int i = hPtr - coll->bucket;
+        int i = hPtr - list->bucket;
         person *pData = (person *)(*hPtr);
-        writefln("[%d] (%p : %p) person: [%d] %s", i, hPtr, (object)coll->end, pData->id, pData->name);
+        writefln("[%d] (%p : %p) person: [%d] %s", i, hPtr, (object)list->end, pData->id, pData->name);
 
         ++hPtr;
     }
@@ -112,56 +112,57 @@ void __dispose_enumerator_data(enumerator enumer)
 }
 collection __generate_collection(int count)
 {
-    collection coll = Collection.new(0);
+    collection list = Collection.new();
     int i = 0;
     while (i < count)
     {
         person *p = malloc(sizeof(person));
         p->id = i;
         p->name = NAMES[i];
-        Collection.add(coll, p);
+        Collection.add(list, p);
 
         ++i;
     }
 
-    return coll;
+    return list;
 }
 
 //  test cases
 void _collection_new(void)
 {
-    writeln("Collection.new: new collection with 0 capacity");
+    writeln("Collection.new: new collection with default capacity");
     //  x < `DEFAULT_ARRAY_SIZE` will result in the default capacity(64)
 
-    collection coll = Collection.new(0);
-    assert(coll->capacity == DEFAULT_ARRAY_SIZE);
-    assert(Collection.count(coll) == 0);
-    assert(coll->bucket != NULL);
+    collection list = Collection.new();
+    //  NOTE: calling `Collection.capacity(...) re-calculate the capacity
+    assert(Collection.capacity(list) == DEFAULT_ARRAY_SIZE);
+    assert(Collection.count(list) == 0);
+    assert(list->bucket != NULL);
 
-    __output_collection_info(coll);
-    Collection.dispose(coll);
+    __output_collection_info(list);
+    Collection.dispose(list);
 }
 void _collection_add(void)
 {
     writeln("Collection.add: add element to collection");
 
-    collection coll = Collection.new(0);
+    collection list = Collection.new();
     person *pExp = malloc(sizeof(person));
     pExp->id = 1;
     pExp->name = "Harold";
 
-    assert(Collection.add(coll, pExp));
-    person *pAct = (object)coll->bucket[0];
-    assert(Collection.count(coll) == 1);
+    assert(Collection.add(list, pExp));
+    person *pAct = (object)list->bucket[0];
+    assert(Collection.count(list) == 1);
 
-    writefln("(%p : %p) person: [%d] %s", coll->bucket, pAct, pAct->id, pAct->name);
+    writefln("(%p : %p) person: [%d] %s", list->bucket, pAct, pAct->id, pAct->name);
 
-    handle memDiff = coll->end - (handle)coll->bucket;
+    handle memDiff = list->end - (handle)list->bucket;
     assert(memDiff == sizeof(handle));
 
-    __output_collection_info(coll);
-    __output_collection_data(coll);
-    Collection.dispose(coll);
+    __output_collection_info(list);
+    __output_collection_data(list);
+    Collection.dispose(list);
     free(pExp);
 }
 void _collection_add_multiple(void)
@@ -169,46 +170,46 @@ void _collection_add_multiple(void)
     writeln("Collection.add: add multiple elements to collection");
 
     int expCount = 5;
-    collection coll = __generate_collection(expCount);
-    int actCount = Collection.count(coll);
+    collection list = __generate_collection(expCount);
+    int actCount = Collection.count(list);
     assert(actCount == expCount);
 
-    __output_collection_info(coll);
-    __output_collection_data(coll);
+    __output_collection_info(list);
+    __output_collection_data(list);
 
     //  release all generated data
     for (int i = 0; i < expCount; i++)
     {
-        object d = (object)coll->bucket[i];
+        object d = (object)list->bucket[i];
         free(d);
     }
-    Collection.dispose(coll);
+    Collection.dispose(list);
 }
 void _collection_get_enumerator(void)
 {
     writeln("Collection.get_enumerator: add multiple elements to collection");
 
     int expCount = 5;
-    collection coll = __generate_collection(expCount);
+    collection list = __generate_collection(expCount);
 
-    enumerator enumer = Collection.get_enumerator(coll);
+    enumerator enumer = Collection.get_enumerator(list);
     assert(enumer != NULL);
     assert(enumer->current == NULL);
     assert(Collection.count(enumer->list) == expCount);
 
     for (int i = 0; i < expCount; i++)
     {
-        object d = (object)coll->bucket[i];
+        object d = (object)list->bucket[i];
         free(d);
     }
-    Collection.dispose(coll);
+    Collection.dispose(list);
     Enumerator.dispose(enumer);
 }
 void _collection_get_iterator(void)
 {
-    collection coll = __generate_collection(25);
+    collection list = __generate_collection(25);
 
-    assert(Collection.count(coll) == 25);
+    assert(Collection.count(list) == 25);
 }
 
 void _enumerator_move_next(void)
@@ -216,9 +217,9 @@ void _enumerator_move_next(void)
     writeln("Enumerator.next: enumerate collection accessing current object");
 
     int expCount = 5;
-    collection coll = __generate_collection(expCount);
+    collection list = __generate_collection(expCount);
 
-    enumerator enumer = Collection.get_enumerator(coll);
+    enumerator enumer = Collection.get_enumerator(list);
     int actCount = 0;
     while (Enumerator.next(enumer))
     {
@@ -229,7 +230,7 @@ void _enumerator_move_next(void)
         ++actCount;
     }
     assert(actCount == expCount);
-    Collection.dispose(coll);
+    Collection.dispose(list);
     Enumerator.dispose(enumer);
 }
 void _enumerator_reset(void)
@@ -237,9 +238,9 @@ void _enumerator_reset(void)
     writeln("Enumerator.reset: reset enumerator for re-use");
 
     int expCount = 5;
-    collection coll = __generate_collection(expCount);
+    collection list = __generate_collection(expCount);
 
-    enumerator enumer = Collection.get_enumerator(coll);
+    enumerator enumer = Collection.get_enumerator(list);
     int actCount = 0;
     while (Enumerator.next(enumer))
     {
@@ -253,6 +254,6 @@ void _enumerator_reset(void)
     __output_enumerator_data(enumer);
     Enumerator.reset(enumer);
     __dispose_enumerator_data(enumer);
-    Collection.dispose(coll);
+    Collection.dispose(list);
     Enumerator.dispose(enumer);
 }

@@ -16,12 +16,12 @@
             },
             "compilerPath": "/usr/bin/gcc"
         },
-                {
+        {
             "name": "release",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": [],
+            "defines": ["DEBUG=1"],
             "cStandard": "gnu17",
             "intelliSenseMode": "gcc-x64",
             "browse": {

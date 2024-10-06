@@ -18,7 +18,7 @@
 			"core.h": "c",
 			"test.h": "c",
 			"setjmp.h": "c",
-			"main.C": "cpp",
+			"main.C": "c",
 			"internal_io.h": "c",
 			"internal_string.h": "c",
 			"allocator.h": "c",
@@ -29,6 +29,28 @@
 			"array": "c",
 			"string_view": "c",
 			"stdlib.h": "c"
-		}
+		},
+		"todohighlight.include": [
+			"**/*.txt",
+			"**/*.mdown",
+			"**/*.md",
+			"**/*.c",
+			"**/*.h"
+		],
+		"todohighlight.keywords": [
+			
+			{
+				"text": "TODO:",
+				"color": "#fff",
+				"backgroundColor": "#ffbd2a",
+				"overviewRulerColor": "rgba(255,189,42,0.8)"
+			},
+			{
+				"text": "FIXME:",
+				"color": "#fff",
+				"backgroundColor": "#f06292",
+				"overviewRulerColor": "rgba(240,98,146,0.8)"
+			}
+		]
 	},
 }

@@ -13,13 +13,18 @@ typedef handle *array;
 //  we always want to keep an empty element at the end
 static const handle EMPTY_ELEMENT = 0;
 
+extern const struct set_cap
+{
+    handle cap;
+} CAP;
+
 typedef bool (*comparator)(object, object);
 
 struct set_collection
 {
     array bucket;
-    size_t capacity;
     handle end;
+    size_t capacity;
 };
 struct set_enumerator
 {
@@ -42,9 +47,10 @@ typedef struct set_iterator *iterator;
 
 extern const struct ICollection
 {
-    collection (*new)(int cap);
+    collection (*new)(void);
     void (*dispose)(collection);
     size_t (*count)(collection);
+    size_t (*capacity)(collection);
     bool (*add)(collection, object);
     enumerator (*get_enumerator)(collection);
 } Collection;
@@ -54,4 +60,5 @@ extern const struct IEnumerator
     void (*reset)(enumerator);
     void (*dispose)(enumerator);
 } Enumerator;
+
 #endif //  _COLLECTION_H
