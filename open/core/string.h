@@ -7,7 +7,7 @@
 
 #include "types.h"
 
-extern const struct Open_String
+extern const struct IString
 {
     //  empty string
     string const empty;
@@ -30,7 +30,7 @@ extern const struct Open_String
     //  [NOT WORKING] Determines whether the current string is freeable
     bool (*freeable)(string);
     //  Free the current string
-    void (*free)(string);
+    void (*dispose)(string);
     //  Returns the string length
     size_t (*length)(string);
     //  Appends the supplied string at the end of thecurrent string

@@ -43,14 +43,14 @@ struct io_stream
 
 typedef struct io_stream *stream;
 
-extern const struct Open_Stream
+extern const struct IStream
 {
     stream (*new)(string);
     void (*get_error)(stream, string *);
     void (*err_info)(enum io_error, string *);
     void (*mode_info)(enum io_mode, string *);
     bool (*is_open)(stream);
-    void (*free)(stream);
+    void (*dispose)(stream);
     void (*mode_to_string)(stream);
 } Stream;
 

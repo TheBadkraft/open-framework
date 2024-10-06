@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 
-#include "../types.h"
+#include "../core/types.h"
 
 void str_vjoin(string, string *, va_list);
 size_t str_vsnjoin(string, string *, va_list);

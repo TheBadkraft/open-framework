@@ -7,7 +7,7 @@
 #include "types.h"
 
 #if DEBUG
-#include "../open/test.h"
+#include "../testing/test.h"
 #endif
 
 enum Alloc_Mode
@@ -18,7 +18,7 @@ enum Alloc_Mode
 
 struct Mem_Block
 {
-    objptr obj_ptr;
+    handle obj_ptr;
 };
 
 struct Mem_Page
@@ -33,7 +33,7 @@ typedef enum Alloc_Mode allocMode;
 typedef struct Mem_Block *mem_block;
 typedef struct Mem_Page *mem_page;
 
-extern const struct Open_Allocator
+extern const struct IAllocator
 {
     size_t (*count)();
     size_t (*capacity)();

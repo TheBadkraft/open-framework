@@ -5,11 +5,11 @@
 #define DEBUG 1
 #endif
 
-#include "../open/test.h"
+#include "../open/testing/test.h"
 #include "alloc_test.h"
 
-#include "../open/core.h"
-#include "../open/allocator.h"
+#include "../open/core/core.h"
+#include "../open/core/allocator.h"
 
 typedef struct test1
 {

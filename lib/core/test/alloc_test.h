@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../open/allocator.h"
+#include "../open/core/allocator.h"
 
 mem_block _alloc_get_pointer(uintptr_t);
 void _output_alloc_stats();

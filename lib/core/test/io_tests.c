@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../open/test.h"
+#include "../open/testing/test.h"
 
-#include "../open/core.h"
-#include "../open/io.h"
-#include "../open/io_stream.h"
-#include "../open/allocator.h"
+#include "../open/core/core.h"
+#include "../open/core/allocator.h"
+#include "../open/io/io.h"
+#include "../open/io/io_stream.h"
 
 //	FILE: test case prototypes
 void _file_path_exists();
@@ -121,7 +121,7 @@ void _output_file_info(file pFile)
 	writefln("directory: %s", pDir->name);
 	writefln("size:      %ld", File.size(pFile));
 
-	Directory.free(pDir);
+	Directory.dispose(pDir);
 }
 void _output_directory_info(directory pDir)
 {
@@ -141,7 +141,7 @@ void _output_stream_info(stream pStream)
 	Stream.get_error(pStream, &errMsg);
 	writefln("error:   %s", errMsg);
 
-	String.free(errMsg);
+	String.dispose(errMsg);
 }
 
 //		================================ TEST CASES ================================
@@ -159,7 +159,7 @@ void _file_size()
 
 	assert(File.size(pFile) == -1);
 
-	File.free(pFile);
+	File.dispose(pFile);
 	Allocator.flush();
 }
 void _get_file_obj()
@@ -178,7 +178,7 @@ void _get_file_obj()
 		File.delete(pFile);
 	}
 
-	File.free(pFile);
+	File.dispose(pFile);
 	Allocator.flush();
 }
 void _create_file()
@@ -196,7 +196,7 @@ void _create_file()
 		File.delete(pFile);
 	}
 
-	File.free(pFile);
+	File.dispose(pFile);
 }
 void _new_file_from_path()
 {
@@ -214,12 +214,12 @@ void _new_file_from_path()
 	Path.combine(&def_path, cwdir->path, __DEF_PATH, NULL);
 
 	def_file = File.new(def_path);
-	String.free(def_path);
+	String.dispose(def_path);
 
 	assert(def_file != NULL);
 	_output_file_info(def_file);
 
-	File.free(def_file);
+	File.dispose(def_file);
 	Allocator.flush();
 }
 void _file_directory()
@@ -234,8 +234,8 @@ void _file_directory()
 	assert(strcmp("./.data", pDir->path) == 0);
 
 	_output_directory_info(pDir);
-	File.free(pFile);
-	Directory.free(pDir);
+	File.dispose(pFile);
+	Directory.dispose(pDir);
 }
 
 void _dir_new()
@@ -246,7 +246,7 @@ void _dir_new()
 	assert(strcmp("./.data", pDir->path) == 0);
 
 	_output_directory_info(pDir);
-	Directory.free(pDir);
+	Directory.dispose(pDir);
 }
 void _dir_exists()
 {
@@ -254,7 +254,7 @@ void _dir_exists()
 	assert(Directory.exists(pDir));
 
 	_output_directory_info(pDir);
-	Directory.free(pDir);
+	Directory.dispose(pDir);
 }
 void _dir_current()
 {
@@ -263,7 +263,7 @@ void _dir_current()
 	assert(pDir != NULL);
 
 	_output_directory_info(pDir);
-	Directory.free(pDir);
+	Directory.dispose(pDir);
 }
 
 void _get_abs_path()
@@ -281,7 +281,7 @@ void _get_abs_path()
 	if (retOk)
 	{
 		//	if the path does not exist, actPath is never allocated
-		String.free(actPath);
+		String.dispose(actPath);
 	}
 
 	retOk = Path.absolute(pfNone, &actPath);
@@ -290,7 +290,7 @@ void _get_abs_path()
 	writefln("%s -> %s", pfNone, retOk ? "exits" : "does not exist");
 	if (retOk)
 	{
-		String.free(actPath);
+		String.dispose(actPath);
 	}
 }
 void _combine_paths()
@@ -307,7 +307,7 @@ void _combine_paths()
 	Path.combine(&pBase, ".data", "main.C", NULL);
 
 	assert(strcmp(expPath, pBase) == 0);
-	String.free(pBase);
+	String.dispose(pBase);
 }
 void _combine_with_empty_base()
 {
@@ -335,7 +335,7 @@ void _combine_with_empty_base()
 	writefln("combined: %s", pBase);
 
 	assert(strcmp(expPath, pBase) == 0);
-	Directory.free(cwdir);
+	Directory.dispose(cwdir);
 }
 void _path_directory()
 {
@@ -368,7 +368,7 @@ void _get_stream_error()
 
 	assert(strcmp(expMsg, errMsg) == 0);
 
-	String.free(errMsg);
+	String.dispose(errMsg);
 }
 void _new_stream()
 {
@@ -379,7 +379,7 @@ void _new_stream()
 	assert(strcmp(pfNone, pStream->source) == 0);
 
 	_output_stream_info(pStream);
-	Stream.free(pStream);
+	Stream.dispose(pStream);
 }
 void _open_file_stream()
 {
@@ -393,5 +393,5 @@ void _open_file_stream()
 	assert(Stream.is_open(pStream));
 
 	_output_stream_info(pStream);
-	Stream.free(pStream);
+	Stream.dispose(pStream);
 }
