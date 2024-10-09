@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef DEBUG
-#define DEBUG 1
-#endif
-
 #include "../open/testing/test.h"
 #include "alloc_test.h"
 

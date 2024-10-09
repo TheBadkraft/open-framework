@@ -32,18 +32,18 @@ struct set_enumerator
     handle *element;
     object current;
 };
-struct coll_iterator
+struct query_iterator
 {
     struct set_enumerator *enumer;
-    comparator comparer;
+    bool (*compare)(object, object);
 };
 
 //  basic element bucket
 typedef struct set_collection *collection;
 //  basic element enumerator
 typedef struct set_enumerator *enumerator;
-//  element comparer enumeration
-typedef struct set_iterator *iterator;
+//  basic query iterator
+typedef struct query_iterator *iterator;
 
 extern const struct ICollection
 {
@@ -51,8 +51,10 @@ extern const struct ICollection
     void (*dispose)(collection);
     size_t (*count)(collection);
     size_t (*capacity)(collection);
-    bool (*add)(collection, object);
+    object (*add)(collection, object);
+    object (*remove)(iterator, object);
     enumerator (*get_enumerator)(collection);
+    bool (*get_queryable)(collection, iterator *);
 } Collection;
 extern const struct IEnumerator
 {
@@ -60,5 +62,9 @@ extern const struct IEnumerator
     void (*reset)(enumerator);
     void (*dispose)(enumerator);
 } Enumerator;
+extern const struct IIterator
+{
+    void (*dispose)(iterator);
+} Iterator;
 
 #endif //  _COLLECTION_H

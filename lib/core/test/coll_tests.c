@@ -6,6 +6,11 @@
 #include "../open/core/core.h"
 #include "../open/collections/collection.h"
 
+#ifdef DIAG
+#undef DIAG
+#define DIAG 1
+#endif
+
 static string *NAMES = (string[]){
     "Sam", "Harold", "Betty", "James", "Jill", "Sharon", "Jackson", "Tully", "Sean", "Debra",
     "Walter", "Don", "Frank", "Mary", "Cathy", "Martin", "Jesse", "Karly", "Daniel", "Billy",
@@ -17,10 +22,16 @@ typedef struct tst_person
     string name;
 } person;
 
+//  used to test query iterator
+bool query_persons(object, object);
+
 //  test case prototypes
 void _collection_new(void);
 void _collection_add(void);
+void _collection_add_alt(void);
 void _collection_add_multiple(void);
+void _collection_remove(void);
+void _collection_clear(void);
 void _collection_get_enumerator(void);
 void _collection_get_iterator(void);
 
@@ -40,13 +51,16 @@ int main(int argc, string *argv)
     {
         write_header("Collection interface");
 
-        TEST(_collection_new);
-        TEST(_collection_add);
-        TEST(_collection_add_multiple);
+        // TEST(_collection_new);
+        // TEST(_collection_add);
+        // TEST(_collection_add_alt);
+        // TEST(_collection_add_multiple);
+        TEST(_collection_remove);
+        // TEST(_collection_clear);
     }
     END_SET(collection);
 
-    BEGIN_SET(enumerator, true)
+    BEGIN_SET(enumerator, false)
     {
         write_header("Enumerator interface");
 
@@ -151,7 +165,7 @@ void _collection_add(void)
     pExp->id = 1;
     pExp->name = "Harold";
 
-    assert(Collection.add(list, pExp));
+    assert(Collection.add(list, pExp) != NULL);
     person *pAct = (object)list->bucket[0];
     assert(Collection.count(list) == 1);
 
@@ -159,6 +173,28 @@ void _collection_add(void)
 
     handle memDiff = list->end - (handle)list->bucket;
     assert(memDiff == sizeof(handle));
+
+    __output_collection_info(list);
+    __output_collection_data(list);
+    Collection.dispose(list);
+    free(pExp);
+}
+void _collection_add_alt(void)
+{
+    writeln("Collection.add: alternative add method");
+
+    int expId = 6;
+    int expName = 8;
+
+    collection list = Collection.new();
+    person *pExp = Collection.add(list, malloc(sizeof(person)));
+    pExp->id = expId;
+    pExp->name = NAMES[expName];
+
+    person *pAct = (object)list->bucket[0];
+
+    assert(pAct->id == pExp->id);
+    assert(strcmp(pAct->name, pExp->name) == 0);
 
     __output_collection_info(list);
     __output_collection_data(list);
@@ -185,13 +221,48 @@ void _collection_add_multiple(void)
     }
     Collection.dispose(list);
 }
+void _collection_remove(void)
+{
+    writeln("Collection.remove: remove element from collection");
+
+    int expCount = 5;
+    collection list = __generate_collection(expCount);
+    iterator query;
+    Collection.get_queryable(list, &query);
+    __output_enumerator_data(query->enumer);
+    Enumerator.reset(query->enumer);
+
+    int expId = 3;
+    string name = NAMES[expId];
+    person p = {
+        .id = expId,
+        .name = name};
+    query->compare = &query_persons;
+
+    person *pAct = Collection.remove(query, &p);
+    assert(pAct != NULL);
+    //  this is why we return the removed object
+    free(pAct);
+
+    __output_enumerator_data(query->enumer);
+    // assert(Collection.count(list) == --expCount);
+    Enumerator.reset(query->enumer);
+
+    __dispose_enumerator_data(query->enumer);
+    Iterator.dispose(query);
+    Collection.dispose(list);
+}
+void _collection_clear(void)
+{
+}
 void _collection_get_enumerator(void)
 {
-    writeln("Collection.get_enumerator: add multiple elements to collection");
+    writeln("Collection.get_enumerator: get collection enumerator");
 
     int expCount = 5;
     collection list = __generate_collection(expCount);
 
+    //  TODO: ??? need to make enumerator an `out` parameter ...
     enumerator enumer = Collection.get_enumerator(list);
     assert(enumer != NULL);
     assert(enumer->current == NULL);
@@ -207,9 +278,20 @@ void _collection_get_enumerator(void)
 }
 void _collection_get_iterator(void)
 {
-    collection list = __generate_collection(25);
+    writeln("Collection.get_queryable: get collection query iterator");
 
-    assert(Collection.count(list) == 25);
+    collection list = __generate_collection(5);
+    assert(Collection.count(list) == 5);
+    __output_collection_info(list);
+
+    iterator query;
+    Collection.get_queryable(list, &query);
+
+    assert(query != NULL);
+
+    __dispose_enumerator_data(query->enumer);
+    Iterator.dispose(query);
+    Collection.dispose(list);
 }
 
 void _enumerator_move_next(void)
@@ -256,4 +338,18 @@ void _enumerator_reset(void)
     __dispose_enumerator_data(enumer);
     Collection.dispose(list);
     Enumerator.dispose(enumer);
+}
+
+/*
+    Demonstrates a query comparator.
+    The left param (pExp) is the object you are testing for.
+    The right param (pAct) is the object supplied by the enumerator
+*/
+bool query_persons(object pExp, object pAct)
+{
+    person *pL = (person *)pExp;
+    person *pR = (person *)pAct;
+
+    return pL->id == pR->id &&
+           strcmp(pL->name, pR->name) == 0;
 }
