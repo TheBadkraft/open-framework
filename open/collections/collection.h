@@ -13,37 +13,48 @@ typedef handle *array;
 //  we always want to keep an empty element at the end
 static const handle EMPTY_ELEMENT = 0;
 
+extern const struct set_cap
+{
+    handle cap;
+} CAP;
+
 typedef bool (*comparator)(object, object);
 
-struct coll
+struct set_collection
 {
-    array list;
+    array bucket;
+    handle end;
     size_t capacity;
-    handle last;
 };
-struct coll_enumerator
+struct set_enumerator
 {
-    struct coll *coll;
+    struct set_collection *list;
     handle *element;
     object current;
 };
-struct coll_iterator
+struct query_iterator
 {
-    handle current;
-    comparator compare;
+    struct set_enumerator *enumer;
+    bool (*compare)(object, object);
 };
 
-typedef struct coll *collection;
-typedef struct coll_enumerator *enumerator;
-typedef struct coll_iterator *iterator;
+//  basic element bucket
+typedef struct set_collection *collection;
+//  basic element enumerator
+typedef struct set_enumerator *enumerator;
+//  basic query iterator
+typedef struct query_iterator *iterator;
 
 extern const struct ICollection
 {
-    collection (*new)(int cap);
+    collection (*new)(void);
     void (*dispose)(collection);
     size_t (*count)(collection);
-    bool (*add)(collection, object);
+    size_t (*capacity)(collection);
+    object (*add)(collection, object);
+    object (*remove)(iterator, object);
     enumerator (*get_enumerator)(collection);
+    bool (*get_queryable)(collection, iterator *);
 } Collection;
 extern const struct IEnumerator
 {
@@ -51,4 +62,9 @@ extern const struct IEnumerator
     void (*reset)(enumerator);
     void (*dispose)(enumerator);
 } Enumerator;
+extern const struct IIterator
+{
+    void (*dispose)(iterator);
+} Iterator;
+
 #endif //  _COLLECTION_H
