@@ -3,7 +3,13 @@
 
 #include "open/collections/collection.h"
 #include "open/core/allocator.h"
-#include "open/core/diagnostics.h"
+
+#if NDEBUG
+#ifdef DEBUG
+#undef DEBUG
+#define DEBUG 0
+#endif
+#endif
 
 const float RESIZE_THRESHOLD = .75F;
 const size_t HANDLE_SIZE = sizeof(handle);
@@ -26,13 +32,14 @@ const struct set_cap CAP = {
         [ ] copy-to
         [ ] copy-from
         [ ] add-range
-        [ ] insert-at
-        [ ] remove-at
+        [!] insert-at
+        [!] remove-at
         [ ] get-at
         [ ] alloc
         [x] add (change to return the object added instead of bool)
       II. enhancements
         [x] enhance collection->capacity
+        [!] `add_item` to call `array_insert_at`
         [ ] implement a yield pattern
         [ ] replace enumerator->list with ref id
         [ ] internally manage enumerator ref properties
@@ -41,9 +48,9 @@ const struct set_cap CAP = {
 
 void _array_allocate(array *, size_t *, size_t);
 size_t _array_resize(array *);
+handle _array_remove_at(array, size_t);
 handle *_array_get_cap_loc(array, size_t);
 bool _array_at_threshold(size_t, size_t);
-handle _array_remove_at(array, size_t);
 
 collection list_new(void);
 void list_dispose(collection);
@@ -84,13 +91,38 @@ size_t _array_resize(array *list)
     //  TODO ...
     return -1;
 }
+/// @brief expands array creating empty element at the specified index
+/// @param list current array
+/// @param index element location
+/// @param end (ref) end element handle
+/// @param capacity array capacity
+/// @return TRUE if empty element created; otherwise FALSE
+bool _array_insert_at(array list, size_t index, handle *end, size_t capacity)
+{
+}
+/// @brief condenses array to remove the element at the specified index
+/// @param list current array
+/// @param index element location to be removed
+/// @return handle of the end element
+handle _array_remove_at(array list, size_t index)
+{
+    handle *current = (list + index);
+    while (*(++current) != EMPTY_ELEMENT)
+    {
+        *(list + index) = *current;
+        ++index;
+    }
+
+    *(list + index) = EMPTY_ELEMENT;
+    return (handle)(list + index);
+}
 /// @brief get the array's end cap element location
 /// @param list the current array
 /// @param count array element count
 /// @return the cap object's element location
 handle *_array_get_cap_loc(array list, size_t count)
 {
-#ifdef DEBUG
+#if DEBUG
     printf("===== *** WARNING: calc array cap location *** =====\n\n");
 #endif
 
@@ -118,33 +150,6 @@ bool _array_at_threshold(size_t count, size_t capacity)
     size_t ratio = count / capacity;
     return ratio > RESIZE_THRESHOLD;
 }
-/// @brief removes item from array using handle
-/// @param list current array
-/// @param index element location to be removed
-/// @return handle of the end element
-handle _array_remove_at(array list, size_t index)
-{
-    handle *current = (list + index);
-    printf("removing at [%ld]: [%p (%ld)]\n", index, (list + index), (handle) * (list + index));
-
-    while (*(++current) != EMPTY_ELEMENT)
-    {
-        printf("moving: [%p (%ld)] -> [%ld: %p]\n", current, (handle)*current, index, (list + index));
-
-        *(list + index) = *current;
-
-        printf("replaced: [%ld] <- [%p (%ld)]\n", index, (list + index), (handle) * (list + index));
-
-        ++index;
-    }
-
-    *(list + index) = EMPTY_ELEMENT;
-
-    printf("replaced: [%ld] <- [%p (%ld)]\n", index, (list + index), (handle) * (list + index));
-
-    handle end = (handle)(list + index);
-    return end;
-}
 
 /// @brief construct a new collection object
 /// @return collection object; NULL if fail
@@ -161,10 +166,10 @@ collection list_new(void)
         list->end = (handle)(list->bucket);
         list->capacity = capacity;
 
-        /*  -- debugging checks
-            handle *cap = _array_get_cap_loc(list->bucket, 0);
-            printf("%p ... %p ... %p (%ld)\n", list->bucket, (object)list->end, cap, list_capacity(list));
-         */
+#if DEBUG
+        handle *cap = _array_get_cap_loc(list->bucket, 0);
+        printf("%p ... %p ... %p (%ld)\n", list->bucket, (object)list->end, cap, list_capacity(list));
+#endif
     }
 
     return list;
@@ -191,13 +196,15 @@ size_t list_count(collection list)
 
     return memDiff / HANDLE_SIZE;
 }
-/// @brief re-calculates collection capacity
+/// @brief if DEBUG, re-calculates collection capacity; otherwise returns capacity
 /// @param list current collection
 /// @return collection capacity
 size_t list_capacity(collection list)
 {
+#if DEBUG
     handle *cap = _array_get_cap_loc(list->bucket, list_count(list));
     list->capacity = (--cap) - list->bucket;
+#endif
 
     return list->capacity;
 }
@@ -217,9 +224,9 @@ object list_add_item(collection list, object item)
     (*(list->bucket + count)) = (handle)item;
     list->end += HANDLE_SIZE;
 
-    // #if DIAG == 1
+#if DEBUG
     printf("(%p ... %p ... %p) <- [%p (%ld])\n", list->bucket, (list->bucket + count), (object)(list->end), item, (handle)item);
-    // #endif
+#endif
 
     return item;
 }
@@ -305,9 +312,9 @@ bool enumer_move_next(enumerator pEnumerator)
         return false;
     }
 
-    // #if DIAG
-    // printf("move next --> %p\n", current);
-    // #endif
+#if DEBUG
+    printf("move next --> %p\n", current);
+#endif
 
     pEnumerator->element = current;
     pEnumerator->current = (object)*current;

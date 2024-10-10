@@ -7,7 +7,10 @@
 #include "types.h"
 #include "string.h"
 #include "version.h"
-#include "diagnostics.h"
+
+// #ifndef DEBUG
+// #define DEBUG 1
+// #endif
 
 #ifndef NULL
 #define NULL ((void *)0)

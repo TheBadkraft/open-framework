@@ -6,11 +6,6 @@
 #include "../open/core/core.h"
 #include "../open/collections/collection.h"
 
-#ifdef DIAG
-#undef DIAG
-#define DIAG 1
-#endif
-
 static string *NAMES = (string[]){
     "Sam", "Harold", "Betty", "James", "Jill", "Sharon", "Jackson", "Tully", "Sean", "Debra",
     "Walter", "Don", "Frank", "Mary", "Cathy", "Martin", "Jesse", "Karly", "Daniel", "Billy",
@@ -47,20 +42,24 @@ collection __generate_collection(int);
 
 int main(int argc, string *argv)
 {
+#if DEBUG
+    writeln("DIAGNOSTICS ENABLED");
+#endif
+
     BEGIN_SET(collection, true)
     {
         write_header("Collection interface");
 
-        // TEST(_collection_new);
-        // TEST(_collection_add);
-        // TEST(_collection_add_alt);
-        // TEST(_collection_add_multiple);
+        TEST(_collection_new);
+        TEST(_collection_add);
+        TEST(_collection_add_alt);
+        TEST(_collection_add_multiple);
         TEST(_collection_remove);
-        // TEST(_collection_clear);
+        TEST(_collection_clear);
     }
     END_SET(collection);
 
-    BEGIN_SET(enumerator, false)
+    BEGIN_SET(enumerator, true)
     {
         write_header("Enumerator interface");
 
@@ -70,7 +69,7 @@ int main(int argc, string *argv)
     }
     END_SET(enumerator);
 
-    BEGIN_SET(iterator, false)
+    BEGIN_SET(iterator, true)
     {
         write_header("Iterator interface");
 

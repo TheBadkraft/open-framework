@@ -25,7 +25,7 @@
             ],
             "preLaunchTask": "build debug",
             "miDebuggerPath": "/usr/bin/gdb",
-            "miDebuggerArgs": "${workspaceFolder}"
+            "miDebuggerArgs": "${workspaceFolder}",
         },
         {   "name": "launch",
             "type": "cppdbg",

@@ -19,12 +19,13 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"detail": "compiler: gcc"
+			"detail": "compiler: gcc",
 		},
 		{   "label": "build so",
 			"type": "cppbuild",
 			"command": "/usr/bin/gcc",
 			"args": [
+				"-DNDEBUG",
 				"-shared",
 				"-fpic",
 				"-o",

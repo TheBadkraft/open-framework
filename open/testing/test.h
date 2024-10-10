@@ -10,15 +10,15 @@
 #include "../except/Except.h"
 #include "../except/Assert.h"
 
-int test_count = 0;
-int pass_count = 0;
-int set_count = 0;
+static int test_count = 0;
+static int pass_count = 0;
+static int set_count = 0;
 
-void writeln(string);
-void writefln(const string, ...);
-void vwritefln(const string, va_list);
+static void writeln(string);
+static void writefln(const string, ...);
+static void vwritefln(const string, va_list);
 
-bool doTests = true;
+static bool doTests = true;
 
 #define BEGIN_SET(__test_set, __do_tests)                                    \
     {                                                                        \
@@ -79,18 +79,18 @@ bool doTests = true;
     writefln("Total Tests: %29d", test_count); \
     writefln("Tests PASS:  %29d", pass_count); \
 })
-void write_header(char *header)
+static void write_header(char *header)
 {
     writefln("%s", header);
     puts("===================================================");
 }
 
-void writeln(char *line)
+static void writeln(char *line)
 {
     printf("%s", line);
     puts("");
 }
-void writefln(const string format, ...)
+static void writefln(const string format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -108,24 +108,24 @@ void writefln(const string format, ...)
     vwritefln(format, args);
     va_end(args);
 }
-void vwritefln(const string format, va_list args)
+static void vwritefln(const string format, va_list args)
 {
     vprintf(format, args);
     puts("");
 }
 
 //  utility definitions ...
-bool __test_path_exists(string pPath)
+static bool __test_path_exists(string pPath)
 {
     return access(pPath, F_OK) == 0 ? true : false;
 }
 
-const struct Test_Utils
+static struct Test_Utils
 {
     bool (*path_exists)(string);
 } Utils;
 
-const struct Test_Utils Utils = {
+static struct Test_Utils Utils = {
     .path_exists = &__test_path_exists};
 
 #endif //  _TESTING_H

@@ -5,7 +5,6 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": ["DEBUG=1"],
             "cStandard": "gnu17",
             "intelliSenseMode": "gcc-x64",
             "browse": {
@@ -14,14 +13,19 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true
             },
-            "compilerPath": "/usr/bin/gcc"
+            "compilerPath": "/usr/bin/gcc",
+            "defines": [
+                "NDEBUG"
+            ]
         },
         {
             "name": "release",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": ["DEBUG=1"],
+            "defines": [
+                "DEBUG=0"
+            ],
             "cStandard": "gnu17",
             "intelliSenseMode": "gcc-x64",
             "browse": {
