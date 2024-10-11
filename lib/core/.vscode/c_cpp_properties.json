@@ -15,7 +15,7 @@
             },
             "compilerPath": "/usr/bin/gcc",
             "defines": [
-                "NDEBUG"
+                "DEBUG=1"
             ]
         },
         {

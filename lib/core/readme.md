@@ -110,5 +110,13 @@ Debugging the `remove` function:
 > ==========================================   [PASS]
 > ```
 
+Advantages of this list implementation:
+ - *enumeration* function
+ - *query iterator*
+ - uses pointer math and handles (`uintptr_t`)
+ - facilitates the implementation of a `swap` function 
+   *with enumerator & query iterator facilitates*:
+   - static sorting (rearrange list order)
+   - dynamic sorting (without rearranging list order)
 
 

@@ -25,6 +25,7 @@ struct set_collection
     array bucket;
     handle end;
     size_t capacity;
+    comparator comparer;
 };
 struct set_enumerator
 {
@@ -35,7 +36,7 @@ struct set_enumerator
 struct query_iterator
 {
     struct set_enumerator *enumer;
-    bool (*compare)(object, object);
+    comparator comparer;
 };
 
 //  basic element bucket
@@ -52,9 +53,10 @@ extern const struct ICollection
     size_t (*count)(collection);
     size_t (*capacity)(collection);
     object (*add)(collection, object);
-    object (*remove)(iterator, object);
+    object (*remove)(collection, object);
     enumerator (*get_enumerator)(collection);
     bool (*get_queryable)(collection, iterator *);
+    bool (*query)(collection, object, object *);
 } Collection;
 extern const struct IEnumerator
 {

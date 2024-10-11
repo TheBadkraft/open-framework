@@ -6,6 +6,10 @@
 #include "../open/core/core.h"
 #include "../open/collections/collection.h"
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
 static string *NAMES = (string[]){
     "Sam", "Harold", "Betty", "James", "Jill", "Sharon", "Jackson", "Tully", "Sean", "Debra",
     "Walter", "Don", "Frank", "Mary", "Cathy", "Martin", "Jesse", "Karly", "Daniel", "Billy",
@@ -33,17 +37,19 @@ void _collection_get_iterator(void);
 void _enumerator_move_next(void);
 void _enumerator_reset(void);
 
+void _collection_query_data(void);
+
 //  utility prototypes
 void __output_collection_info(collection);
 void __output_collection_data(collection);
+void __dispose_data(collection);
 void __output_enumerator_data(enumerator);
-void __dispose_enumerator_data(enumerator);
 collection __generate_collection(int);
 
 int main(int argc, string *argv)
 {
 #if DEBUG
-    writeln("DIAGNOSTICS ENABLED");
+    writeln("DEBUG ENABLED");
 #endif
 
     BEGIN_SET(collection, true)
@@ -74,6 +80,7 @@ int main(int argc, string *argv)
         write_header("Iterator interface");
 
         TEST(_collection_get_iterator);
+        TEST(_collection_query_data);
     }
     END_SET(iterator);
 
@@ -98,7 +105,7 @@ void __output_collection_data(collection list)
     {
         int i = hPtr - list->bucket;
         person *pData = (person *)(*hPtr);
-        writefln("[%d] (%p : %p) person: [%d] %s", i, hPtr, (object)list->end, pData->id, pData->name);
+        writefln("[%d] [%p (%p): %p] person: [%d] %s", i, hPtr, (object)(*hPtr), (object)list->end, pData->id, pData->name);
 
         ++hPtr;
     }
@@ -116,12 +123,14 @@ void __output_enumerator_data(enumerator enumer)
         ++i;
     }
 }
-void __dispose_enumerator_data(enumerator enumer)
+void __dispose_data(collection list)
 {
+    enumerator enumer = Collection.get_enumerator(list);
     while (Enumerator.next(enumer))
     {
         free(enumer->current);
     }
+    Enumerator.dispose(enumer);
 }
 collection __generate_collection(int count)
 {
@@ -226,30 +235,31 @@ void _collection_remove(void)
 
     int expCount = 5;
     collection list = __generate_collection(expCount);
-    iterator query;
-    Collection.get_queryable(list, &query);
-    __output_enumerator_data(query->enumer);
-    Enumerator.reset(query->enumer);
+    list->comparer = &query_persons;
+    __output_collection_data(list);
+    __output_collection_info(list);
 
     int expId = 3;
     string name = NAMES[expId];
     person p = {
         .id = expId,
         .name = name};
-    query->compare = &query_persons;
 
-    person *pAct = Collection.remove(query, &p);
+    writefln("test case removing %s:", name);
+    person *pAct = Collection.remove(list, &p);
     assert(pAct != NULL);
     //  this is why we return the removed object
     free(pAct);
 
-    __output_enumerator_data(query->enumer);
-    // assert(Collection.count(list) == --expCount);
-    Enumerator.reset(query->enumer);
+    __output_collection_data(list);
+    __output_collection_info(list);
+    assert(Collection.count(list) == --expCount);
 
-    __dispose_enumerator_data(query->enumer);
-    Iterator.dispose(query);
+    __dispose_data(list);
     Collection.dispose(list);
+}
+void _collection_insert(void)
+{
 }
 void _collection_clear(void)
 {
@@ -288,7 +298,7 @@ void _collection_get_iterator(void)
 
     assert(query != NULL);
 
-    __dispose_enumerator_data(query->enumer);
+    __dispose_data(list);
     Iterator.dispose(query);
     Collection.dispose(list);
 }
@@ -334,9 +344,27 @@ void _enumerator_reset(void)
 
     __output_enumerator_data(enumer);
     Enumerator.reset(enumer);
-    __dispose_enumerator_data(enumer);
+    __dispose_data(list);
     Collection.dispose(list);
     Enumerator.dispose(enumer);
+}
+
+void _collection_query_data(void)
+{
+    writeln("Collection.query: retrieve object from collection");
+
+    int expCount = 11;
+    collection list = __generate_collection(expCount);
+    //  give the collection a default comparer
+    list->comparer = &query_persons;
+
+    int expId = 7;
+    string name = NAMES[expId];
+    person pExp = {.id = expId};
+    person *pAct;
+
+    assert(Collection.query(list, &pExp, (void **)&pAct));
+    writefln("(%p : %p) person: [%d] %s", list->bucket, pAct, pAct->id, pAct->name);
 }
 
 /*
@@ -349,6 +377,5 @@ bool query_persons(object pExp, object pAct)
     person *pL = (person *)pExp;
     person *pR = (person *)pAct;
 
-    return pL->id == pR->id &&
-           strcmp(pL->name, pR->name) == 0;
+    return pL->id == pR->id;
 }

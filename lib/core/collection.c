@@ -4,12 +4,7 @@
 #include "open/collections/collection.h"
 #include "open/core/allocator.h"
 
-#if NDEBUG
-#ifdef DEBUG
-#undef DEBUG
-#define DEBUG 0
-#endif
-#endif
+#define DIAG 0
 
 const float RESIZE_THRESHOLD = .75F;
 const size_t HANDLE_SIZE = sizeof(handle);
@@ -48,7 +43,8 @@ const struct set_cap CAP = {
 
 void _array_allocate(array *, size_t *, size_t);
 size_t _array_resize(array *);
-handle _array_remove_at(array, size_t);
+bool _array_insert_at(array, size_t, handle *, size_t);
+bool _array_remove_at(array, size_t, handle *);
 handle *_array_get_cap_loc(array, size_t);
 bool _array_at_threshold(size_t, size_t);
 
@@ -57,11 +53,14 @@ void list_dispose(collection);
 size_t list_count(collection);
 size_t list_capacity(collection);
 object list_add_item(collection, object);
-object list_remove_item(iterator, object);
+object list_remove_item(collection, object);
 enumerator list_get_enumerator(collection);
 bool list_get_queryable(collection, iterator *);
+
 bool enumer_move_next(enumerator);
 void enumer_reset(enumerator);
+
+bool iter_query(iterator, object);
 
 /// @brief allocate memory for the current array list
 /// @param list     the target list
@@ -99,22 +98,34 @@ size_t _array_resize(array *list)
 /// @return TRUE if empty element created; otherwise FALSE
 bool _array_insert_at(array list, size_t index, handle *end, size_t capacity)
 {
+    handle *current = (list + index);
+    while (++current != (object)(*end))
+    {
+    }
 }
 /// @brief condenses array to remove the element at the specified index
 /// @param list current array
 /// @param index element location to be removed
-/// @return handle of the end element
-handle _array_remove_at(array list, size_t index)
+/// @param end (ref) array end handle; modifies ref value
+/// @return TRUE if successful; otherwise FALSE
+bool _array_remove_at(array list, size_t index, handle *end)
 {
     handle *current = (list + index);
-    while (*(++current) != EMPTY_ELEMENT)
+    while (++current != (object)(*end))
     {
         *(list + index) = *current;
         ++index;
     }
 
     *(list + index) = EMPTY_ELEMENT;
-    return (handle)(list + index);
+    bool retOk = (current - (list + index)) == 1;
+
+    if (retOk)
+    {
+        (*end) = (handle)(list + index);
+    }
+
+    return retOk;
 }
 /// @brief get the array's end cap element location
 /// @param list the current array
@@ -122,7 +133,7 @@ handle _array_remove_at(array list, size_t index)
 /// @return the cap object's element location
 handle *_array_get_cap_loc(array list, size_t count)
 {
-#if DEBUG
+#if DIAG
     printf("===== *** WARNING: calc array cap location *** =====\n\n");
 #endif
 
@@ -166,7 +177,7 @@ collection list_new(void)
         list->end = (handle)(list->bucket);
         list->capacity = capacity;
 
-#if DEBUG
+#if DIAG
         handle *cap = _array_get_cap_loc(list->bucket, 0);
         printf("%p ... %p ... %p (%ld)\n", list->bucket, (object)list->end, cap, list_capacity(list));
 #endif
@@ -201,14 +212,9 @@ size_t list_count(collection list)
 /// @return collection capacity
 size_t list_capacity(collection list)
 {
-#if DEBUG
-    handle *cap = _array_get_cap_loc(list->bucket, list_count(list));
-    list->capacity = (--cap) - list->bucket;
-#endif
-
     return list->capacity;
 }
-/// @brief add element to collection
+/// @brief add item to collection
 /// @param list current collection
 /// @param item item to add
 /// @return object being added to the collection
@@ -225,37 +231,54 @@ object list_add_item(collection list, object item)
     list->end += HANDLE_SIZE;
 
 #if DEBUG
-    printf("(%p ... %p ... %p) <- [%p (%ld])\n", list->bucket, (list->bucket + count), (object)(list->end), item, (handle)item);
+    printf("(%p ... %p ... %p) <- [%p (%ld)]\n", list->bucket, (list->bucket + count), (object)(list->end), item, (handle)item);
 #endif
 
     return item;
 }
-object list_remove_item(iterator query, object item)
+/// @brief remove item from collectin
+/// @param list current collection
+/// @param item item to remove
+/// @return object being removed from the collectino
+object list_remove_item(collection list, object item)
 {
     handle *element = NULL;
     object pElement = NULL;
-    bool retFlag = false;
 
-    while (!retFlag && Enumerator.next(query->enumer))
+    iterator query;
+    if (list_get_queryable(list, &query))
     {
-        if (query->compare(item, query->enumer->current))
+        bool retFound = iter_query(query, item);
+        if (retFound)
         {
             element = query->enumer->element;
-            retFlag = true;
+            pElement = (object)*element;
+
+#if DEBUG
+            printf("before remove:\n");
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", element - list->bucket, list->bucket, element, (object)(list->end), pElement, (handle)pElement);
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", (element - list->bucket + 1), list->bucket, (element + 1), (object)(list->end), (object) * (element + 1), (handle)((object) * (element + 1)));
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", (element - list->bucket + 2), list->bucket, (element + 2), (object)(list->end), (object) * (element + 2), (handle)((object) * (element + 2)));
+#endif
+
+            if (!_array_remove_at(list->bucket, element - list->bucket, &(list->end)))
+            {
+                //  we have a problem ...
+                printf("_array_remove_at fail\n");
+                printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", element - list->bucket, list->bucket, element, (object)(list->end), pElement, (handle)pElement);
+
+                return NULL;
+            }
+
+#if DEBUG
+            printf("after remove:\n");
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", element - list->bucket, list->bucket, element, (object)(list->end), pElement, (handle)pElement);
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", (element - list->bucket + 1), list->bucket, (element + 1), (object)(list->end), (object) * (element + 1), (handle)((object) * (element + 1)));
+            printf("[%ld](%p ... %p ... %p) <- [%p (%ld)]\n", (element - list->bucket + 2), list->bucket, (element + 2), (object)(list->end), (object) * (element + 2), (handle)((object) * (element + 2)));
+#endif
         }
     }
-
-    if (retFlag)
-    {
-        pElement = (object)(*element);
-        collection list = query->enumer->list;
-        handle end = _array_remove_at(list->bucket, element - list->bucket);
-
-        list->end = end;
-    }
-
-    //  we are nice enough to reset the enumerator here
-    Enumerator.reset(query->enumer);
+    Allocator.dealloc(query);
 
     return pElement;
 }
@@ -283,11 +306,35 @@ bool list_get_queryable(collection list, iterator *pIterator)
         if ((*pIterator))
         {
             (*pIterator)->enumer = pEnumerator;
+            //  set the default comparator
+            (*pIterator)->comparer = list->comparer;
         }
     }
 
     return ((*pIterator) != NULL);
 }
+/// @brief query list
+/// @param list current collection
+/// @param item predicate criteria
+/// @param result object result
+/// @return TRUE if found; otherwise FALSE
+bool list_query(collection list, object item, object *result)
+{
+    handle *element = NULL;
+    object pElement = NULL;
+    bool retFound = false;
+
+    iterator query;
+    if (list_get_queryable(list, &query))
+    {
+        retFound = iter_query(query, item);
+        (*result) = retFound ? query->enumer->current : NULL;
+    };
+    Allocator.dealloc(query);
+
+    return retFound;
+}
+//  ==================================================
 
 /// @brief advance enumerator one element
 /// @param pEnumerator current enumerator
@@ -312,7 +359,7 @@ bool enumer_move_next(enumerator pEnumerator)
         return false;
     }
 
-#if DEBUG
+#if DIAG
     printf("move next --> %p\n", current);
 #endif
 
@@ -334,6 +381,7 @@ void enumer_dispose(enumerator pEnumerator)
 {
     Allocator.dealloc(pEnumerator);
 }
+//  ==================================================
 
 /// @brief dispose of the query iterator
 /// @param pIterator current iterator
@@ -344,6 +392,21 @@ void iter_dispose(iterator pIterator)
     Allocator.dealloc(pIterator);
     pIterator = NULL;
 }
+bool iter_query(iterator query, object item)
+{
+    bool retFound = false;
+
+    while (!retFound && Enumerator.next(query->enumer))
+    {
+        if (query->comparer(item, query->enumer->current))
+        {
+            retFound = true;
+        }
+    }
+
+    return retFound;
+}
+//  ==================================================
 
 const struct ICollection Collection = {
     .new = &list_new,
@@ -354,6 +417,7 @@ const struct ICollection Collection = {
     .remove = &list_remove_item,
     .get_enumerator = &list_get_enumerator,
     .get_queryable = &list_get_queryable,
+    .query = &list_query,
 };
 const struct IEnumerator Enumerator = {
     .next = &enumer_move_next,

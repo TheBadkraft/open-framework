@@ -12,6 +12,12 @@
 				"${workspaceFolder}/*.c",
 				"-l_except"
 			],
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"showReuseMessage": false,
+				"clear": false
+			},
 			"problemMatcher": [
 				"$gcc"
 			],
